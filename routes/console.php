@@ -33,7 +33,8 @@ Artisan::command('cec:health', function () {
         if (! Schema::hasTable($table)) {
             return 1;
         }
-    }$this->info('CEC_BASE_DATOS_OK');
+    }if (__('validation.required') === 'validation.required') { $this->error('Faltan las traducciones de validación.'); return 1; }
+    $this->info('CEC_BASE_DATOS_OK');
 
     return 0;
 });

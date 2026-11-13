@@ -31,6 +31,7 @@ class WebspaceSFTP:
     def chmod(self, p, mode): return self.client.chmod(self.path(p), mode)
     def remove(self, p): return self.client.remove(self.path(p))
     def readlink(self, p): return self.client.readlink(self.path(p))
+    def rename(self, source, destination): return self.client.rename(self.path(source), self.path(destination))
     def symlink(self, source, destination):
         if source.startswith('/'):
             raise RuntimeError('Solo se permiten enlaces relativos dentro de la instalación.')
@@ -83,6 +84,17 @@ def exists(path):
 def dotenv(value):
     # Escape values for vlucas/phpdotenv. Prevent interpolation and physical newlines.
     return '"'+str(value).replace('\\','\\\\').replace('$','\\$').replace('"','\\"').replace('\n','\\n').replace('\r','\\r')+'"'
+
+loader = r"""<?php
+$root = dirname(__DIR__);
+clearstatcache(true, $root.'/current');
+$release = readlink($root.'/current');
+if (!is_string($release) || !preg_match('~^releases/[a-f0-9]{40}$~', $release)) {
+    http_response_code(503);
+    exit('Campus temporalmente no disponible.');
+}
+require $root.'/'.$release.'/public/index.php';
+"""
 
 try:
     transport=paramiko.Transport(socket.create_connection((os.environ['IONOS_HOST'].strip(),22),timeout=20))
@@ -167,9 +179,26 @@ try:
     sftp.symlink('releases/'+sha,nextlink)
     run('mv -Tf -- '+shlex.quote(nextlink)+' '+shlex.quote(current),silent=True)
     public=posixpath.join(root,'public')
-    if exists(public):
-        if not stat.S_ISLNK(sftp.lstat(public).st_mode) or sftp.readlink(public)!='current/public':raise RuntimeError('El destino public existente no es el esperado.')
-    else:sftp.symlink('current/public',public)
+    # Keep the web document root a real, stable directory. Only the loader resolves
+    # the release pointer, avoiding stale PHP/hosting symlink caches on IONOS.
+    if exists(public) and stat.S_ISLNK(sftp.lstat(public).st_mode):
+        if sftp.readlink(public)!='current/public':
+            raise RuntimeError('El destino public existente no es el esperado.')
+        stage=posixpath.join(root,'webroot-'+sha)
+        if not exists(stage):sftp.mkdir(stage,0o755)
+        run('cp -R '+shlex.quote(release+'/public/.')+' '+shlex.quote(stage+'/'),silent=True)
+        write(posixpath.join(stage,'.cec-webroot'),'managed\n')
+        write(posixpath.join(stage,'index.php'),loader,0o644)
+        sftp.remove(public)
+        sftp.rename(stage,public)
+    else:
+        if exists(public) and not exists(posixpath.join(public,'.cec-webroot')):
+            raise RuntimeError('La carpeta public no pertenece a este despliegue.')
+        if not exists(public):sftp.mkdir(public,0o755)
+        run('cp -R '+shlex.quote(release+'/public/.')+' '+shlex.quote(public+'/'),silent=True)
+        write(posixpath.join(public,'.cec-webroot'),'managed\n')
+        write(posixpath.join(public,'index.php'),loader,0o644)
+    write(posixpath.join(public,'cec-release.txt'),sha+'\n',0o644)
     print('CEC_INSTALACION_CORRECTA')
     print('CEC_DESTINO_IONOS=/campus-cec/public')
     print('CEC_WORDPRESS_CONSERVADO=/CampusCEC')
