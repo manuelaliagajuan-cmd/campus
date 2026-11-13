@@ -1,6 +1,7 @@
 """Deploy the tested app to its own IONOS directory. Never touch CampusCEC or domain settings."""
 import base64, hashlib, hmac, io, json, os, posixpath, re, secrets, shlex, socket, stat, sys, tarfile, tempfile
 import paramiko
+import urllib.request
 
 FINGERPRINT = 'SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q'
 REQUIRED = ['IONOS_HOST','IONOS_USER','IONOS_PASSWORD','IONOS_DB_HOST','IONOS_DB_NAME','IONOS_DB_USER','IONOS_DB_PASSWORD']
@@ -199,6 +200,25 @@ try:
         write(posixpath.join(public,'.cec-webroot'),'managed\n')
         write(posixpath.join(public,'index.php'),loader,0o644)
     write(posixpath.join(public,'cec-release.txt'),sha+'\n',0o644)
+    # PHP OPcache can retain the pre-migration index after an old symlinked
+    # document root is replaced. A one-use random endpoint clears only code cache;
+    # remove it immediately, and only call it when this domain serves our release.
+    try:
+        with urllib.request.urlopen(config['APP_URL']+'/cec-release.txt',timeout=15) as response:
+            active=response.read(100).decode().strip()
+        if active == sha:
+            refresh='cec-refresh-'+secrets.token_hex(24)+'.php'
+            refreshpath=posixpath.join(public,refresh)
+            code="<?php header('Cache-Control: no-store'); if (function_exists('opcache_reset')) { opcache_reset(); } clearstatcache(true); echo 'CEC_CACHE_REFRESHED';"
+            write(refreshpath,code,0o644)
+            try:
+                with urllib.request.urlopen(config['APP_URL']+'/'+refresh,timeout=20) as response:
+                    if response.read(100).decode().strip()=='CEC_CACHE_REFRESHED':
+                        print('CEC_CACHE_PHP_ACTUALIZADA')
+            finally:
+                sftp.remove(refreshpath)
+    except (OSError, ValueError):
+        print('CEC_VERIFICACION_WEB_PENDIENTE')
     print('CEC_INSTALACION_CORRECTA')
     print('CEC_DESTINO_IONOS=/campus-cec/public')
     print('CEC_WORDPRESS_CONSERVADO=/CampusCEC')
