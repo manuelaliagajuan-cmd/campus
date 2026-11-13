@@ -1,0 +1,119 @@
+name: Comprobar conexión IONOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Primero consultar huella; después verificar acceso"
+        type: choice
+        options:
+          - consultar-huella
+          - verificar-acceso
+        default: consultar-huella
+        required: true
+      fingerprint:
+        description: "Para verificar acceso: huella SHA256 confirmada con IONOS"
+        type: string
+        required: false
+
+permissions: {}
+
+concurrency:
+  group: ionos-connection-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Preparar cliente SSH
+        run: python -m pip install --disable-pip-version-check paramiko==4.0.0
+
+      - name: Consultar identidad del servidor sin enviar la contraseña
+        if: inputs.mode == 'consultar-huella'
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+        run: |
+          python - <<'PY'
+          import os, socket, hashlib, base64, paramiko
+          host = os.environ.get("IONOS_HOST", "").strip()
+          if not host:
+              raise SystemExit("Falta el secreto IONOS_HOST.")
+          transport = None
+          try:
+              sock = socket.create_connection((host, 22), timeout=20)
+              transport = paramiko.Transport(sock)
+              transport.start_client(timeout=20)
+              key = transport.get_remote_server_key()
+              fingerprint = "SHA256:" + base64.b64encode(hashlib.sha256(key.asbytes()).digest()).decode().rstrip("=")
+              print("Tipo de clave:", key.get_name())
+              print("Huella observada:", fingerprint)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                  f.write("## Identidad SSH de IONOS\n\nTipo: `" + key.get_name() + "`\n\nHuella observada: `" + fingerprint + "`\n\nNo se ha enviado la contraseña ni se ha iniciado sesión. Confirma esta huella con IONOS o con una conexión SSH previamente verificada antes de ejecutar verificar-acceso.\n")
+          except (OSError, paramiko.SSHException):
+              raise SystemExit("No se pudo consultar la identidad SSH. Revisa el host y la disponibilidad del puerto 22.")
+          finally:
+              if transport:
+                  transport.close()
+          PY
+
+      - name: Verificar acceso y versiones disponibles
+        if: inputs.mode == 'verificar-acceso'
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+          IONOS_USER: ${{ secrets.IONOS_USER }}
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+          EXPECTED_FINGERPRINT: ${{ inputs.fingerprint }}
+        run: |
+          python - <<'PY'
+          import os, socket, hashlib, base64, hmac, re, paramiko
+          host = os.environ.get("IONOS_HOST", "").strip()
+          user = os.environ.get("IONOS_USER", "").strip()
+          password = os.environ.get("IONOS_PASSWORD", "")
+          expected = os.environ.get("EXPECTED_FINGERPRINT", "").strip()
+          if not all([host, user, password]):
+              raise SystemExit("Falta alguno de los tres secretos IONOS.")
+          if not re.fullmatch(r"SHA256:[A-Za-z0-9+/]{43}", expected):
+              raise SystemExit("Introduce una huella SSH SHA256 verificada antes de conectar.")
+          transport = None
+          try:
+              sock = socket.create_connection((host, 22), timeout=20)
+              transport = paramiko.Transport(sock)
+              transport.start_client(timeout=20)
+              key = transport.get_remote_server_key()
+              actual = "SHA256:" + base64.b64encode(hashlib.sha256(key.asbytes()).digest()).decode().rstrip("=")
+              if not hmac.compare_digest(actual, expected):
+                  raise SystemExit("La identidad del servidor no coincide. No se ha enviado la contraseña.")
+              transport.auth_password(user, password, fallback=False)
+              channel = transport.open_session(timeout=20)
+              channel.settimeout(30)
+              channel.exec_command("printf 'Acceso SSH correcto\\n'; for p in php php8.2 php8.3 php8.4 /usr/bin/php8.2-cli /usr/bin/php8.3-cli /usr/bin/php8.4-cli; do if command -v \"$p\" >/dev/null 2>&1; then \"$p\" -r 'echo PHP_VERSION, PHP_EOL;' 2>/dev/null; fi; done; if command -v composer >/dev/null 2>&1; then printf 'Composer disponible\\n'; else printf 'Composer no encontrado en PATH\\n'; fi")
+              result = bytearray()
+              while True:
+                  chunk = channel.recv(4096)
+                  if not chunk:
+                      break
+                  result.extend(chunk)
+                  if len(result) > 32768:
+                      raise SystemExit("Respuesta inesperadamente larga; diagnóstico detenido.")
+              status = channel.recv_exit_status()
+              text = result.decode("utf-8", errors="replace")
+              # Never print raw remote errors or credentials.
+              safe = []
+              for line in text.splitlines():
+                  if line in ["Acceso SSH correcto", "Composer disponible", "Composer no encontrado en PATH"] or re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+[A-Za-z0-9.+~-]*", line):
+                      safe.append(line)
+              print("\n".join(safe))
+              if status != 0:
+                  raise SystemExit("El diagnóstico remoto no terminó correctamente.")
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                  f.write("## Diagnóstico IONOS\n\n" + "\n".join("- " + line for line in safe) + "\n\nSolo se han ejecutado consultas. No se han subido archivos, instalado programas ni cambiado WordPress.\n")
+          except paramiko.AuthenticationException:
+              raise SystemExit("IONOS rechazó la autenticación. Revisa usuario y contraseña en los secretos.")
+          except (OSError, paramiko.SSHException):
+              raise SystemExit("No se pudo completar el diagnóstico SSH. Revisa conectividad y acceso SSH en IONOS.")
+          finally:
+              if transport:
+                  transport.close()
+          PY
