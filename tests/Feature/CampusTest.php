@@ -199,4 +199,19 @@ class CampusTest extends TestCase
         $this->assertNull(YouTube::id('https://evil.test/watch?v=dQw4w9WgXcQ'));
         $this->assertNull(YouTube::id('https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ'));
     }
+    public function test_missing_question_prompt_has_a_clear_spanish_message(): void
+    {
+        app()->setLocale('es');
+        $u = $this->person('teacher');
+        $c = $this->course($u);
+        $questions = $this->questions();
+        $questions[0]['prompt'] = '';
+        $response = $this->actingAs($u)->from('/docente/actividades/nueva')->post('/docente/actividades', [
+            'title' => 'Prueba', 'course_id' => $c->id, 'mode' => 'practice',
+            'max_attempts' => 0, 'pass_percent' => 70, 'questions_json' => json_encode($questions),
+        ]);
+        $response->assertSessionHasErrors(['questions.0.prompt' => 'El campo enunciado de la pregunta 1 es obligatorio.']);
+        $this->get('/docente/actividades/nueva')->assertOk()->assertSee('El campo enunciado de la pregunta 1 es obligatorio.')->assertDontSee('validation.required');
+        $this->assertDatabaseCount('activities', 0);
+    }
 }

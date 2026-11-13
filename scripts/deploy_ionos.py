@@ -140,7 +140,7 @@ try:
         remote_archive=posixpath.join(root,'releases',sha+'.tar.gz')
         with tempfile.TemporaryFile() as archive:
             with tarfile.open(fileobj=archive,mode='w:gz') as tar:
-                for name in ['app','artisan','bootstrap','composer.json','composer.lock','config','database','public','resources','routes','vendor']:
+                for name in ['app','artisan','bootstrap','composer.json','composer.lock','config','database','lang','public','resources','routes','vendor']:
                     def include(info):
                         if info.name.startswith('bootstrap/cache/') and not info.name.endswith('.gitignore'):return None
                         if info.name.startswith('database/') and info.name.endswith('.sqlite'):return None
