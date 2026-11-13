@@ -1,0 +1,47 @@
+name: Habilitar administrador del campus
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Correo exacto de tu cuenta ya registrada en el nuevo campus
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ionos-connection-check
+  cancel-in-progress: false
+jobs:
+  admin:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Preparar cliente
+        run: python -m pip install --disable-pip-version-check paramiko==4.0.0
+      - name: Habilitar la cuenta registrada
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+          IONOS_USER: ${{ secrets.IONOS_USER }}
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+          ADMIN_EMAIL: ${{ inputs.email }}
+        run: |
+          python - <<'PYTHON'
+          import os, socket, hashlib, base64, hmac, shlex, re, paramiko
+          email=os.environ['ADMIN_EMAIL'].strip()
+          if len(email)>190 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+",email):raise SystemExit('Correo no válido.')
+          t=None
+          try:
+              t=paramiko.Transport(socket.create_connection((os.environ['IONOS_HOST'].strip(),22),timeout=20));t.start_client(timeout=20)
+              actual='SHA256:'+base64.b64encode(hashlib.sha256(t.get_remote_server_key().asbytes()).digest()).decode().rstrip('=')
+              if not hmac.compare_digest(actual,'SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q'):raise SystemExit('La huella SSH ha cambiado.')
+              t.auth_password(os.environ['IONOS_USER'].strip(),os.environ['IONOS_PASSWORD'],fallback=False)
+              ch=t.open_session(timeout=20);ch.settimeout(40)
+              ch.exec_command('cd campus-cec/current && php artisan cec:admin '+shlex.quote(email)+' --no-interaction')
+              # Consume output without logging personally identifying information.
+              while ch.recv(4096):pass
+              if ch.recv_exit_status()!=0:raise SystemExit('No se pudo habilitar la cuenta. Regístrala primero en el nuevo campus y comprueba el correo.')
+              print('Cuenta de administración habilitada. Cierra sesión y vuelve a entrar en el campus.')
+          except (OSError,paramiko.SSHException):raise SystemExit('No se pudo completar la conexión SSH.')
+          finally:
+              if t:t.close()
+          PYTHON

@@ -1,0 +1,56 @@
+name: Comprobar e instalar Campus CEC
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: campus-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Preparar PHP y Composer
+        run: |
+          php -v
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+      - name: Pruebas de aplicación
+        run: |
+          php artisan test
+          php artisan view:cache
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: ionos-connection-check
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Preparar dependencias de producción
+        run: |
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+          python -m pip install --disable-pip-version-check paramiko==4.0.0
+      - name: Instalar en directorio independiente
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+          IONOS_USER: ${{ secrets.IONOS_USER }}
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+          IONOS_DB_HOST: ${{ secrets.IONOS_DB_HOST }}
+          IONOS_DB_NAME: ${{ secrets.IONOS_DB_NAME }}
+          IONOS_DB_USER: ${{ secrets.IONOS_DB_USER }}
+          IONOS_DB_PASSWORD: ${{ secrets.IONOS_DB_PASSWORD }}
+          CEC_MAIL_HOST: ${{ secrets.CEC_MAIL_HOST }}
+          CEC_MAIL_USER: ${{ secrets.CEC_MAIL_USER }}
+          CEC_MAIL_PASSWORD: ${{ secrets.CEC_MAIL_PASSWORD }}
+          CEC_MAIL_PORT: ${{ secrets.CEC_MAIL_PORT }}
+          CEC_MAIL_FROM: ${{ secrets.CEC_MAIL_FROM }}
+        run: python scripts/deploy_ionos.py

@@ -1,0 +1,6 @@
+@extends('layout')
+@section('title',$lesson->title)
+@section('content')<a href="{{ route('courses.show',$lesson->course) }}">← {{ $lesson->course->title }}</a><div class="eyebrow" style="margin-top:25px">{{ $lesson->unit }}</div><h1>{{ $lesson->title }}</h1>
+@if($lesson->youtube_id)<div class="video-box"><iframe src="https://www.youtube-nocookie.com/embed/{{ $lesson->youtube_id }}" title="{{ $lesson->title }}" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>@endif
+<div class="lesson-copy">{{ $lesson->content }}</div><h2>Practica lo aprendido</h2>@forelse($lesson->activities as $activity)<div class="resource"><div><h3>{{ $activity->title }}</h3><span class="pill">{{ $activity->mode==='test'?'Test evaluable':'Práctica' }}</span></div><form method="post" action="{{ route('activities.start',$activity) }}">@csrf<button type="submit">Empezar →</button></form></div>@empty<p>No hay actividades asociadas a esta lección.</p>@endforelse
+<div class="actions">@if($completed)<span class="badge">Lección completada</span>@else<form method="post" action="{{ route('lessons.complete',$lesson) }}">@csrf<button type="submit">Marcar como completada</button></form>@endif<a href="{{ route('courses.show',$lesson->course) }}">Volver al curso</a></div>@endsection

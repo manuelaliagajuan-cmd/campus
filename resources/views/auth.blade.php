@@ -1,0 +1,12 @@
+@extends('layout')
+@section('title', ['login'=>'Acceso','register'=>'Crear cuenta','forgot'=>'Recuperar acceso','reset'=>'Restablecer contraseña'][$mode])
+@section('content')<section class="auth-panel"><div class="eyebrow">Bienvenido a tu campus</div><h1>{{ ['login'=>'CONTINÚA APRENDIENDO.','register'=>'TU SIGUIENTE PASO.','forgot'=>'RECUPERA TU ACCESO.','reset'=>'TU NUEVA CONTRASEÑA.'][$mode] }}</h1><p>{{ $mode==='register'?'Crea tu cuenta de estudiante. El centro te matriculará en tus cursos.':'El espacio de aprendizaje del Centro de Estudios Campoamor.' }}</p>
+<form method="post" action="{{ match($mode){'login'=>route('login'),'register'=>route('register'),'forgot'=>route('password.email'),'reset'=>route('password.update')} }}">@csrf
+@if($mode==='register')<label class="field">Nombre completo<input name="name" autocomplete="name" required maxlength="120" value="{{ old('name') }}"></label>@endif
+@if($mode==='reset')<input type="hidden" name="token" value="{{ $token }}">@endif
+<label class="field">Correo electrónico<input type="email" name="email" autocomplete="email" required maxlength="190" value="{{ old('email',$email??'') }}"></label>
+@if($mode!=='forgot')<label class="field">Contraseña<input type="password" name="password" required autocomplete="{{ $mode==='login'?'current-password':'new-password' }}" @if($mode!=='login') minlength="12" maxlength="72" @endif></label>@endif
+@if(in_array($mode,['register','reset']))<p class="help">Al menos 12 caracteres, con letras y números.</p><label class="field">Repite la contraseña<input type="password" name="password_confirmation" autocomplete="new-password" required minlength="12" maxlength="72"></label>@endif
+@if($mode==='login')<label class="check"><input type="checkbox" name="remember" value="1"> Recordarme en este dispositivo</label>@endif
+<button type="submit">{{ ['login'=>'Entrar al campus','register'=>'Crear mi cuenta','forgot'=>'Enviar instrucciones','reset'=>'Guardar contraseña'][$mode] }} &nbsp; →</button></form>
+@if($mode==='login')<p><a href="{{ route('password.request') }}">¿Has olvidado tu contraseña?</a></p><p>¿Eres nuevo? <a href="{{ route('register') }}">Crea tu cuenta</a>.</p><p class="help">Los profesores acceden con su cuenta asignada por el centro.</p>@else<p><a href="{{ route('login') }}">Volver al acceso</a></p>@endif</section>@endsection
