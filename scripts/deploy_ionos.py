@@ -10,6 +10,34 @@ for name in REQUIRED:
 sha = os.environ.get('GITHUB_SHA','')
 if not re.fullmatch('[a-f0-9]{40}',sha):
     raise SystemExit('Identificador de versión no válido.')
+class WebspaceSFTP:
+    # IONOS can expose a chrooted SFTP root while SSH returns an absolute host path.
+    def __init__(self, client, ssh_home):
+        self.client = client
+        self.ssh_home = ssh_home.rstrip('/')
+        self.ftp_home = client.normalize('.').rstrip('/') or '/'
+
+    def path(self, value):
+        if value == self.ssh_home:
+            return self.ftp_home
+        if value.startswith(self.ssh_home + '/'):
+            return posixpath.join(self.ftp_home, value[len(self.ssh_home) + 1:])
+        raise RuntimeError('Se ha rechazado una ruta fuera del espacio web.')
+
+    def stat(self, p): return self.client.stat(self.path(p))
+    def lstat(self, p): return self.client.lstat(self.path(p))
+    def open(self, p, *args): return self.client.open(self.path(p), *args)
+    def mkdir(self, p, mode): return self.client.mkdir(self.path(p), mode)
+    def chmod(self, p, mode): return self.client.chmod(self.path(p), mode)
+    def remove(self, p): return self.client.remove(self.path(p))
+    def readlink(self, p): return self.client.readlink(self.path(p))
+    def symlink(self, source, destination):
+        if source.startswith('/'):
+            raise RuntimeError('Solo se permiten enlaces relativos dentro de la instalación.')
+        return self.client.symlink(source, self.path(destination))
+    def putfo(self, file, p): return self.client.putfo(file, self.path(p))
+    def close(self): return self.client.close()
+
 transport = None
 sftp = None
 sensitive = [os.environ[n] for n in REQUIRED]
@@ -63,10 +91,11 @@ try:
     actual='SHA256:'+base64.b64encode(hashlib.sha256(key.asbytes()).digest()).decode().rstrip('=')
     if not hmac.compare_digest(actual,FINGERPRINT):raise RuntimeError('La identidad SSH ha cambiado; no se ha enviado la contraseña.')
     transport.auth_password(os.environ['IONOS_USER'].strip(),os.environ['IONOS_PASSWORD'],fallback=False)
-    sftp=paramiko.SFTPClient.from_transport(transport)
+    raw_sftp=paramiko.SFTPClient.from_transport(transport)
     home=run('pwd -P',silent=True)
     if not home.startswith('/') or '\n' in home:raise RuntimeError('No se ha podido resolver el directorio remoto.')
-    # Ensure the SSH/SFTP roots agree and that this is the inspected webspace.
+    # Resolve both namespaces before writing anything.
+    sftp=WebspaceSFTP(raw_sftp,home)
     sftp.stat(posixpath.join(home,'CampusCEC'))
     root=posixpath.join(home,'campus-cec');marker=posixpath.join(root,'.cec-managed')
     if exists(root) and not exists(marker):raise RuntimeError('La carpeta campus-cec ya existe y no pertenece a este despliegue.')
@@ -119,8 +148,8 @@ try:
                     tar.add(name,arcname=name,filter=include)
             archive.seek(0);sftp.putfo(archive,remote_archive)
         run('tar -xzf '+shlex.quote(remote_archive)+' -C '+shlex.quote(release)+' && rm -- '+shlex.quote(remote_archive),silent=True)
-        sftp.symlink(envpath,posixpath.join(release,'.env'))
-        sftp.symlink(posixpath.join(root,'shared/storage'),posixpath.join(release,'storage'))
+        sftp.symlink('../../shared/.env',posixpath.join(release,'.env'))
+        sftp.symlink('../../shared/storage',posixpath.join(release,'storage'))
     prefix='cd '+shlex.quote(release)+' && '
     # The first migration must only run against an empty database.
     if first:
@@ -135,7 +164,7 @@ try:
     current=posixpath.join(root,'current');nextlink=posixpath.join(root,'current.next')
     if exists(current) and not stat.S_ISLNK(sftp.lstat(current).st_mode):raise RuntimeError('current existe y no es un enlace gestionado.')
     if exists(nextlink):sftp.remove(nextlink)
-    sftp.symlink(release,nextlink)
+    sftp.symlink('releases/'+sha,nextlink)
     run('mv -Tf -- '+shlex.quote(nextlink)+' '+shlex.quote(current),silent=True)
     public=posixpath.join(root,'public')
     if exists(public):
