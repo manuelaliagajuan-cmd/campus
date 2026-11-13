@@ -1,0 +1,101 @@
+name: Comprobar base de datos del campus
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ionos-connection-check
+  cancel-in-progress: false
+
+jobs:
+  database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Preparar cliente SSH
+        run: python -m pip install --disable-pip-version-check paramiko==4.0.0
+
+      - name: Verificar conexión y consultar número de tablas
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+          IONOS_USER: ${{ secrets.IONOS_USER }}
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+          IONOS_DB_HOST: ${{ secrets.IONOS_DB_HOST }}
+          IONOS_DB_NAME: ${{ secrets.IONOS_DB_NAME }}
+          IONOS_DB_USER: ${{ secrets.IONOS_DB_USER }}
+          IONOS_DB_PASSWORD: ${{ secrets.IONOS_DB_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import os, socket, hashlib, base64, hmac, json, shlex, re, paramiko
+          names = ["IONOS_HOST", "IONOS_USER", "IONOS_PASSWORD", "IONOS_DB_HOST", "IONOS_DB_NAME", "IONOS_DB_USER", "IONOS_DB_PASSWORD"]
+          missing = [name for name in names if not os.environ.get(name)]
+          if missing:
+              raise SystemExit("Faltan secretos: " + ", ".join(missing))
+          expected = "SHA256:1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q"
+          transport = None
+          php = r"""
+          $d = json_decode(stream_get_contents(STDIN), true);
+          if (!is_array($d) || !extension_loaded('pdo_mysql')) {
+              echo "PDO_MYSQL_NO_DISPONIBLE\n"; exit(2);
+          }
+          try {
+              $pdo = new PDO('mysql:host='.$d['host'].';port=3306;dbname='.$d['name'].';charset=utf8mb4', $d['user'], $d['password'], [
+                  PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                  PDO::ATTR_TIMEOUT => 15
+              ]);
+              $version = $pdo->query('SELECT VERSION()')->fetchColumn();
+              $tables = $pdo->query('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE()')->fetchColumn();
+              echo "BASE_DATOS_CONECTADA\n";
+              echo "VERSION=".preg_replace('/[^A-Za-z0-9.+~-]/', '', $version)."\n";
+              echo "TABLAS=".(int)$tables."\n";
+          } catch (Throwable $e) {
+              echo "ERROR_CONEXION_BASE_DATOS\n"; exit(3);
+          }
+          """
+          try:
+              transport = paramiko.Transport(socket.create_connection((os.environ["IONOS_HOST"].strip(), 22), timeout=20))
+              transport.start_client(timeout=20)
+              key = transport.get_remote_server_key()
+              actual = "SHA256:" + base64.b64encode(hashlib.sha256(key.asbytes()).digest()).decode().rstrip("=")
+              if not hmac.compare_digest(actual, expected):
+                  raise SystemExit("La huella SSH cambió. No se ha enviado la contraseña.")
+              transport.auth_password(os.environ["IONOS_USER"].strip(), os.environ["IONOS_PASSWORD"], fallback=False)
+              channel = transport.open_session(timeout=20)
+              channel.settimeout(45)
+              channel.exec_command("php -r " + shlex.quote(php))
+              payload = json.dumps({
+                  "host": os.environ["IONOS_DB_HOST"].strip(),
+                  "name": os.environ["IONOS_DB_NAME"].strip(),
+                  "user": os.environ["IONOS_DB_USER"].strip(),
+                  "password": os.environ["IONOS_DB_PASSWORD"]
+              })
+              channel.sendall(payload.encode("utf-8"))
+              channel.shutdown_write()
+              output = bytearray()
+              while True:
+                  chunk = channel.recv(4096)
+                  if not chunk:
+                      break
+                  output.extend(chunk)
+                  if len(output) > 16384:
+                      raise SystemExit("Respuesta inesperadamente larga.")
+              status = channel.recv_exit_status()
+              lines = []
+              for line in output.decode("utf-8", errors="replace").splitlines():
+                  if line in ["BASE_DATOS_CONECTADA", "PDO_MYSQL_NO_DISPONIBLE", "ERROR_CONEXION_BASE_DATOS"] or re.fullmatch(r"(VERSION=[A-Za-z0-9.+~-]+|TABLAS=[0-9]+)", line):
+                      lines.append(line)
+              print("\n".join(lines))
+              if status != 0 or "BASE_DATOS_CONECTADA" not in lines:
+                  raise SystemExit("No se ha confirmado la conexión. Revisa los cuatro secretos de base de datos y que php tenga PDO MySQL.")
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                  f.write("## Base de datos del campus\n\n" + "\n".join("- " + line for line in lines) + "\n\nSolo se han ejecutado consultas SELECT. Las credenciales se han enviado por la entrada estándar del canal SSH cifrado, sin escribirlas en archivos ni incluirlas en comandos o registros.\n")
+          except paramiko.AuthenticationException:
+              raise SystemExit("IONOS rechazó la autenticación SSH.")
+          except (OSError, paramiko.SSHException):
+              raise SystemExit("No se pudo completar la prueba SSH.")
+          finally:
+              if transport:
+                  transport.close()
+          PY
