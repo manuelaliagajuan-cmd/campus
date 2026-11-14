@@ -53,7 +53,7 @@ Artisan::command('cec:publish-accesses', function () {
 })->purpose('Publicar las cuentas de estudiantes para revisión privada desde Gestión');
 
 Artisan::command('cec:erp-diagnostics', function () {
-    $this->line(json_encode(ErpConnection::diagnostics(), JSON_THROW_ON_ERROR));
+    $this->line('CEC_ERP_DIAGNOSTICS='.json_encode(ErpConnection::diagnostics(), JSON_THROW_ON_ERROR));
 
     return 0;
 })->purpose('Comprobar la conexión de Gestión sin mostrar nombres, correos ni saldos');
