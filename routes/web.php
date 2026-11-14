@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccessController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampusController;
@@ -35,6 +36,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/docente/cursos/{course}/avisos', [NotificationController::class, 'store'])->name('staff.announcements.store');
         Route::delete('/docente/avisos/{announcement}', [NotificationController::class, 'destroy'])->name('staff.announcements.delete');
         Route::post('/salir', [AuthController::class, 'logout'])->name('logout');
+        Route::get('/mis-accesos', [AccessController::class, 'index'])->name('accesses');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');
         Route::get('/lecciones/{lesson}', [CampusController::class, 'lesson'])->name('lessons.show');

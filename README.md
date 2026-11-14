@@ -90,3 +90,9 @@ La cabecera permite alternar la interfaz entre español e inglés y conserva la 
 Los avisos y recordatorios se publican desde la gestión del curso. Pueden aparecer inmediatamente o a partir de la fecha indicada. Son notificaciones dentro del campus con contador de no leídas, lectura individual o conjunta; no son correos ni notificaciones push del dispositivo. Solo se muestran a los usuarios autorizados de cada curso. Los avisos programados se incorporan al consultar la página o el contador al llegar su fecha; no requieren un cron. La campana actualiza su contador aproximadamente cada minuto mientras la pestaña está visible.
 
 La migración `2026_11_14_000001_add_progress_certificates_and_notices` añade estas tablas y campos sin borrar cursos, usuarios, actividades ni intentos existentes. La raíz web es una carpeta estable; un cargador consulta el enlace de la versión para evitar que PHP sirva código anterior por la caché de rutas del alojamiento.
+
+## Índice del curso y menú personal
+
+Dentro del curso, las lecciones, actividades, intentos y materiales conservan un índice lateral por unidades. Identifica vídeo, lectura, práctica y test, resalta el elemento actual y marca las lecciones completadas y los tests superados. Puede ocultarse sin perder las respuestas; en móvil se abre como un panel. Las actividades reutilizadas conservan la unidad desde la que se accedió.
+
+El menú del avatar enlaza a aprendizaje, cursos y bonos, materiales, certificados y avisos. «Mis cursos y bonos» consulta los cursos a los que la cuenta tiene acceso realmente. Los bonos de sesiones de Gestión todavía no están sincronizados: véase [conexión con el ERP](docs/ERP-integration.md).

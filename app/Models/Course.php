@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
@@ -53,5 +54,20 @@ class Course extends Model
     public function announcements()
     {
         return $this->hasMany(Announcement::class);
+    }
+
+    public function scopeAccessibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->role === 'admin') {
+            return $query;
+        }
+
+        return $query->where(function ($allowed) use ($user) {
+            if ($user->role === 'teacher') {
+                $allowed->where('teacher_id', $user->id);
+            }
+            $method = $user->role === 'teacher' ? 'orWhere' : 'where';
+            $allowed->$method(fn ($enrolled) => $enrolled->where('published', true)->whereHas('students', fn ($students) => $students->where('users.id', $user->id)));
+        });
     }
 }

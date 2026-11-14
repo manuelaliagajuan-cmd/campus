@@ -4,6 +4,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const open = document.body.classList.toggle('menu-open');
     toggle.setAttribute('aria-expanded', String(open));
   });
+  const courseToggle = document.querySelector('.course-outline-toggle');
+  const isMobile = () => window.matchMedia('(max-width: 740px)').matches;
+  const setCourseCollapsed = collapsed => {
+    document.body.classList.toggle('course-nav-collapsed', collapsed);
+    courseToggle?.setAttribute('aria-expanded', String(!collapsed));
+    try { sessionStorage.setItem('cec:course-navigation-collapsed', String(collapsed)); } catch (_) {}
+  };
+  const closeCourseNavigation = () => {
+    if (isMobile()) {
+      document.body.classList.remove('menu-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.focus();
+    } else {
+      setCourseCollapsed(true);
+      courseToggle?.focus();
+    }
+  };
+  if (courseToggle) {
+    try { setCourseCollapsed(sessionStorage.getItem('cec:course-navigation-collapsed') === 'true'); } catch (_) {}
+    courseToggle.addEventListener('click', () => setCourseCollapsed(!document.body.classList.contains('course-nav-collapsed')));
+  }
+  document.querySelectorAll('[data-close-course-nav]').forEach(button => button.addEventListener('click', closeCourseNavigation));
+  document.addEventListener('click', event => {
+    document.querySelectorAll('.profile-menu[open], .header-language[open]').forEach(menu => { if (!menu.contains(event.target)) menu.open = false; });
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const openMenu = document.querySelector('.profile-menu[open], .header-language[open]');
+    if (openMenu) { openMenu.open = false; openMenu.querySelector('summary').focus(); }
+    else if (document.body.classList.contains('learning-course') && document.body.classList.contains('menu-open')) closeCourseNavigation();
+  });
+  const outline = document.querySelector('[data-course-outline]');
+  if (outline) {
+    const key = 'cec:course-outline:' + outline.dataset.courseOutline;
+    let saved = {};
+    try { saved = JSON.parse(sessionStorage.getItem(key) || '{}'); } catch (_) {}
+    const units = [...outline.querySelectorAll('[data-outline-unit]')];
+    units.forEach(unit => {
+      if (unit.dataset.activeUnit === 'true') unit.open = true;
+      else if (saved.open && Object.prototype.hasOwnProperty.call(saved.open, unit.dataset.outlineUnit)) unit.open = saved.open[unit.dataset.outlineUnit];
+    });
+    if (typeof saved.scroll === 'number') outline.scrollTop = saved.scroll;
+    const save = () => {
+      const open = Object.fromEntries(units.map(unit => [unit.dataset.outlineUnit, unit.open]));
+      try { sessionStorage.setItem(key, JSON.stringify({open, scroll: outline.scrollTop})); } catch (_) {}
+    };
+    units.forEach(unit => unit.addEventListener('toggle', save));
+    outline.addEventListener('scroll', save, {passive: true});
+    const reveal = () => {
+      const current = outline.querySelector('[aria-current="page"]');
+      if (!current) return;
+      const box = current.getBoundingClientRect(), viewport = outline.getBoundingClientRect();
+      if (box.top < viewport.top) outline.scrollTop -= viewport.top - box.top + 12;
+      else if (box.bottom > viewport.bottom) outline.scrollTop += box.bottom - viewport.bottom + 12;
+    };
+    window.requestAnimationFrame(reveal);
+    toggle?.addEventListener('click', () => window.requestAnimationFrame(reveal));
+    courseToggle?.addEventListener('click', () => window.requestAnimationFrame(reveal));
+  }
   document.querySelectorAll('form[data-confirm]').forEach(form => form.addEventListener('submit', event => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
   }));

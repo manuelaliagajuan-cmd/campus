@@ -3,7 +3,7 @@
 @if(in_array('ordering',array_column($questions,'type')))
 @push('head')<script src="{{ asset('assets/vendor/sortable-1.15.6.min.js') }}" defer></script>@endpush
 @endif
-@section('content')<div class="eyebrow">{{ $attempt->activity->course->title }}</div><h1>{{ $attempt->activity->title }}</h1><p>{{ __('Responde a las preguntas y envía tu actividad para consultar el resultado.') }}</p><form method="post" action="{{ route('attempts.submit',$attempt) }}">@csrf
+@section('content')<div class="eyebrow">{{ $attempt->activity->course->title }}</div><h1>{{ $attempt->activity->title }}</h1><p>{{ __('Responde a las preguntas y envía tu actividad para consultar el resultado.') }}</p><form method="post" action="{{ route('attempts.submit',['attempt'=>$attempt,'leccion'=>request()->integer('leccion')?:null]) }}">@csrf
 @foreach($questions as $i=>$q)<section class="question-card"><span class="eyebrow">{{ __('Pregunta') }} {{ $i+1 }} {{ __('de') }} {{ count($questions) }}</span><h2 class="question-title">{{ $q['prompt'] }}</h2>
 @if(in_array($q['type'],['multiple','truefalse']))@foreach($q['options'] as $n=>$option)<label class="option"><input type="radio" name="answers[{{ $i }}]" value="{{ $n }}" required @checked((string)old('answers.'.$i,'')===(string)$n)><span>{{ $option }}</span></label>@endforeach
 @elseif($q['type']==='cloze')<div class="cloze">@foreach($q['segments'] as $n=>$segment){{ $segment }}@if($n<count($q['segments'])-1)<input name="answers[{{ $i }}][{{ $n }}]" aria-label="Hueco {{ $n+1 }}" maxlength="500" required value="{{ old('answers.'.$i.'.'.$n) }}">@endif @endforeach</div>
