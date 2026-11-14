@@ -30,6 +30,28 @@ jobs:
           node --check public/assets/course-cover-editor.js
           node --check public/assets/audio-picker.js
           node --check public/assets/online-classroom.js
+      - name: Probar aula con dos navegadores y medios WebRTC reales
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ runner.temp }}/classroom.sqlite
+          CEC_BROWSER_FIXTURE: ${{ runner.temp }}/classroom-fixture.json
+        run: |
+          touch "$DB_DATABASE"
+          php artisan migrate --force
+          php tests/browser/seed.php
+          npm install --prefix "$RUNNER_TEMP/cec-browser" playwright@1.56.1 --no-audit --no-fund
+          "$RUNNER_TEMP/cec-browser/node_modules/.bin/playwright" install --with-deps chromium
+          (cd public && php -S 127.0.0.1:8782 "$GITHUB_WORKSPACE/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php") > "$RUNNER_TEMP/classroom-php.log" 2>&1 &
+          export CEC_PLAYWRIGHT_PATH="$RUNNER_TEMP/cec-browser/node_modules/playwright/index.mjs"
+          node tests/browser/classroom.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: classroom-debug
+          path: |
+            ${{ runner.temp }}/online-class-*.png
+            ${{ runner.temp }}/classroom-php.log
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test
