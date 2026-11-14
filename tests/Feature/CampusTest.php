@@ -174,7 +174,7 @@ class CampusTest extends TestCase
         $c->students()->attach($u);
         $a = $c->activities()->create(['title' => 'Mixed', 'published' => 1, 'questions' => [['type' => 'cloze', 'prompt' => 'Fill', 'text' => 'It [[secret-answer]] today.'], ['type' => 'ordering', 'prompt' => 'Order', 'items' => ['First', 'Second']]]]);
         $this->actingAs($u)->post('/actividades/'.$a->id.'/empezar');
-        $this->get('/intentos/'.Attempt::first()->id)->assertOk()->assertDontSee('secret-answer')->assertSee('draggable', false);
+        $this->get('/intentos/'.Attempt::first()->id)->assertOk()->assertDontSee('secret-answer')->assertSee('data-sortable-item', false);
     }
 
     public function test_password_reset_notification_uses_laravel_broker(): void
@@ -199,6 +199,7 @@ class CampusTest extends TestCase
         $this->assertNull(YouTube::id('https://evil.test/watch?v=dQw4w9WgXcQ'));
         $this->assertNull(YouTube::id('https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ'));
     }
+
     public function test_missing_question_prompt_has_a_clear_spanish_message(): void
     {
         app()->setLocale('es');

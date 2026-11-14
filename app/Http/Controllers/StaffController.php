@@ -38,13 +38,14 @@ class StaffController extends Controller
         $d['teacher_id'] = $r->user()->id;
         $c = Course::create($d);
 
-        return redirect()->route('staff.edit', $c)->with('status', 'Curso creado. Añade sus lecciones.');
+        return redirect()->route('staff.edit', $c)->with('status', __('Curso creado. Añade sus lecciones.'));
     }
 
     private function courseData(Request $r): array
     {
-        $d = $r->validate(['title' => 'required|string|max:180', 'description' => 'nullable|string|max:10000', 'language' => 'required|string|max:60', 'level' => 'required|string|max:20']);
+        $d = $r->validate(['title' => 'required|string|max:180', 'description' => 'nullable|string|max:10000', 'language' => 'required|string|max:60', 'level' => 'required|string|max:20', 'duration_hours' => 'nullable|numeric|min:0.5|max:2000']);
         $d['published'] = $r->boolean('published');
+        $d['certificate_enabled'] = $r->has('certificate_enabled') ? $r->boolean('certificate_enabled') : true;
 
         return $d;
     }
@@ -52,7 +53,7 @@ class StaffController extends Controller
     public function edit(Request $r, Course $course)
     {
         $this->manage($r, $course);
-        $course->load(['lessons', 'students', 'resources']);
+        $course->load(['lessons', 'students', 'resources', 'announcements']);
         $progress = Completion::whereIn('lesson_id', $course->lessons->pluck('id'))->selectRaw('user_id, COUNT(*) as total')->groupBy('user_id')->pluck('total', 'user_id');
 
         return view('staff.course', compact('course', 'progress'));
@@ -63,7 +64,7 @@ class StaffController extends Controller
         $this->manage($r, $course);
         $course->update($this->courseData($r));
 
-        return back()->with('status', 'Curso actualizado.');
+        return back()->with('status', __('Curso actualizado.'));
     }
 
     public function lessonForm(Request $r, Course $course, ?Lesson $lesson = null)
@@ -73,7 +74,7 @@ class StaffController extends Controller
             abort_unless($lesson->course_id === $course->id, 404);
         }
 
-return view('staff.lesson', ['course' => $course, 'lesson' => $lesson ?? new Lesson]);
+        return view('staff.lesson', ['course' => $course, 'lesson' => $lesson ?? new Lesson]);
     }
 
     public function lessonSave(Request $r, Course $course, ?Lesson $lesson = null)
@@ -84,7 +85,7 @@ return view('staff.lesson', ['course' => $course, 'lesson' => $lesson ?? new Les
         }$d = $r->validate(['title' => 'required|string|max:180', 'unit' => 'required|string|max:120', 'content' => 'nullable|string|max:50000', 'youtube_url' => 'nullable|url|max:500', 'position' => 'required|integer|min:1|max:10000']);
         $id = YouTube::id($d['youtube_url'] ?? null);
         if (! empty($d['youtube_url']) && ! $id) {
-            return back()->withErrors(['youtube_url' => 'Introduce una URL válida de YouTube.'])->withInput();
+            return back()->withErrors(['youtube_url' => __('Introduce una URL válida de YouTube.')])->withInput();
         }unset($d['youtube_url']);
         $d['youtube_id'] = $id;
         if ($lesson) {
@@ -93,7 +94,7 @@ return view('staff.lesson', ['course' => $course, 'lesson' => $lesson ?? new Les
             $course->lessons()->create($d);
         }
 
-return redirect()->route('staff.edit', $course)->with('status', 'Lección guardada.');
+        return redirect()->route('staff.edit', $course)->with('status', __('Lección guardada.'));
     }
 
     public function enroll(Request $r, Course $course)
@@ -102,10 +103,10 @@ return redirect()->route('staff.edit', $course)->with('status', 'Lección guarda
         $r->validate(['email' => 'required|email']);
         $u = User::where('email', $r->input('email'))->first();
         if (! $u) {
-            return back()->withErrors(['email' => 'El estudiante debe registrarse primero en el campus.']);
+            return back()->withErrors(['email' => __('El estudiante debe registrarse primero en el campus.')]);
         }$course->students()->syncWithoutDetaching([$u->id]);
 
-        return back()->with('status', 'Matrícula guardada.');
+        return back()->with('status', __('Matrícula guardada.'));
     }
 
     public function revoke(Request $r, Course $course, User $user)
@@ -113,7 +114,7 @@ return redirect()->route('staff.edit', $course)->with('status', 'Lección guarda
         $this->manage($r, $course);
         $course->students()->detach($user->id);
 
-        return back()->with('status', 'Matrícula retirada.');
+        return back()->with('status', __('Matrícula retirada.'));
     }
 
     public function upload(Request $r, Course $course)
@@ -129,7 +130,7 @@ return redirect()->route('staff.edit', $course)->with('status', 'Lección guarda
             throw $e;
         }
 
-return back()->with('status', 'Material subido.');
+        return back()->with('status', __('Material subido.'));
     }
 
     public function deleteFile(Request $r, Resource $resource)
@@ -138,7 +139,7 @@ return back()->with('status', 'Material subido.');
         Storage::disk('local')->delete($resource->path);
         $resource->delete();
 
-        return back()->with('status', 'Material eliminado.');
+        return back()->with('status', __('Material eliminado.'));
     }
 
     public function users(Request $r)
@@ -156,6 +157,6 @@ return back()->with('status', 'Material subido.');
         $user->role = $d['role'];
         $user->save();
 
-        return back()->with('status','Permisos actualizados.');
+        return back()->with('status', __('Permisos actualizados.'));
     }
 }

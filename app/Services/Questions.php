@@ -23,7 +23,7 @@ class Questions
                 case 'cloze':Validator::make($q, ['text' => 'required|string|max:5000'])->validate();
                     preg_match_all('/\[\[([^\[\]]+)\]\]/u', $q['text'], $m);
                     if (count($m[1]) < 1 || count($m[1]) > 15) {
-                        throw ValidationException::withMessages(['questions' => 'El texto debe contener entre 1 y 15 huecos con formato [[respuesta]].']);
+                        throw ValidationException::withMessages(['questions' => __('El texto debe contener entre 1 y 15 huecos con formato [[respuesta]].')]);
                     }$base['text'] = $q['text'];
                     break;
                 case 'matching':Validator::make($q, ['pairs' => 'required|array|list|min:2|max:15', 'pairs.*' => 'required|array|list|size:2', 'pairs.*.*' => 'required|string|max:250'])->validate();
@@ -35,6 +35,6 @@ class Questions
             }$out[] = $base;
         }
 
-return $out;
+        return $out;
     }
 }

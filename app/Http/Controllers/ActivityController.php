@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Attempt;
+use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\User;
+use App\Services\Certificates;
 use App\Services\Grader;
 use App\Services\Questions;
 use Illuminate\Http\Request;
@@ -68,7 +70,21 @@ class ActivityController extends Controller
             }$activity->lessons()->sync($lessonIds);
         });
 
-        return redirect()->route('activities.edit', $activity)->with('status', 'Actividad guardada. Puedes probarla y reutilizarla en las lecciones seleccionadas.');
+        return redirect()->route('activities.edit', $activity)->with('status', __('Actividad guardada. Puedes probarla y reutilizarla en las lecciones seleccionadas.'));
+    }
+
+    public function overview(Request $r, Activity $activity)
+    {
+        abort_unless($activity->course->accessibleBy($r->user()) && ($activity->published || $activity->course->managedBy($r->user())), 403);
+        $query = $activity->attempts()->where('user_id', $r->user()->id);
+        $openAttempt = (clone $query)->whereNull('submitted_at')->first();
+        $used = (clone $query)->whereNotNull('submitted_at')->count();
+        $history = (clone $query)->whereNotNull('submitted_at')->latest('submitted_at')->limit(5)->get();
+        $staffPreview = $activity->course->managedBy($r->user());
+        $remaining = $activity->max_attempts ? max(0, $activity->max_attempts - $used) : null;
+        $canStart = $staffPreview || $openAttempt || $remaining === null || $remaining > 0;
+
+        return view('activity-overview', compact('activity', 'openAttempt', 'used', 'history', 'staffPreview', 'remaining', 'canStart'));
     }
 
     public function start(Request $r, Activity $activity)
@@ -80,7 +96,7 @@ class ActivityController extends Controller
             $open = (clone $q)->whereNull('submitted_at')->first();
             if ($open) {
                 return $open;
-            }abort_if(! $activity->course->managedBy($r->user()) && $activity->max_attempts > 0 && (clone $q)->count() >= $activity->max_attempts, 403, 'Has alcanzado el límite de intentos.');
+            }abort_if(! $activity->course->managedBy($r->user()) && $activity->max_attempts > 0 && (clone $q)->count() >= $activity->max_attempts, 403, __('Has alcanzado el límite de intentos.'));
 
             return $activity->attempts()->create(['user_id' => $r->user()->id, 'questions' => $activity->questions, 'pass_percent' => $activity->pass_percent]);
         });
@@ -97,7 +113,7 @@ class ActivityController extends Controller
     {
         $this->own($r, $attempt);
         if ($attempt->submitted_at) {
-            return view('result', compact('attempt'));
+            return view('result', ['attempt' => $attempt, 'certificate' => Certificate::where('user_id', $r->user()->id)->where('course_id', $attempt->activity->course_id)->first()]);
         }$questions = array_map(fn ($q) => Grader::publicQuestion($q, $attempt->id), $attempt->questions);
 
         return view('attempt', compact('attempt', 'questions'));
@@ -117,6 +133,8 @@ class ActivityController extends Controller
             $a->update(['answers' => $answers, 'score' => $result['score'], 'feedback' => $result['feedback'], 'submitted_at' => now()]);
         });
 
-        return redirect()->route('attempts.show',$attempt);
+        Certificates::issueIfEligible($r->user(), $attempt->activity->course);
+
+        return redirect()->route('attempts.show', $attempt);
     }
 }

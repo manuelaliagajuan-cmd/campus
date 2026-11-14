@@ -14,7 +14,7 @@ LMS propio del Centro de Estudios Campoamor (Alicante), sin WordPress, TutorLMS 
 - Corrección en servidor, resultados persistentes y consulta docente. No se entregan soluciones al alumno antes de responder. Los intentos conservan las preguntas y el objetivo con los que comenzaron, aunque el profesor edite después la actividad.
 - Interfaz adaptable a móvil con azul Campoamor `#212A5E`, blanco, negro y recursos gráficos del manual. Se usa Arial como sustitución de Nexa; falta incorporar el archivo original del logotipo y, si se desea, la fuente con licencia web.
 
-Los vídeos de YouTube se sirven desde YouTube y no ocupan espacio de vídeo en IONOS. «No listado» no evita compartir el enlace. Esta versión no incluye preguntas superpuestas durante el vídeo, certificados, pagos, videoconferencias, SCORM ni integración H5P. Las actividades y evaluaciones aquí descritas son propias de este LMS.
+Los vídeos de YouTube se sirven desde YouTube y no ocupan espacio de vídeo en IONOS. «No listado» no evita compartir el enlace. Esta versión no incluye preguntas superpuestas durante el vídeo, pagos, videoconferencias, SCORM ni integración H5P. Las actividades y evaluaciones aquí descritas son propias de este LMS.
 
 ## Desarrollo local
 
@@ -35,7 +35,7 @@ php artisan test
 php artisan view:cache
 ```
 
-Pruebas locales: 15 pruebas de aplicación con 59 aserciones; flujo en Chromium de acceso, catálogo, creación de dos tipos de pregunta, vista previa, guardado, respuesta y nota 100%, menú móvil y ausencia de desbordamiento horizontal a 390 px. Las pruebas automatizadas usan SQLite; las migraciones y el chequeo de conexión del despliegue se ejecutan sobre MariaDB de IONOS. No se ha realizado una prueba de carga con alumnos simultáneos.
+Pruebas locales: 25 pruebas de aplicación con 136 aserciones; flujo en Chromium de acceso, catálogo, creación de dos tipos de pregunta, vista previa, guardado, respuesta y nota 100%, menú móvil y ausencia de desbordamiento horizontal a 390 px. Las pruebas automatizadas usan SQLite; las migraciones y el chequeo de conexión del despliegue se ejecutan sobre MariaDB de IONOS. No se ha realizado una prueba de carga con alumnos simultáneos.
 
 ## GitHub e IONOS
 
@@ -53,7 +53,7 @@ El primer despliegue exige una base de datos vacía y registra qué base pertene
 ### Publicar en el subdominio
 
 1. Esperar a que los trabajos `test` y `deploy` del flujo estén en verde.
-2. En IONOS, cambiar **solo** el destino de `campus.cecalicante.es` de `/CampusCEC` a **`/campus-cec/public`**. El despliegue crea este enlace al directorio público de la versión instalada.
+2. En IONOS, cambiar **solo** el destino de `campus.cecalicante.es` de `/CampusCEC` a **`/campus-cec/public`**. El despliegue mantiene esta carpeta pública estable y su cargador selecciona la versión instalada.
 3. Abrir el campus con HTTPS y registrar tu cuenta personal. No hay un administrador predefinido.
 4. Ejecutar **Habilitar administrador del campus** desde GitHub Actions, introduciendo el correo exacto de esa cuenta. Este flujo solo lo puede iniciar quien tenga permisos de ejecución en el repositorio; no es una operación disponible para visitantes del campus.
 5. Cerrar sesión y volver a entrar. Aparecerán gestión de usuarios, creación de cursos y catálogo docente.
@@ -76,3 +76,17 @@ Para volver al sitio anterior, restaurar el destino de `campus.cecalicante.es` a
 ## Alcance pendiente de verificación operativa
 
 El despliegue automatizado verifica PHP, migraciones, vistas y conexión. Tras cambiar el destino hacen falta pruebas HTTP reales de login, subida y descarga (incluida la configuración de límites de IONOS), correo SMTP y vídeo de YouTube. La velocidad depende del plan y la concurrencia; no se han prometido tiempos ni capacidad simultánea sin medirlos.
+
+## Experiencia de aprendizaje y certificados
+
+La entrada de cada actividad muestra preguntas, intentos disponibles y nota objetivo antes de comenzar. Visitar esta página no consume intentos; «Empezar» crea uno y «Continuar» reanuda el que está abierto. La ordenación usa SortableJS 1.15.6 (MIT, distribuido localmente con su licencia), con tarjeta flotante, hueco de destino, desplazamiento automático y alternativa accesible por flechas. La corrección distingue verde/acierto, rojo/error y ámbar/solución, además de texto e iconos.
+
+El progreso del curso suma lecciones completadas y tests evaluables publicados superados. Las prácticas no bloquean el certificado. «Continuar» lleva a la siguiente lección pendiente o al test pendiente. Los filtros distinguen cursos en curso y completados, y existe una sección de certificados obtenidos.
+
+Los profesores pueden habilitar o deshabilitar certificados y añadir una duración opcional al curso. El certificado de finalización de CEC se emite al alumno matriculado después de completar todas las lecciones y superar todos los tests evaluables publicados. No se emite en cursos vacíos; un curso compuesto solo por tests puede completarse al superarlos. Se genera un PDF real mediante Dompdf; guarda nombre, título, idioma, nivel, duración y nota (cuando correspondan) como una instantánea. Un certificado ya obtenido no cambia al editar después el curso y sigue disponible al titular si se retira su matrícula. No es una acreditación de Coursera ni de otra entidad. Descarga y vista previa requieren autorización; no hay una página pública con datos personales de alumnos.
+
+La cabecera permite alternar la interfaz entre español e inglés y conserva la preferencia en la cuenta. Las lecciones, preguntas, respuestas y avisos escritos por docentes no se traducen ni se envían a servicios externos. El certificado institucional se emite en español.
+
+Los avisos y recordatorios se publican desde la gestión del curso. Pueden aparecer inmediatamente o a partir de la fecha indicada. Son notificaciones dentro del campus con contador de no leídas, lectura individual o conjunta; no son correos ni notificaciones push del dispositivo. Solo se muestran a los usuarios autorizados de cada curso. Los avisos programados se incorporan al consultar la página o el contador al llegar su fecha; no requieren un cron. La campana actualiza su contador aproximadamente cada minuto mientras la pestaña está visible.
+
+La migración `2026_11_14_000001_add_progress_certificates_and_notices` añade estas tablas y campos sin borrar cursos, usuarios, actividades ni intentos existentes. La raíz web es una carpeta estable; un cargador consulta el enlace de la versión para evitar que PHP sirva código anterior por la caché de rutas del alojamiento.

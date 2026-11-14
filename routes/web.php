@@ -3,12 +3,16 @@
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampusController;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\StaffController;
 use App\Http\Middleware\PrivateResponse;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(PrivateResponse::class)->group(function () {
     Route::redirect('/', '/campus');
+    Route::post('/idioma', [LocaleController::class, 'update'])->name('locale');
     Route::middleware('guest')->group(function () {
         Route::get('/acceso', fn () => (new AuthController)->form('login'))->name('login');
         Route::post('/acceso', [AuthController::class, 'login'])->middleware('throttle:6,1');
@@ -20,6 +24,16 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
     Route::middleware('auth')->group(function () {
+        Route::get('/certificados', [CertificateController::class, 'index'])->name('certificates.index');
+        Route::get('/certificados/{certificate}', [CertificateController::class, 'show'])->name('certificates.show');
+        Route::get('/certificados/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');
+        Route::post('/cursos/{course}/certificado', [CertificateController::class, 'issue'])->name('certificates.issue');
+        Route::get('/notificaciones', [NotificationController::class, 'index'])->name('notifications');
+        Route::get('/notificaciones/contador', [NotificationController::class, 'count'])->name('notifications.count');
+        Route::post('/notificaciones/leer-todas', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::post('/notificaciones/{announcement}/leer', [NotificationController::class, 'read'])->name('notifications.read');
+        Route::post('/docente/cursos/{course}/avisos', [NotificationController::class, 'store'])->name('staff.announcements.store');
+        Route::delete('/docente/avisos/{announcement}', [NotificationController::class, 'destroy'])->name('staff.announcements.delete');
         Route::post('/salir', [AuthController::class, 'logout'])->name('logout');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');
@@ -47,8 +61,9 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/docente/actividades', [ActivityController::class, 'save'])->name('activities.store');
         Route::get('/docente/actividades/{activity}', [ActivityController::class, 'edit'])->name('activities.edit');
         Route::put('/docente/actividades/{activity}', [ActivityController::class, 'save'])->name('activities.update');
+        Route::get('/actividades/{activity}', [ActivityController::class, 'overview'])->name('activities.overview');
         Route::post('/actividades/{activity}/empezar', [ActivityController::class, 'start'])->middleware('throttle:30,1')->name('activities.start');
         Route::get('/intentos/{attempt}', [ActivityController::class, 'show'])->name('attempts.show');
-        Route::post('/intentos/{attempt}',[ActivityController::class, 'submit'])->name('attempts.submit');
+        Route::post('/intentos/{attempt}', [ActivityController::class, 'submit'])->name('attempts.submit');
     });
 });

@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
+    protected $attributes = ['certificate_enabled' => true];
+
     protected $guarded = ['id'];
 
     protected function casts(): array
     {
-        return ['published' => 'boolean'];
+        return ['published' => 'boolean', 'certificate_enabled' => 'boolean', 'duration_hours' => 'float'];
     }
 
     public function teacher()
@@ -46,5 +48,10 @@ class Course extends Model
     public function accessibleBy(User $u): bool
     {
         return $this->managedBy($u) || ($this->published && $this->students()->where('users.id', $u->id)->exists());
+    }
+
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class);
     }
 }

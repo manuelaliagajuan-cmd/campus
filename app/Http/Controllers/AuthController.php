@@ -32,7 +32,7 @@ class AuthController extends Controller
     {
         $d = $r->validate(['email' => 'required|email', 'password' => 'required|string']);
         if (! Auth::attempt($d, $r->boolean('remember'))) {
-            return back()->withErrors(['email' => 'No se ha podido iniciar sesión con esos datos.'])->onlyInput('email');
+            return back()->withErrors(['email' => __('No se ha podido iniciar sesión con esos datos.')])->onlyInput('email');
         }$r->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
@@ -51,10 +51,10 @@ class AuthController extends Controller
     {
         $r->validate(['email' => 'required|email']);
         if (config('mail.default') === 'log') {
-            return back()->with('status', 'Para recuperar el acceso, contacta con el centro.');
+            return back()->with('status', __('Para recuperar el acceso, contacta con el centro.'));
         }Password::sendResetLink($r->only('email'));
 
-        return back()->with('status', 'Si existe una cuenta con ese correo, recibirás las instrucciones para recuperar el acceso.');
+        return back()->with('status', __('Si existe una cuenta con ese correo, recibirás las instrucciones para recuperar el acceso.'));
     }
 
     public function resetForm(Request $r, string $token)
@@ -70,6 +70,6 @@ class AuthController extends Controller
             event(new PasswordReset($u));
         });
 
-        return $status === Password::PASSWORD_RESET ? redirect()->route('login')->with('status', 'Contraseña actualizada.') : back()->withErrors(['email' => 'El enlace no es válido o ha caducado.']);
+        return $status === Password::PASSWORD_RESET ? redirect()->route('login')->with('status', __('Contraseña actualizada.')) : back()->withErrors(['email' => __('El enlace no es válido o ha caducado.')]);
     }
 }

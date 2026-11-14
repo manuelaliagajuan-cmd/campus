@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Announcement;
 use App\Models\Attempt;
 use App\Models\Completion;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Resource;
+use App\Services\Certificates;
+use App\Services\CourseProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,7 +22,11 @@ class CampusController extends Controller
         $courses = $courses->withCount('lessons')->with('teacher')->orderByDesc('courses.created_at')->get();
         $completed = Completion::where('user_id', $u->id)->whereIn('lesson_id', Lesson::whereIn('course_id', $courses->pluck('id'))->select('id'))->pluck('lesson_id');
 
-        return view('dashboard', compact('courses', 'completed'));
+        $progress = CourseProgress::many($u, $courses);
+        $state = in_array($r->query('estado'), ['en-curso', 'completados', 'todos'], true) ? $r->query('estado') : ($u->isStaff() ? 'todos' : 'en-curso');
+        $visibleCourses = $courses->filter(fn ($c) => $state === 'todos' || ($state === 'completados' ? $progress[$c->id]['complete'] : ! $progress[$c->id]['complete']));
+
+        return view('dashboard', compact('courses', 'completed', 'progress', 'state', 'visibleCourses'));
     }
 
     public function course(Request $r, Course $course)
@@ -28,7 +35,10 @@ class CampusController extends Controller
         $course->load(['lessons', 'teacher', 'resources', 'activities' => fn ($q) => $q->where('published', true)]);
         $completed = Completion::where('user_id', $r->user()->id)->pluck('lesson_id');
 
-        return view('course', compact('course', 'completed'));
+        $progress = CourseProgress::for($r->user(), $course);
+        $notices = Announcement::visibleTo($r->user())->where('course_id', $course->id)->latest('publish_at')->limit(3)->get();
+
+        return view('course', compact('course', 'completed', 'progress', 'notices'));
     }
 
     public function lesson(Request $r, Lesson $lesson)
@@ -44,7 +54,9 @@ class CampusController extends Controller
         abort_unless($lesson->course->accessibleBy($r->user()), 403);
         Completion::firstOrCreate(['user_id' => $r->user()->id, 'lesson_id' => $lesson->id]);
 
-        return back()->with('status', 'Lección marcada como completada.');
+        $certificate = Certificates::issueIfEligible($r->user(), $lesson->course);
+
+        return back()->with('status', $certificate ? __('Curso completado. Tu certificado ya está disponible.') : __('Lección marcada como completada.'));
     }
 
     public function library(Request $r)
@@ -73,9 +85,9 @@ class CampusController extends Controller
         if (! $u->isStaff()) {
             $query->where('user_id', $u->id)->whereHas('activity.course', fn ($q) => $q->where('published', true)->whereHas('students', fn ($s) => $s->where('users.id', $u->id)));
         } elseif ($u->role === 'teacher') {
-            $query->whereHas('activity.course', fn ($q) => $q->where('teacher_id',$u->id));
+            $query->whereHas('activity.course', fn ($q) => $q->where('teacher_id', $u->id));
         }
 
-return view('results',['attempts' => $query->latest()->paginate(30)]);
+        return view('results', ['attempts' => $query->latest()->paginate(30)]);
     }
 }

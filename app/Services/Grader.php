@@ -50,7 +50,19 @@ class Grader
             $feedback[] = ['prompt' => $q['prompt'], 'correct' => $right >= 1, 'fraction' => round($right * 100), 'expected' => $expected, 'explanation' => $q['explanation'] ?? ''];
         }
 
-return ['score' => round(100 * $total / max(1, count($questions)), 2), 'feedback' => $feedback];
+        return ['score' => round(100 * $total / max(1, count($questions)), 2), 'feedback' => $feedback];
+    }
+
+    public static function answerLabels(array $question, mixed $answer): array
+    {
+        if (in_array($question['type'] ?? '', ['multiple', 'truefalse'], true)) {
+            return [is_scalar($answer) && isset($question['options'][(string) $answer]) ? $question['options'][(string) $answer] : __('Sin respuesta')];
+        }
+        if (! is_array($answer) || $answer === []) {
+            return [__('Sin respuesta')];
+        }
+
+        return array_map(fn ($value) => is_scalar($value) && trim((string) $value) !== '' ? (string) $value : __('Sin respuesta'), array_values($answer));
     }
 
     public static function publicQuestion(array $q, int $seed): array
@@ -76,7 +88,7 @@ return ['score' => round(100 * $total / max(1, count($questions)), 2), 'feedback
             $original = $q['choices'];
             usort($q['choices'], fn ($a, $b) => strcmp(hash('sha256', $seed.$a), hash('sha256', $seed.$b)));
             if (count($original) > 1 && $q['choices'] === $original) {
-                $q['choices'] = array_merge(array_slice($original,1),[$original[0]]);
+                $q['choices'] = array_merge(array_slice($original, 1), [$original[0]]);
             }
         }
 

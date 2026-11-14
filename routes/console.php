@@ -29,11 +29,15 @@ Artisan::command('cec:empty-database', function () {
 });
 Artisan::command('cec:health', function () {
     DB::select('SELECT 1');
-    foreach (['users', 'courses', 'activities', 'attempts', 'sessions'] as $table) {
+    foreach (['users', 'courses', 'activities', 'attempts', 'sessions', 'certificates', 'announcements', 'announcement_reads'] as $table) {
         if (! Schema::hasTable($table)) {
             return 1;
         }
-    }if (__('validation.required') === 'validation.required') { $this->error('Faltan las traducciones de validación.'); return 1; }
+    }if (__('validation.required') === 'validation.required') {
+        $this->error('Faltan las traducciones de validación.');
+
+        return 1;
+    }
     $this->info('CEC_BASE_DATOS_OK');
 
     return 0;
