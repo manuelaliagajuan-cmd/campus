@@ -84,11 +84,11 @@ class CampusAccessReviewTest extends TestCase
     {
         $u = User::factory()->create(['email' => 'pupil@example.test', 'email_verified_at' => null]);
         $this->fixture($u, ['account_email' => 'old@example.test']);
-        $this->actingAs($u)->get('/mis-accesos')->assertSee('Necesitamos revisar')->assertDontSee('Doce clases de prueba');
+        $this->actingAs($u)->get('/mis-accesos')->assertSee('Estamos preparando tu acceso')->assertDontSee('Doce clases de prueba');
         $this->assertNull($u->fresh()->email_verified_at);
         $u->forceFill(['erp_student_id' => 'A-other'])->save();
         $this->fixture($u);
-        $this->get('/mis-accesos')->assertSee('Necesitamos revisar')->assertDontSee('Doce clases de prueba');
+        $this->get('/mis-accesos')->assertSee('Estamos preparando tu acceso')->assertDontSee('Doce clases de prueba');
         $this->assertDatabaseCount('enrollments', 0);
     }
 
@@ -97,7 +97,7 @@ class CampusAccessReviewTest extends TestCase
         User::factory()->create(['erp_student_id' => 'A-1']);
         $u = User::factory()->create(['email_verified_at' => null]);
         $this->fixture($u);
-        $this->actingAs($u)->get('/mis-accesos')->assertSee('Necesitamos revisar')->assertDontSee('Doce clases de prueba');
+        $this->actingAs($u)->get('/mis-accesos')->assertSee('Estamos preparando tu acceso')->assertDontSee('Doce clases de prueba');
         $this->assertNull($u->fresh()->email_verified_at);
     }
 
@@ -108,6 +108,6 @@ class CampusAccessReviewTest extends TestCase
         $data = ErpConnection::diagnostics();
         $this->assertTrue($data['source_valid']);
         $this->assertSame(1, $data['matching_unverified_students']);
-        $this->assertStringNotContainsString($u->email,json_encode($data));
+        $this->assertStringNotContainsString($u->email, json_encode($data));
     }
 }

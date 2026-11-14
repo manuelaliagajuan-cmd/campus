@@ -10,6 +10,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PassWorkspaceController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\TrashController;
 use App\Http\Middleware\PrivateResponse;
 use App\Http\Middleware\SyncErp;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,10 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/archivos/{resource}', [CampusController::class, 'file'])->name('resources.file');
         Route::get('/resultados', [CampusController::class, 'results'])->name('results');
         Route::get('/docente/cursos/nuevo', [StaffController::class, 'create'])->name('staff.create');
+        Route::get('/docente/papelera', [TrashController::class, 'index'])->name('staff.trash');
+        Route::post('/docente/papelera/cursos/{courseId}/restaurar', [TrashController::class, 'course'])->name('staff.course.restore');
+        Route::post('/docente/papelera/actividades/{activityId}/restaurar', [TrashController::class, 'activity'])->name('activities.restore');
+        Route::delete('/docente/cursos/{course}', [StaffController::class, 'destroy'])->name('staff.destroy');
         Route::post('/docente/cursos', [StaffController::class, 'store'])->name('staff.store');
         Route::get('/docente/cursos/{course}', [StaffController::class, 'edit'])->name('staff.edit');
         Route::put('/docente/cursos/{course}', [StaffController::class, 'update'])->name('staff.update');
@@ -75,6 +80,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/docente/actividades/nueva', [ActivityController::class, 'create'])->name('activities.create');
         Route::post('/docente/actividades', [ActivityController::class, 'save'])->name('activities.store');
         Route::get('/docente/actividades/{activity}', [ActivityController::class, 'edit'])->name('activities.edit');
+        Route::delete('/docente/actividades/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
         Route::put('/docente/actividades/{activity}', [ActivityController::class, 'save'])->name('activities.update');
         Route::get('/actividades/{activity}', [ActivityController::class, 'overview'])->name('activities.overview');
         Route::post('/actividades/{activity}/empezar', [ActivityController::class, 'start'])->middleware('throttle:30,1')->name('activities.start');

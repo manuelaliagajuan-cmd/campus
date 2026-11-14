@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Activity extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected $hidden = ['questions'];
@@ -17,7 +20,7 @@ class Activity extends Model
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class)->withTrashed();
     }
 
     public function lessons()

@@ -1,14 +1,14 @@
 @if($erp['state']==='connected')
-<p class="help">{{ __('Actualizado desde Gestión CEC') }} · {{ \Illuminate\Support\Carbon::parse($erp['updated_at'])->timezone('Europe/Madrid')->format('d/m/Y H:i') }}</p>
+<p class="help">{{ __('Actualizado') }} · {{ \Illuminate\Support\Carbon::parse($erp['updated_at'])->timezone('Europe/Madrid')->format('d/m/Y H:i') }}</p>
 <div class="session-passes">@forelse($erp['passes'] as $pass)
 <article class="panel session-pass"><div class="section-head"><h3>{{ $pass['name'] }}</h3><span class="badge">{{ __($pass['status']) }}</span></div><p><strong class="pass-balance">{{ $pass['remaining'] }}</strong> {{ __('clases restantes de') }} {{ $pass['sessions'] }}</p><p>{{ __('Clases utilizadas') }}: {{ $pass['used'] }}</p><progress max="{{ max(1,$pass['sessions']) }}" value="{{ min($pass['sessions'],$pass['used']) }}" aria-label="{{ __('Clases utilizadas') }}"></progress><p class="help">{{ __('Inicio') }}: {{ $pass['start'] ?: '—' }} · {{ __('Caducidad') }}: {{ $pass['expires'] ?: __('Sin caducidad') }}</p><p><a href="{{ route('passes.show',$pass['id']) }}">{{ __('Materiales del bono →') }}</a></p></article>
-@empty<p class="notice">{{ __('No tienes bonos asignados en Gestión CEC.') }}</p>@endforelse</div>
-@elseif($erp['state']==='verify')
-<div class="notice"><h3>{{ __('Confirma tu correo') }}</h3><p>{{ __('Para conectar los cursos y bonos de Gestión, confirma que este correo te pertenece.') }}</p><form method="post" action="{{ route('verification.send') }}">@csrf<button>{{ in_array(config('mail.default'),['log','array'],true)?__('Cómo confirmar mi correo'):__('Enviar enlace de confirmación') }}</button></form>@if(in_array(config('mail.default'),['log','array'],true))<p>{{ __('El centro puede revisar y vincular tu cuenta desde Nuevos accesos en Gestión.') }}</p>@endif</div>
+@empty<p class="notice">{{ __('Todavía no tienes bonos asignados.') }}</p>@endforelse</div>
+@elseif(!auth()->user()->hasVerifiedEmail() || $erp['state']==='verify')
+<div class="notice account-review"><h3>{{ __('Estamos preparando tu acceso') }}</h3><p>{{ __('Estamos revisando tu inscripción. En cuanto el centro confirme tu acceso, aquí aparecerán tus cursos y bonos. No necesitas hacer nada más.') }}</p></div>
 @elseif(in_array($erp['state'],['ambiguous','review'],true))
-<p class="notice">{{ __('Necesitamos revisar tu vinculación con Gestión. Contacta con el centro para comprobar el correo de tu ficha.') }}</p>
+<div class="notice account-review"><h3>{{ __('Estamos preparando tu acceso') }}</h3><p>{{ __('Estamos revisando tu inscripción. En cuanto el centro confirme tu acceso, aquí aparecerán tus cursos y bonos. No necesitas hacer nada más.') }}</p></div>
 @elseif($erp['state']==='unassigned')
-<p class="notice">{{ __('No hay una ficha activa de Gestión vinculada a tu correo. Contacta con el centro si ya estás matriculado.') }}</p>
+<p class="notice">{{ __('Todavía no tienes bonos asignados. Los verás aquí cuando estén disponibles.') }}</p>
 @else
-<p class="notice">{{ __('El saldo de tus bonos todavía no está disponible en el campus. Consulta con el centro.') }}</p>@if(auth()->user()->role==='admin')<p>{{ __('Abre Gestión en el navegador donde están tus datos y espera al aviso de guardado conectado con campus.') }}</p><a href="https://gestion.cecalicante.es" target="_blank" rel="noopener">{{ __('Abrir Gestión CEC') }} ↗</a>@endif
+<p class="notice">{{ __('No podemos mostrar tus bonos en este momento. Vuelve a intentarlo más tarde.') }}</p>@if(auth()->user()->role==='admin')<p>{{ __('Abre Gestión en el navegador donde están tus datos y espera al aviso de guardado conectado con campus.') }}</p><a href="https://gestion.cecalicante.es" target="_blank" rel="noopener">{{ __('Abrir Gestión CEC') }} ↗</a>@endif
 @endif

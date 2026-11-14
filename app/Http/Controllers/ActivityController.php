@@ -73,6 +73,14 @@ class ActivityController extends Controller
         return redirect()->route('activities.edit', $activity)->with('status', __('Actividad guardada. Puedes probarla y reutilizarla en las lecciones seleccionadas.'));
     }
 
+    public function destroy(Request $r, Activity $activity)
+    {
+        abort_unless($activity->course->managedBy($r->user()), 403);
+        $activity->delete();
+
+        return redirect()->route('activities.catalog')->with('status', __('Actividad eliminada. Puedes restaurarla desde la papelera.'));
+    }
+
     public function overview(Request $r, Activity $activity)
     {
         abort_unless($activity->course->accessibleBy($r->user()) && ($activity->published || $activity->course->managedBy($r->user())), 403);
@@ -106,6 +114,7 @@ class ActivityController extends Controller
 
     private function own(Request $r, Attempt $attempt): void
     {
+        abort_if($attempt->activity->trashed() && ! $attempt->submitted_at, 404);
         abort_unless($attempt->user_id === $r->user()->id && $attempt->activity->course->accessibleBy($r->user()), 403);
     }
 

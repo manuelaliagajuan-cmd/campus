@@ -235,14 +235,14 @@ class ErpConnection
             }
             $ids = [];
             foreach ($data['courses'] as $source) {
-                $course = Course::firstOrNew(['erp_id' => $source['id']]);
+                $course = Course::withTrashed()->firstOrNew(['erp_id' => $source['id']]);
                 if (! $course->exists) {
                     $course->forceFill(['teacher_id' => $admin->id, 'language' => '—', 'level' => '—', 'certificate_enabled' => false]);
                 }
                 $course->forceFill(['title' => $source['name'], 'published' => $source['active']])->save();
                 $ids[] = $source['id'];
             }
-            Course::whereNotNull('erp_id')->whereNotIn('erp_id', $ids)->update(['published' => false]);
+            Course::withTrashed()->whereNotNull('erp_id')->whereNotIn('erp_id', $ids)->update(['published' => false]);
             DB::table('erp_sync_states')->where('source', 'gestion')->update(['revision' => $data['revision'], 'synced_at' => now()]);
         });
     }

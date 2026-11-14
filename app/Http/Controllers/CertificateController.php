@@ -25,12 +25,12 @@ class CertificateController extends Controller
             return back()->with('status', __('Completa todas las lecciones y supera los tests evaluables para obtener tu certificado.'));
         }
 
-return redirect()->route('certificates.show', $certificate);
+        return redirect()->route('certificates.show', $certificate);
     }
 
     private function authorizeCertificate(Request $r, Certificate $certificate): void
     {
-        abort_unless($certificate->user_id === $r->user()->id || $certificate->course->managedBy($r->user()), 403);
+        abort_unless($certificate->user_id === $r->user()->id || ($r->user()->role === 'admin' || ($r->user()->role === 'teacher' && $certificate->course->teacher_id === $r->user()->id)), 403);
     }
 
     public function show(Request $r, Certificate $certificate)

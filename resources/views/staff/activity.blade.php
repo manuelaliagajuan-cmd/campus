@@ -11,4 +11,4 @@
 <dialog id="preview-dialog"><h2>{{ __('Vista previa de preguntas') }}</h2><div id="preview-content"></div><button type="button" class="secondary" id="close-preview">{{ __('Cerrar') }}</button></dialog>
 @php($initial=old('questions_json')?json_decode(old('questions_json'),true):($activity->questions??null))
 @push('scripts')<script>window.CEC_BUILDER={questions:{{ Illuminate\Support\Js::from($initial) }},type:{{ Illuminate\Support\Js::from($initialType) }}};</script><script src="{{ asset('assets/builder.js') }}?v=2" defer></script>@endpush
-@endsection
+@if($activity->exists)<section class="panel deletion-panel"><h2>{{ __('Eliminar actividad') }}</h2><p>{{ __('Se retirará del banco y de las lecciones. Los resultados ya enviados se conservarán.') }}</p><form method="post" action="{{ route('activities.destroy',$activity) }}" data-confirm="{{ __('¿Eliminar esta actividad del banco? Se retirará de las lecciones y podrás restaurarla desde la papelera.') }}">@csrf @method('DELETE')<button class="button danger-outline">{{ __('Eliminar actividad') }}</button> <a href="{{ route('staff.trash') }}">{{ __('Abrir papelera') }}</a></form></section>@endif @endsection

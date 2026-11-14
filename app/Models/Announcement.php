@@ -16,7 +16,7 @@ class Announcement extends Model
 
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class)->withTrashed();
     }
 
     public function author()
@@ -32,6 +32,7 @@ class Announcement extends Model
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
         return $query->where('publish_at', '<=', now())->whereHas('course', function (Builder $course) use ($user) {
+            $course->whereNull('courses.deleted_at');
             if ($user->role === 'admin') {
                 return;
             }

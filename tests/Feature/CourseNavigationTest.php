@@ -75,7 +75,7 @@ class CourseNavigationTest extends TestCase
     {
         [$t,$s,$c,$v,$l,$a] = $this->fixtures();
         $private = Course::create(['teacher_id' => $t->id, 'title' => 'Curso de otro alumno', 'published' => true]);
-        $this->actingAs($s)->get('/mis-accesos')->assertOk()->assertSee('Curso autorizado')->assertDontSee('Curso de otro alumno')->assertSee('Bonos de sesiones')->assertSee('El saldo de tus bonos todavía no está disponible');
+        $this->actingAs($s)->get('/mis-accesos')->assertOk()->assertSee('Curso autorizado')->assertDontSee('Curso de otro alumno')->assertSee('Bonos de sesiones')->assertSee('No podemos mostrar tus bonos en este momento');
         $this->get('/campus')->assertOk()->assertSee('profile-menu', false)->assertSee('Mis cursos y bonos');
         $c->students()->detach($s);
         $this->get('/mis-accesos')->assertOk()->assertDontSee('Curso autorizado');

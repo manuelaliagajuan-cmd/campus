@@ -84,7 +84,7 @@ class CampusController extends Controller
     public function results(Request $r)
     {
         $u = $r->user();
-        $query = Attempt::whereNotNull('submitted_at')->with(['activity.course', 'user']);
+        $query = Attempt::whereNotNull('submitted_at')->whereHas('activity.course', fn ($q) => $q->whereNull('courses.deleted_at'))->with(['activity.course', 'user']);
         if (! $u->isStaff()) {
             $query->where('user_id', $u->id)->whereHas('activity.course', fn ($q) => $q->where('published', true)->whereHas('students', fn ($s) => $s->where('users.id', $u->id)));
         } elseif ($u->role === 'teacher') {

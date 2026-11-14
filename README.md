@@ -112,3 +112,13 @@ El editor de lección ofrece «Texto y vídeo» o «Presentación interactiva».
 El alumno navega con Anterior/Siguiente y una barra de progreso de la presentación. Las actividades se realizan dentro de la diapositiva, con los intentos, permisos y corrección habituales; abrir una diapositiva no consume intentos. Completar la lección conserva el funcionamiento manual existente y los tests evaluables siguen contando para completar el curso. Los vídeos permanecen alojados en YouTube.
 
 La marca usa los SVG proporcionados por CEC, con el encuadre ajustado para el menú y las pantallas pequeñas. Los logos y favicons eligen la variante clara u oscura según `prefers-color-scheme` del navegador. No se ha activado una indexación pública de contenidos privados del campus.
+
+## Eliminar y restaurar cursos y actividades
+
+La gestión de cada curso incluye «Eliminar curso». El banco de actividades y su editor incluyen «Eliminar actividad». Las operaciones solicitan confirmación y llevan el elemento a «Papelera», accesible desde el menú personal, el campus docente y el banco. Profesorado solo puede eliminar y restaurar elementos de sus cursos; administración puede hacerlo con todos.
+
+La eliminación retira el acceso, las actividades disponibles y los avisos correspondientes, conservando archivos, matrículas, lecciones, intentos y certificados para restaurar. Los resultados ya enviados de una actividad eliminada siguen disponibles mientras su curso siga activo; no se pueden continuar intentos abiertos de esa actividad hasta restaurarla. Los certificados obtenidos siguen disponibles para su titular aunque se elimine el curso. No hay un borrado definitivo ni una purga automática de datos.
+
+Eliminar en el campus un curso procedente de Gestión no borra el curso ni sus datos económicos del ERP. La sincronización conserva el registro eliminado y no lo recrea. Al restaurarlo conserva su identidad y la disponibilidad actual del origen. Si se elimina también el curso de una actividad, primero se restaura el curso.
+
+Las cuentas nuevas de alumno ven un estado de inscripción en revisión, sin instrucciones internas de Gestión ni un botón de correo que no envía nada. Los avisos operativos y la revisión de identidades permanecen en administración.

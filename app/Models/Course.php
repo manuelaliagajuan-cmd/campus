@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Course extends Model
 {
+    use SoftDeletes;
+
     protected $attributes = ['certificate_enabled' => true];
 
     protected $guarded = ['id'];
@@ -43,12 +46,12 @@ class Course extends Model
 
     public function managedBy(User $u): bool
     {
-        return $u->role === 'admin' || ($u->role === 'teacher' && $this->teacher_id === $u->id);
+        return ! $this->trashed() && ($u->role === 'admin' || ($u->role === 'teacher' && $this->teacher_id === $u->id));
     }
 
     public function accessibleBy(User $u): bool
     {
-        return $this->managedBy($u) || ($this->published && $this->students()->where('users.id', $u->id)->exists());
+        return ! $this->trashed() && ($this->managedBy($u) || ($this->published && $this->students()->where('users.id', $u->id)->exists()));
     }
 
     public function announcements()

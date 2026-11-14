@@ -77,6 +77,14 @@ class StaffController extends Controller
         return back()->with('status', __('Curso actualizado.'));
     }
 
+    public function destroy(Request $r, Course $course)
+    {
+        $this->manage($r, $course);
+        $course->delete();
+
+        return redirect()->route('dashboard')->with('status', __('Curso eliminado del campus. Puedes restaurarlo desde la papelera.'));
+    }
+
     public function lessonForm(Request $r, Course $course, ?Lesson $lesson = null)
     {
         $this->manage($r, $course);

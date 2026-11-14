@@ -16,7 +16,7 @@ class EmailVerificationController extends Controller
             return back();
         }
         if (in_array(config('mail.default'), ['log', 'array'], true)) {
-            return back()->with('status', __('Contacta con el centro para confirmar tu correo y conectar tus cursos y bonos.'));
+            return back()->with('status', __('Estamos revisando tu inscripción. En cuanto el centro confirme tu acceso, aquí aparecerán tus cursos y bonos. No necesitas hacer nada más.'));
         }
         $request->user()->sendEmailVerificationNotification();
 

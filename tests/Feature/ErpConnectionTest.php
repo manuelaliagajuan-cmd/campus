@@ -65,7 +65,7 @@ class ErpConnectionTest extends TestCase
     public function test_unverified_account_does_not_receive_private_data_even_with_matching_email(): void
     {
         $u = $this->pupil(['email_verified_at' => null]);
-        $this->actingAs($u)->get('/mis-accesos')->assertOk()->assertSee('Confirma tu correo')->assertDontSee('Bono de ocho clases')->assertDontSee('Conversación desde Gestión');
+        $this->actingAs($u)->get('/mis-accesos')->assertOk()->assertSee('Estamos preparando tu acceso')->assertDontSee('Bono de ocho clases')->assertDontSee('Conversación desde Gestión');
         $this->assertDatabaseCount('enrollments', 0);
         $u->markEmailAsVerified();
         $this->get('/mis-accesos')->assertSee('Bono de ocho clases');
@@ -75,7 +75,7 @@ class ErpConnectionTest extends TestCase
     {
         $this->data['students'][] = ['id' => 'A-002', 'email' => 'STUDENT@example.test', 'active' => true, 'courses' => ['CUR-002']];
         $this->write();
-        $this->actingAs($this->pupil())->get('/mis-accesos')->assertOk()->assertSee('Necesitamos revisar')->assertDontSee('Bono de ocho clases')->assertDontSee('Bono privado de otra persona');
+        $this->actingAs($this->pupil())->get('/mis-accesos')->assertOk()->assertSee('Estamos preparando tu acceso')->assertDontSee('Bono de ocho clases')->assertDontSee('Bono privado de otra persona');
         $this->assertDatabaseCount('enrollments', 0);
     }
 
@@ -123,7 +123,7 @@ class ErpConnectionTest extends TestCase
         $this->data['revision'] = 2;
         $this->data['students'][0]['active'] = false;
         $this->write();
-        $this->actingAs($u)->get('/mis-accesos')->assertSee('No hay una ficha activa')->assertDontSee('Bono de ocho clases');
+        $this->actingAs($u)->get('/mis-accesos')->assertSee('Todavía no tienes bonos asignados')->assertDontSee('Bono de ocho clases');
         $this->assertDatabaseCount('enrollments', 0);
         $this->data['revision'] = 3;
         $this->data['students'][0]['active'] = true;
@@ -170,7 +170,7 @@ class ErpConnectionTest extends TestCase
         $this->data['revision'] = 2;
         $this->data['students'] = [['id' => 'A-002', 'email' => 'student@example.test', 'active' => true, 'courses' => ['CUR-002']]];
         $this->write();
-        $this->actingAs($u)->get('/mis-accesos')->assertOk()->assertSee('Necesitamos revisar')->assertDontSee('Bono privado de otra persona')->assertDontSee('Otro curso');
+        $this->actingAs($u)->get('/mis-accesos')->assertOk()->assertSee('Estamos preparando tu acceso')->assertDontSee('Bono privado de otra persona')->assertDontSee('Otro curso');
         $this->assertDatabaseCount('enrollments', 0);
     }
 
@@ -193,7 +193,7 @@ class ErpConnectionTest extends TestCase
     public function test_email_delivery_is_honest_without_smtp_and_sends_verification_when_configured(): void
     {
         $u = $this->pupil(['email_verified_at' => null]);
-        $this->actingAs($u)->post('/cuenta/confirmar-correo')->assertSessionHas('status', 'Contacta con el centro para confirmar tu correo y conectar tus cursos y bonos.');
+        $this->actingAs($u)->post('/cuenta/confirmar-correo')->assertSessionHas('status', 'Estamos revisando tu inscripción. En cuanto el centro confirme tu acceso, aquí aparecerán tus cursos y bonos. No necesitas hacer nada más.');
         Notification::fake();
         config(['mail.default' => 'smtp']);
         $this->post('/cuenta/confirmar-correo')->assertRedirect();
