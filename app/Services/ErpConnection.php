@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class ErpConnection
@@ -33,6 +34,34 @@ class ErpConnection
         ])->validate();
 
         return $data;
+    }
+
+    public static function diagnostics(): array
+    {
+        $path = config('erp.projection_path');
+        $result = ['configured' => (bool) $path, 'source_exists' => $path && is_file($path), 'source_readable' => $path && is_readable($path), 'source_valid' => false, 'active_records' => 0, 'matching_unverified_students' => 0, 'matching_verified_students' => 0, 'matching_staff_accounts' => 0];
+        try {
+            $data = self::snapshot();
+        } catch (\Throwable $e) {
+            $result['source_error_type'] = class_basename($e);
+            $result['source_error_fields'] = $e instanceof ValidationException ? array_keys($e->errors()) : [];
+
+            return $result;
+        }
+        if (! $data) {
+            return $result;
+        }
+        $result['source_valid'] = true;
+        $records = collect($data['students'])->where('active', true);
+        $result['active_records'] = $records->count();
+        foreach (User::all() as $user) {
+            if ($records->filter(fn ($s) => strtolower(trim($s['email'])) === strtolower(trim($user->email)))->count() === 1) {
+                $key = $user->role !== 'student' ? 'matching_staff_accounts' : ($user->hasVerifiedEmail() ? 'matching_verified_students' : 'matching_unverified_students');
+                $result[$key]++;
+            }
+        }
+
+        return $result;
     }
 
     public static function sync(User $user): array
@@ -74,31 +103,53 @@ class ErpConnection
         }
         self::courses($data);
         $status['updated_at'] = $data['updated_at'];
-        if (! $user->hasVerifiedEmail()) {
-            self::reconcile($user, []);
-
-            return array_replace($status, ['state' => 'verify']);
-        }
-        $email = strtolower(trim($user->email));
-        $matches = collect($data['students'])->filter(fn ($s) => strtolower(trim($s['email'])) === $email)->values();
-        // Duplicate emails (including inactive siblings) are never merged.
-        $accounts = User::whereRaw('LOWER(TRIM(email)) = ?', [$email])->count();
-        if ($matches->count() > 1 || $accounts > 1) {
-            self::reconcile($user, []);
-
-            return array_replace($status, ['state' => 'ambiguous']);
-        }
-        $student = $matches->first();
-        if (! $student || ! $student['active']) {
-            self::reconcile($user, []);
-
-            return array_replace($status, ['state' => 'unassigned']);
-        }
-        // Once linked, changing an email cannot transfer an existing identity to a different student.
-        if ($user->erp_student_id && $user->erp_student_id !== $student['id']) {
+        try {
+            $review = CampusAccessRegistry::review($user);
+        } catch (\Throwable $e) {
+            report($e);
             self::reconcile($user, []);
 
             return array_replace($status, ['state' => 'review']);
+        }
+        $student = null;
+        if ($review) {
+            // The ERP administrator has explicitly checked this account and this pupil.
+            if ($review['account_email'] !== strtolower(trim($user->email)) || ($user->erp_student_id && $user->erp_student_id !== $review['student_id'])) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'review']);
+            }
+            $student = collect($data['students'])->firstWhere('id', $review['student_id']);
+            if (! $student || ! $student['active']) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'unassigned']);
+            }
+        } else {
+            if (! $user->hasVerifiedEmail()) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'verify']);
+            }
+            $email = strtolower(trim($user->email));
+            $matches = collect($data['students'])->filter(fn ($s) => strtolower(trim($s['email'])) === $email)->values();
+            $accounts = User::whereRaw('LOWER(TRIM(email)) = ?', [$email])->count();
+            if ($matches->count() > 1 || $accounts > 1) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'ambiguous']);
+            }
+            $student = $matches->first();
+            if (! $student || ! $student['active']) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'unassigned']);
+            }
+            if ($user->erp_student_id && $user->erp_student_id !== $student['id']) {
+                self::reconcile($user, []);
+
+                return array_replace($status, ['state' => 'review']);
+            }
         }
         $owner = User::where('erp_student_id', $student['id'])->whereKeyNot($user->id)->exists();
         if ($owner) {
@@ -106,7 +157,9 @@ class ErpConnection
 
             return array_replace($status, ['state' => 'review']);
         }
-        if (! $user->erp_student_id) {
+        if ($review && $user->erp_link_review_id !== $review['review_id']) {
+            $user->forceFill(['erp_student_id' => $student['id'], 'email_verified_at' => $user->email_verified_at ?? now(), 'erp_link_review_id' => $review['review_id'], 'erp_link_checked_by' => $review['checked_by'], 'erp_link_reviewed_at' => $review['reviewed_at']])->save();
+        } elseif (! $user->erp_student_id) {
             $user->forceFill(['erp_student_id' => $student['id']])->save();
         }
         $ids = Course::whereIn('erp_id', $student['courses'])->where('published', true)->pluck('id')->all();
@@ -161,7 +214,7 @@ class ErpConnection
             (clone $q)->where('source_manual', true)->update(['source_erp' => false, 'updated_at' => now()]);
             foreach ($ids as $id) {
                 DB::table('enrollments')->insertOrIgnore(['user_id' => $user->id, 'course_id' => $id, 'source_erp' => true, 'source_manual' => false, 'created_at' => now(), 'updated_at' => now()]);
-                DB::table('enrollments')->where('user_id', $user->id)->where('course_id',$id)->update(['source_erp' => true, 'updated_at' => now()]);
+                DB::table('enrollments')->where('user_id', $user->id)->where('course_id', $id)->update(['source_erp' => true, 'updated_at' => now()]);
             }
         });
     }

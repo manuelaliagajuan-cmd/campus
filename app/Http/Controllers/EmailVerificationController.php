@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\CampusAccessRegistry;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class EmailVerificationController extends Controller
     public function verify(EmailVerificationRequest $request)
     {
         $request->fulfill();
+        CampusAccessRegistry::safelyPublish($request->user());
 
         return redirect()->route('accesses')->with('status', __('Correo confirmado.'));
     }
@@ -36,6 +38,7 @@ class EmailVerificationController extends Controller
         if (! $user->hasVerifiedEmail()) {
             $user->forceFill(['email_verified_at' => now(), 'email_confirmed_by' => $request->user()->id])->save();
             event(new Verified($user));
+            CampusAccessRegistry::safelyPublish($user);
         }
 
         return back()->with('status', __('Correo confirmado. Los accesos de Gestión se actualizarán al entrar.'));

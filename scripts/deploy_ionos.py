@@ -169,7 +169,7 @@ try:
         run(prefix+'php artisan cec:empty-database --no-interaction')
         write(dbmarker,targethash+'\n')
     try:
-        run(prefix+'php artisan migrate --force --no-interaction && php artisan config:cache && php artisan view:cache && php artisan cec:health --no-interaction',timeout=240)
+        run(prefix+'php artisan migrate --force --no-interaction && php artisan config:cache && php artisan view:cache && php artisan cec:health --no-interaction && php artisan cec:publish-accesses --no-interaction && php artisan cec:erp-diagnostics --no-interaction',timeout=240)
     except Exception:
         if prior_env is not None:write(envpath,prior_env)
         raise

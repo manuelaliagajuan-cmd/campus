@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Services\CampusAccessRegistry;
+use App\Services\ErpConnection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -42,3 +44,16 @@ Artisan::command('cec:health', function () {
 
     return 0;
 });
+
+Artisan::command('cec:publish-accesses', function () {
+    CampusAccessRegistry::publishAll();
+    $this->info('CEC_REGISTRO_ACCESOS_PUBLICADO');
+
+    return 0;
+})->purpose('Publicar las cuentas de estudiantes para revisión privada desde Gestión');
+
+Artisan::command('cec:erp-diagnostics', function () {
+    $this->line(json_encode(ErpConnection::diagnostics(), JSON_THROW_ON_ERROR));
+
+    return 0;
+})->purpose('Comprobar la conexión de Gestión sin mostrar nombres, correos ni saldos');

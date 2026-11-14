@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Resource;
 use App\Models\User;
+use App\Services\CampusAccessRegistry;
 use App\Services\YouTube;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -167,6 +168,7 @@ class StaffController extends Controller
         $d = $r->validate(['role' => ['required', Rule::in(['student', 'teacher'])]]);
         $user->role = $d['role'];
         $user->save();
+        CampusAccessRegistry::safelyPublish($user);
 
         return back()->with('status', __('Permisos actualizados.'));
     }

@@ -8,6 +8,7 @@ use App\Services\ErpConnection;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -23,7 +24,9 @@ class ErpConnectionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->projection = tempnam(sys_get_temp_dir(), 'cec-erp-');
+        $dir = sys_get_temp_dir().'/cec-erp-'.bin2hex(random_bytes(8));
+        mkdir($dir, 0700);
+        $this->projection = $dir.'/campus.php';
         config(['erp.projection_path' => $this->projection]);
         User::factory()->create(['role' => 'admin']);
         $this->data = ['schema' => 1, 'revision' => 1, 'updated_at' => '2026-11-14T12:00:00Z', 'courses' => [['id' => 'CUR-001', 'name' => 'Conversación desde Gestión', 'active' => true], ['id' => 'CUR-002', 'name' => 'Otro curso', 'active' => true]], 'students' => [['id' => 'A-001', 'email' => 'student@example.test', 'active' => true, 'courses' => ['CUR-001']]], 'passes' => [['id' => 'B-001', 'student_id' => 'A-001', 'name' => 'Bono de ocho clases', 'sessions' => 8, 'used' => 3, 'remaining' => 5, 'start' => '2026-11-01', 'expires' => '2026-12-30'], ['id' => 'B-002', 'student_id' => 'A-002', 'name' => 'Bono privado de otra persona', 'sessions' => 12, 'used' => 1, 'remaining' => 11, 'start' => '', 'expires' => '']]];
@@ -37,7 +40,7 @@ class ErpConnectionTest extends TestCase
 
     protected function tearDown(): void
     {
-        @unlink($this->projection);
+        File::deleteDirectory(dirname($this->projection));
         parent::tearDown();
     }
 

@@ -34,3 +34,11 @@ Cada bono emitido conserva sus propias condiciones. El saldo es sesiones inicial
 Incluir `academic.php`, las copias rotatorias y las cuentas privadas de Gestión en las copias de seguridad, además de la base de datos y el almacenamiento del campus. Los despliegues no sobrescriben esos archivos. Revisar restauraciones conjuntamente: una revisión del ERP inferior a la ya aplicada requiere revisión antes de reconectar.
 
 Pruebas: la suite Laravel cubre vinculación, correo confirmado, duplicados, aislamiento, cursos nuevos, bajas, origen ausente, matrículas manuales, caducidades y confirmación de correo. Gestión prueba persistencia, autenticación, CSRF, concurrencia, proyección mínima, consumos anulados y recuperación. Su prueba de navegador comprueba la migración inicial, un guardado real de curso, conflictos entre pestañas y que una copia local antigua no sustituya el servidor.
+
+## Revisión de cuentas desde Gestión
+
+«Nuevos accesos» permite a administración de Gestión revisar las cuentas de estudiante y elegir la ficha que les corresponde. La lista se publica privadamente en `campus-accounts.php` al registrar una cuenta y se actualiza al acceder, confirmar el correo o cambiar su rol. `cec:publish-accesses` publica también las cuentas existentes al desplegar. Solo se incluyen ID, nombre, correo, alta, confirmación y vínculo; nunca contraseñas o tokens.
+
+Gestión escribe la aprobación explícita en `campus-links.php` bajo el mismo bloqueo académico. Se conserva quién revisó la identidad, cuándo, el correo revisado y un ID de revisión. El campus consume esa aprobación al entrar o recargar, vincula la ficha y permite consultar sus cursos y bonos. Una revisión expresa permite resolver correos compartidos o distintos sin modificar las fichas originales. No permite ocupar la ficha de otra cuenta ni sustituir un vínculo existente sin revisión adicional. Los cambios de correo invalidan aprobaciones anteriores. Estas revisiones y su auditoría deben incluirse en las copias de seguridad.
+
+`cec:erp-diagnostics` emite solo indicadores y recuentos de conexión y confirmación, sin nombres, correos ni saldos, para diagnosticar un acceso pendiente sin publicar datos personales.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\CampusAccessRegistry;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,7 @@ class AuthController extends Controller
     {
         $d = $r->validate(['name' => 'required|string|max:120', 'email' => 'required|email|max:190|unique:users,email', 'password' => ['required', 'confirmed', 'max:72', PasswordRule::min(12)->letters()->numbers()]]);
         $u = User::create($d);
+        CampusAccessRegistry::safelyPublish($u);
         Auth::login($u);
         $r->session()->regenerate();
 
