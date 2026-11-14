@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\ErpConnection;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Notification;
@@ -249,5 +250,17 @@ class ErpConnectionTest extends TestCase
         $this->data['passes'] = [];
         $this->write();
         $this->get('/campus')->assertOk()->assertSee('Bonos asignados')->assertDontSee('data-dashboard-pass=', false);
+    }
+
+    public function test_scheduled_withdrawal_revokes_erp_access_on_the_date_without_an_erp_visit(): void
+    {
+        $this->travelTo(now()->setDate(2026, 11, 14)->setTime(12, 0));
+        $this->data['students'][0]['withdrawal_date'] = '2026-11-15';
+        $this->write();
+        $u = $this->pupil();
+        $this->actingAs($u)->get('/campus')->assertSee('Bono de ocho clases')->assertSee('Conversación desde Gestión');
+        $this->travelTo(Carbon::parse('2026-11-15 00:00:00', 'Europe/Madrid'));
+        $this->get('/campus')->assertDontSee('Bono de ocho clases')->assertDontSee('Conversación desde Gestión');
+        $this->assertDatabaseCount('enrollments', 0);
     }
 }

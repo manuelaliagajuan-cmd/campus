@@ -27,11 +27,19 @@ class ErpConnection
             'schema' => 'required|in:1', 'revision' => 'required|integer|min:1', 'updated_at' => 'required|date',
             'courses' => 'present|array', 'students' => 'present|array', 'passes' => 'present|array',
             'courses.*.id' => 'required|string|max:100|distinct', 'courses.*.name' => 'required|string|max:180', 'courses.*.active' => 'required|boolean',
-            'students.*.id' => 'required|string|max:100|distinct', 'students.*.email' => 'present|string|max:190', 'students.*.active' => 'required|boolean', 'students.*.courses' => 'present|array', 'students.*.courses.*' => 'string|max:100',
+            'students.*.id' => 'required|string|max:100|distinct', 'students.*.email' => 'present|string|max:190', 'students.*.active' => 'required|boolean', 'students.*.withdrawal_date' => 'nullable|date_format:Y-m-d', 'students.*.courses' => 'present|array', 'students.*.courses.*' => 'string|max:100',
             'passes.*.id' => 'required|string|max:100|distinct', 'passes.*.student_id' => 'required|string|max:100', 'passes.*.name' => 'required|string|max:180',
             'passes.*.sessions' => 'required|integer|min:0|max:500', 'passes.*.used' => 'required|integer|min:0', 'passes.*.remaining' => 'required|integer|min:0',
             'passes.*.start' => 'nullable|date_format:Y-m-d', 'passes.*.expires' => 'nullable|date_format:Y-m-d',
         ])->validate();
+
+        $today = now('Europe/Madrid')->toDateString();
+        foreach ($data['students'] as &$student) {
+            if (! empty($student['withdrawal_date']) && $student['withdrawal_date'] <= $today) {
+                $student['active'] = false;
+            }
+        }
+        unset($student);
 
         return $data;
     }
