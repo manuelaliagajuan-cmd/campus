@@ -8,6 +8,11 @@ class Attempt extends Model
 {
     protected $guarded = ['id'];
 
+    public function audio()
+    {
+        return $this->belongsTo(Resource::class, 'audio_resource_id');
+    }
+
     protected $hidden = ['questions', 'answers', 'feedback'];
 
     protected function casts(): array

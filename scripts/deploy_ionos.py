@@ -139,6 +139,11 @@ try:
     if all(os.environ.get(n) for n in ['CEC_MAIL_HOST','CEC_MAIL_USER','CEC_MAIL_PASSWORD']):
         config.update({'MAIL_MAILER':'smtp','MAIL_HOST':os.environ['CEC_MAIL_HOST'],'MAIL_PORT':os.environ.get('CEC_MAIL_PORT') or '587','MAIL_USERNAME':os.environ['CEC_MAIL_USER'],'MAIL_PASSWORD':os.environ['CEC_MAIL_PASSWORD'],'MAIL_SCHEME':'smtps' if os.environ.get('CEC_MAIL_PORT')=='465' else 'smtp','MAIL_FROM_ADDRESS':os.environ.get('CEC_MAIL_FROM') or os.environ['CEC_MAIL_USER']})
         sensitive.append(os.environ['CEC_MAIL_PASSWORD'])
+    if os.environ.get('CEC_RTC_ICE_SERVERS'):
+        ice = json.loads(os.environ['CEC_RTC_ICE_SERVERS'])
+        if not isinstance(ice,list) or len(ice)>10: raise RuntimeError('Configuración ICE no válida.')
+        config['CEC_RTC_ICE_SERVERS']=json.dumps(ice,separators=(',',':'))
+        sensitive.append(os.environ['CEC_RTC_ICE_SERVERS'])
     # Existing env is backed up without printing its contents.
     if exists(envpath):
         with sftp.open(envpath) as f:prior_env=f.read()

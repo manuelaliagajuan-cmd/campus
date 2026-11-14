@@ -19,7 +19,7 @@ class Presentation
         } catch (\JsonException $e) {
             throw ValidationException::withMessages(['presentation' => __('Revisa las diapositivas de la presentación.')]);
         }
-        $d = Validator::make(['slides' => $slides], ['slides' => 'required|array|min:1|max:40', 'slides.*.title' => 'nullable|string|max:180', 'slides.*.blocks' => 'required|array|min:1|max:15', 'slides.*.blocks.*.type' => 'required|in:text,image,video,activity'])->validate();
+        $d = Validator::make(['slides' => $slides], ['slides' => 'required|array|min:1|max:40', 'slides.*.title' => 'nullable|string|max:180', 'slides.*.blocks' => 'required|array|min:1|max:15', 'slides.*.blocks.*.type' => 'required|in:text,image,audio,video,activity'])->validate();
         $result = [];
         foreach ($slides as $slide) {
             $blocks = [];
@@ -28,11 +28,12 @@ class Presentation
                     case 'text':$value = Validator::make($block, ['body' => 'required|string|max:20000'])->validate();
                         $blocks[] = ['type' => 'text', 'body' => $value['body']];
                         break;
+                    case 'audio':
                     case 'image':$value = Validator::make($block, ['resource_id' => 'required|integer'])->validate();
-                        $image = $course->resources()->whereKey($value['resource_id'])->whereIn('mime', ['image/jpeg', 'image/png', 'image/webp'])->first();
+                        $image = $course->resources()->whereKey($value['resource_id'])->whereIn('mime', $block['type'] === 'audio' ? LearningAudio::MIMES : ['image/jpeg', 'image/png', 'image/webp'])->first();
                         if (! $image) {
                             throw ValidationException::withMessages(['presentation' => __('Selecciona una imagen de este curso.')]);
-                        }$blocks[] = ['type' => 'image', 'resource_id' => $image->id];
+                        }$blocks[] = ['type' => $block['type'], 'resource_id' => $image->id];
                         break;
                     case 'video':$youtube = YouTube::id($block['url'] ?? null);
                         if (! $youtube) {
@@ -59,18 +60,18 @@ class Presentation
 
     public static function display(Lesson $lesson): array
     {
-        $images = $lesson->course->resources()->whereIn('mime', ['image/jpeg', 'image/png', 'image/webp'])->get()->keyBy('id');
+        $images = $lesson->course->resources()->whereIn('mime', array_merge(['image/jpeg', 'image/png', 'image/webp'], LearningAudio::MIMES))->get()->keyBy('id');
         $activities = $lesson->course->activities()->where('published', true)->get()->keyBy('id');
 
         return collect($lesson->presentation ?? [])->map(function ($s) use ($images, $activities) {
             $s['blocks'] = array_map(function ($b) use ($images, $activities) {
-                if ($b['type'] === 'image') {
+                if (in_array($b['type'], ['image', 'audio'], true)) {
                     $b['resource'] = $images->get($b['resource_id']);
                 }if ($b['type'] === 'activity') {
                     $b['activity'] = $activities->get($b['activity_id']);
                 }
 
-return $b;
+                return $b;
             }, $s['blocks']);
 
             return $s;

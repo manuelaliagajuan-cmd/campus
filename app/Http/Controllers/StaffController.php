@@ -9,11 +9,13 @@ use App\Models\Resource;
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
 use App\Services\CourseCover;
+use App\Services\LearningAudio;
 use App\Services\Presentation;
 use App\Services\YouTube;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class StaffController extends Controller
 {
@@ -50,6 +52,9 @@ class StaffController extends Controller
         $header = $r->validate(CourseCover::rules());
         unset($header['cover_image'],$header['remove_cover_image']);
         $d = array_merge($d, $header);
+        if ($r->has('online_enabled')) {
+            $d['online_enabled'] = $r->boolean('online_enabled');
+        }
         $d['published'] = $r->boolean('published');
         $d['certificate_enabled'] = $r->has('certificate_enabled') ? $r->boolean('certificate_enabled') : true;
 
@@ -106,6 +111,7 @@ class StaffController extends Controller
             abort_unless($lesson->course_id === $course->id, 404);
         }$d = $r->validate(['title' => 'required|string|max:180', 'unit' => 'required|string|max:120', 'content' => 'nullable|string|max:50000', 'youtube_url' => 'nullable|url|max:500', 'position' => 'required|integer|min:1|max:10000']);
         $r->validate(['format' => 'nullable|in:standard,presentation', 'presentation' => 'nullable|string|max:150000']);
+        $d['audio_resource_id'] = LearningAudio::selected($r, $course);
         $d['format'] = $r->input('format') ?: 'standard';
         $d['presentation'] = $d['format'] === 'presentation' ? Presentation::validate($course, $r->input('presentation')) : null;
         $id = YouTube::id($d['youtube_url'] ?? null);
@@ -124,6 +130,26 @@ class StaffController extends Controller
         }
 
         return redirect()->route('staff.edit', $course)->with('status', __('Lección guardada.'));
+    }
+
+    public function audio(Request $r, Course $course)
+    {
+        $this->manage($r, $course);
+        $r->validate(['file' => 'required|file|mimes:mp3,wav,ogg,m4a,aac,webm|max:20480']);
+        $f = $r->file('file');
+        $audioMime = (new \finfo(FILEINFO_MIME_TYPE))->file($f->getRealPath());
+        if (! in_array($audioMime, LearningAudio::MIMES, true)) {
+            throw ValidationException::withMessages(['file' => __('Selecciona un archivo de audio válido.')]);
+        }
+        $path = $f->store('courses/'.$course->id, 'local');
+        try {
+            $resource = $course->resources()->create(['title' => basename($f->getClientOriginalName()), 'path' => $path, 'filename' => basename($f->getClientOriginalName()), 'mime' => $audioMime, 'size' => $f->getSize()]);
+        } catch (\Throwable $e) {
+            Storage::disk('local')->delete($path);
+            throw $e;
+        }
+
+        return response()->json(['id' => $resource->id, 'title' => $resource->title, 'url' => route('resources.file', $resource)]);
     }
 
     public function image(Request $r, Course $course)

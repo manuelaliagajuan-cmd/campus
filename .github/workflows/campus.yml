@@ -28,6 +28,8 @@ jobs:
           node --check public/assets/campus.js
           node --check public/assets/presentations.js
           node --check public/assets/course-cover-editor.js
+          node --check public/assets/audio-picker.js
+          node --check public/assets/online-classroom.js
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test
@@ -51,6 +53,7 @@ jobs:
           IONOS_DB_NAME: ${{ secrets.IONOS_DB_NAME }}
           IONOS_DB_USER: ${{ secrets.IONOS_DB_USER }}
           IONOS_DB_PASSWORD: ${{ secrets.IONOS_DB_PASSWORD }}
+          CEC_RTC_ICE_SERVERS: ${{ secrets.CEC_RTC_ICE_SERVERS }}
           CEC_MAIL_HOST: ${{ secrets.CEC_MAIL_HOST }}
           CEC_MAIL_USER: ${{ secrets.CEC_MAIL_USER }}
           CEC_MAIL_PASSWORD: ${{ secrets.CEC_MAIL_PASSWORD }}

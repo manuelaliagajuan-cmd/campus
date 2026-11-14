@@ -18,7 +18,7 @@ class Course extends Model
 
     protected function casts(): array
     {
-        return ['published' => 'boolean', 'certificate_enabled' => 'boolean', 'duration_hours' => 'float'];
+        return ['published' => 'boolean', 'online_enabled' => 'boolean', 'certificate_enabled' => 'boolean', 'duration_hours' => 'float'];
     }
 
     public function teacher()

@@ -8,6 +8,11 @@ class Lesson extends Model
 {
     protected $guarded = ['id'];
 
+    public function audio()
+    {
+        return $this->belongsTo(Resource::class, 'audio_resource_id');
+    }
+
     protected function casts(): array
     {
         return ['presentation' => 'array'];

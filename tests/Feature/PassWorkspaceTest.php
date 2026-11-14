@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\OnlineSession;
 use App\Models\PassContent;
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
@@ -110,5 +111,26 @@ class PassWorkspaceTest extends TestCase
         $this->write();
         $this->actingAs($other)->get('/bonos/BON-1')->assertOk()->assertDontSee('Contenido del alumno anterior');
         $this->get('/bonos/materiales/'.$content->id.'/archivo')->assertForbidden();
+    }
+
+    public function test_online_pass_room_is_explicit_private_and_revoked_with_modality_teacher_or_balance(): void
+    {
+        $this->actingAs($this->student)->get('/clases-online')->assertDontSee('Bono de prueba');
+        $this->data['passes'][0]['online_enabled'] = true;
+        $this->data['revision']++;
+        $this->write();
+        $this->get('/clases-online')->assertSee('Bono de prueba');
+        $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1'])->assertRedirect();
+        $session = OnlineSession::firstOrFail();
+        $this->actingAs($this->student)->get('/clases-online/'.$session->id)->assertOk();
+        $this->actingAs(User::factory()->create())->get('/clases-online/'.$session->id)->assertForbidden();
+        $this->data['passes'][0]['teacher_id'] = null;
+        $this->data['revision']++;
+        $this->write();
+        $this->actingAs($this->teacher)->get('/clases-online/'.$session->id)->assertForbidden();
+        $this->data['passes'][0]['remaining'] = 0;
+        $this->data['revision']++;
+        $this->write();
+        $this->actingAs($this->student)->get('/clases-online/'.$session->id)->assertForbidden();
     }
 }

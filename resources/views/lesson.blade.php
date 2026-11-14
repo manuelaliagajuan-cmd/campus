@@ -1,6 +1,7 @@
 @extends('layout')
 @section('title',$lesson->title)
 @section('content')<a href="{{ route('courses.show',$lesson->course) }}">← {{ $lesson->course->title }}</a><div class="eyebrow" style="margin-top:25px">{{ $lesson->unit }}</div><h1>{{ $lesson->title }}</h1>
+@include('partials.audio-player',['audio'=>$lesson->audio])
 @if($lesson->format==='presentation' && $lesson->presentation)
 @include('partials.presentation-viewer')
 @else

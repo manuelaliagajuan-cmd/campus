@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\User;
 use App\Services\Certificates;
 use App\Services\Grader;
+use App\Services\LearningAudio;
 use App\Services\Questions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,6 +61,7 @@ class ActivityController extends Controller
         $lessonIds = $d['lessons'] ?? [];
         abort_if($course->lessons()->whereIn('id', $lessonIds)->count() !== count(array_unique($lessonIds)), 422);
         unset($d['questions_json'],$d['lessons']);
+        $d['audio_resource_id'] = LearningAudio::selected($r, $course);
         $d['questions'] = $questions;
         $d['published'] = $r->boolean('published');
         DB::transaction(function () use (&$activity, $d, $lessonIds) {
@@ -106,7 +108,7 @@ class ActivityController extends Controller
                 return $open;
             }abort_if(! $activity->course->managedBy($r->user()) && $activity->max_attempts > 0 && (clone $q)->count() >= $activity->max_attempts, 403, __('Has alcanzado el límite de intentos.'));
 
-            return $activity->attempts()->create(['user_id' => $r->user()->id, 'questions' => $activity->questions, 'pass_percent' => $activity->pass_percent]);
+            return $activity->attempts()->create(['user_id' => $r->user()->id, 'questions' => $activity->questions, 'pass_percent' => $activity->pass_percent, 'audio_resource_id' => $activity->audio_resource_id]);
         });
 
         return redirect()->route('attempts.show', ['attempt' => $attempt, 'leccion' => $r->integer('leccion') ?: null, 'embed' => $r->boolean('embed') ? 1 : null]);

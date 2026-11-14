@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Models\Announcement;
 use App\Models\Course;
 use App\Services\CourseNavigation;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        foreach (['start' => 10, 'join' => 20, 'poll' => 120, 'event' => 300, 'rate' => 10] as $action => $limit) {
+            RateLimiter::for('online-'.$action, fn (Request $r) => Limit::perMinute($limit)->by('online-'.$action.':'.$r->user()->id));
+        }
         View::composer('layout', function ($view) {
             $unread = 0;
             $courseNavigation = null;
