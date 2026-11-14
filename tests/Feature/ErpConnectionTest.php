@@ -221,4 +221,33 @@ class ErpConnectionTest extends TestCase
         $this->actingAs($u)->get('/mis-accesos')->assertOk()->assertDontSee('Bono de ocho clases')->assertDontSee('Conversación desde Gestión');
         $this->assertDatabaseCount('enrollments', 0);
     }
+
+    public function test_dashboard_shows_each_own_pass_and_course_with_real_remaining_balance(): void
+    {
+        $u = $this->pupil();
+        $this->actingAs($u)->get('/campus')->assertOk()->assertSee('Conversación desde Gestión')->assertSee('Bonos asignados')->assertSee('Mis bonos de clases')->assertSee('data-dashboard-pass="B-001"', false)->assertDontSee('Bono privado de otra persona');
+        $this->data['passes'][] = ['id' => 'B-003', 'student_id' => 'A-001', 'name' => 'Segundo bono del alumno', 'sessions' => 12, 'used' => 2, 'remaining' => 10, 'start' => '', 'expires' => ''];
+        $this->data['revision']++;
+        $this->write();
+        $response = $this->get('/campus');
+        $response->assertOk()->assertSee('Segundo bono del alumno')->assertSee('data-dashboard-pass="B-003"', false)->assertSee('<strong>10</strong>', false)->assertSee('stats-with-passes', false);
+        $this->assertSame(2, substr_count($response->getContent(), 'data-dashboard-pass='));
+    }
+
+    public function test_dashboard_shows_passes_even_when_student_has_no_courses(): void
+    {
+        $this->data['students'][0]['courses'] = [];
+        $this->write();
+        $this->actingAs($this->pupil())->get('/campus')->assertOk()->assertSee('Bono de ocho clases')->assertSee('data-dashboard-pass="B-001"', false)->assertDontSee('Conversación desde Gestión');
+    }
+
+    public function test_dashboard_never_shows_pass_cards_for_an_unconfirmed_or_unassigned_account(): void
+    {
+        $u = $this->pupil(['email_verified_at' => null]);
+        $this->actingAs($u)->get('/campus')->assertOk()->assertDontSee('data-dashboard-pass=', false)->assertDontSee('Bonos asignados')->assertDontSee('Bono de ocho clases');
+        $u->markEmailAsVerified();
+        $this->data['passes'] = [];
+        $this->write();
+        $this->get('/campus')->assertOk()->assertSee('Bonos asignados')->assertDontSee('data-dashboard-pass=', false);
+    }
 }

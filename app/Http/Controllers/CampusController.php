@@ -26,7 +26,10 @@ class CampusController extends Controller
         $state = in_array($r->query('estado'), ['en-curso', 'completados', 'todos'], true) ? $r->query('estado') : ($u->isStaff() ? 'todos' : 'en-curso');
         $visibleCourses = $courses->filter(fn ($c) => $state === 'todos' || ($state === 'completados' ? $progress[$c->id]['complete'] : ! $progress[$c->id]['complete']));
 
-        return view('dashboard', compact('courses', 'completed', 'progress', 'state', 'visibleCourses'));
+        $erp = $r->attributes->get('erp', ['state' => 'unavailable', 'passes' => []]);
+        $sessionPasses = $erp['state'] === 'connected' ? $erp['passes'] : [];
+
+        return view('dashboard', compact('courses', 'completed', 'progress', 'state', 'visibleCourses', 'erp', 'sessionPasses'));
     }
 
     public function course(Request $r, Course $course)

@@ -443,5 +443,9 @@
   "Correo confirmado.": "Email confirmed.",
   "Correo confirmado. Los accesos de Gestión se actualizarán al entrar.": "Email confirmed. Gestión access will update when the student signs in.",
   "Profesor responsable": "Course instructor",
-  "El centro puede revisar y vincular tu cuenta desde Nuevos accesos en Gestión.": "The centre can review and link your account in New access requests in Gestión."
+  "El centro puede revisar y vincular tu cuenta desde Nuevos accesos en Gestión.": "The centre can review and link your account in New access requests in Gestión.",
+  "Bonos asignados": "Assigned session passes",
+  "Mis bonos de clases": "My class passes",
+  "Ver mis bonos →": "View my passes →",
+  "Ver detalle del bono →": "View pass details →"
 }
