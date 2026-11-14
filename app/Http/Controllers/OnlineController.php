@@ -103,7 +103,7 @@ class OnlineController extends Controller
             return $e;
         });
 
-        return response()->json(['ended' => (bool) $session->ended_at, 'peers' => $peers, 'events' => $events, 'time' => now()->toIso8601String()]);
+        return response()->json(['ended' => (bool) $session->ended_at, 'peers' => $peers, 'events' => $events, 'notes' => ['text' => $session->notes ?? '', 'revision' => (int) $session->notes_revision], 'time' => now()->toIso8601String()]);
     }
 
     public function event(Request $r, OnlineSession $session)
@@ -111,7 +111,7 @@ class OnlineController extends Controller
         $room = $this->access($r, $session);
         abort_if($session->ended_at, 409);
         $p = $this->participant($r, $session);
-        $d = $r->validate(['kind' => 'required|in:signal,chat,stroke,clear', 'recipient' => 'nullable|uuid', 'payload' => 'required|array']);
+        $d = $r->validate(['kind' => 'required|in:signal,chat,stroke,clear,sharing', 'recipient' => 'nullable|uuid', 'payload' => 'required|array']);
         abort_if(strlen(json_encode($d['payload'])) > 40000, 422);
         $payload = [];
         $recipient = null;
@@ -119,6 +119,8 @@ class OnlineController extends Controller
             case 'signal':$recipient = $d['recipient'] ?? null;
                 abort_unless($recipient && $recipient !== $p->id && DB::table('online_participants')->where('online_session_id', $session->id)->where('id', $recipient)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->exists(), 422);
                 $payload = validator($d['payload'], ['type' => 'required|in:offer,answer,candidate', 'sdp' => 'nullable|string|max:30000', 'candidate' => 'nullable|array', 'candidate.candidate' => 'nullable|string|max:4000', 'candidate.sdpMid' => 'nullable|string|max:100', 'candidate.sdpMLineIndex' => 'nullable|integer|min:0|max:100', 'candidate.usernameFragment' => 'nullable|string|max:256'])->validate();
+                break;
+            case 'sharing':$payload = validator($d['payload'], ['active' => 'required|boolean'])->validate();
                 break;
             case 'chat':$payload = validator($d['payload'], ['text' => 'required|string|max:2000'])->validate();
                 $payload['name'] = $r->user()->name;
@@ -131,6 +133,23 @@ class OnlineController extends Controller
         $id = DB::table('online_events')->insertGetId(['online_session_id' => $session->id, 'participant_id' => $p->id, 'recipient_id' => $recipient, 'kind' => $d['kind'], 'payload' => json_encode($payload, JSON_THROW_ON_ERROR), 'created_at' => now()]);
 
         return response()->json(['id' => $id]);
+    }
+
+    public function notes(Request $r, OnlineSession $session)
+    {
+        $this->access($r, $session);
+        $this->participant($r, $session);
+        $d = $r->validate(['text' => 'nullable|string|max:20000', 'revision' => 'required|integer|min:0']);
+
+        return DB::transaction(function () use ($session, $d) {
+            $locked = OnlineSession::whereKey($session->id)->lockForUpdate()->firstOrFail();
+            abort_if($locked->ended_at, 409);
+            if ($locked->notes_revision !== $d['revision']) {
+                return response()->json(['message' => __('Los apuntes han cambiado. Tu texto se conserva; revisa la versión compartida antes de guardar.'), 'notes' => ['text' => $locked->notes ?? '', 'revision' => (int) $locked->notes_revision]], 409);
+            }$locked->update(['notes' => $d['text'] ?? '', 'notes_revision' => $locked->notes_revision + 1]);
+
+            return response()->json(['notes' => ['text' => $locked->notes ?? '', 'revision' => (int) $locked->notes_revision]]);
+        });
     }
 
     public function leave(Request $r, OnlineSession $session)

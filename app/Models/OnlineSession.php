@@ -10,6 +10,6 @@ class OnlineSession extends Model
 
     protected function casts(): array
     {
-        return ['ended_at' => 'datetime'];
+        return ['ended_at' => 'datetime', 'notes_revision' => 'integer'];
     }
 }

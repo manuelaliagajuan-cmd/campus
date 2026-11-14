@@ -57,6 +57,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/clases-online/{session}/entrar', [OnlineController::class, 'join'])->middleware('throttle:online-join')->name('online.join');
         Route::get('/clases-online/{session}/estado', [OnlineController::class, 'poll'])->middleware('throttle:online-poll')->name('online.poll');
         Route::post('/clases-online/{session}/evento', [OnlineController::class, 'event'])->middleware('throttle:online-event')->name('online.event');
+        Route::post('/clases-online/{session}/apuntes', [OnlineController::class, 'notes'])->middleware('throttle:online-event')->name('online.notes');
         Route::post('/clases-online/{session}/salir', [OnlineController::class, 'leave'])->name('online.leave');
         Route::post('/clases-online/{session}/finalizar', [OnlineController::class, 'end'])->name('online.end');
         Route::post('/clases-online/{session}/valorar', [OnlineController::class, 'rate'])->middleware('throttle:online-rate')->name('online.rate');

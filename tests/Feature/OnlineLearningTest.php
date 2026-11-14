@@ -119,7 +119,24 @@ class OnlineLearningTest extends TestCase
         $this->get(route('attempts.show', $attempt))->assertOk()->assertSee('Escucha el audio')->assertSee('listening.wav');
         $this->assertEquals($id, $attempt->audio_resource_id);
         $other = Course::create(['title' => 'Other', 'teacher_id' => $teacher->id, 'published' => true]);
-        $this->actingAs($teacher)->postJson(route('staff.lesson.store',$other),['title' => 'Invalid audio', 'unit' => '1', 'position' => 1, 'audio_resource_id' => $id])->assertUnprocessable();
-        $this->postJson(route('staff.audio',$course),['file' => UploadedFile::fake()->createWithContent('bad.mp3','<?php echo 1;')])->assertUnprocessable();
+        $this->actingAs($teacher)->postJson(route('staff.lesson.store', $other), ['title' => 'Invalid audio', 'unit' => '1', 'position' => 1, 'audio_resource_id' => $id])->assertUnprocessable();
+        $this->postJson(route('staff.audio', $course), ['file' => UploadedFile::fake()->createWithContent('bad.mp3', '<?php echo 1;')])->assertUnprocessable();
+    }
+
+    public function test_notes_are_shared_separate_from_chat_and_conflicts_keep_saved_version(): void
+    {
+        [$teacher,$student,$course,$session] = $this->setupRoom();
+        $t = $this->actingAs($teacher)->postJson(route('online.join', $session))->json('participant');
+        $s = $this->actingAs($student)->postJson(route('online.join', $session))->json('participant');
+        $this->postJson(route('online.notes', $session), ['participant' => $s, 'text' => 'Vocabulary: friendship', 'revision' => 0])->assertOk()->assertJsonPath('notes.revision', 1);
+        $this->actingAs($teacher)->getJson(route('online.poll', $session).'?participant='.$t)->assertJsonPath('notes.text', 'Vocabulary: friendship');
+        $this->postJson(route('online.notes', $session), ['participant' => $t, 'text' => 'Stale overwrite', 'revision' => 0])->assertStatus(409)->assertJsonPath('notes.text', 'Vocabulary: friendship');
+        $this->postJson(route('online.notes', $session), ['participant' => $t, 'text' => 'Vocabulary: friendship and trust', 'revision' => 1])->assertOk()->assertJsonPath('notes.revision', 2);
+        $this->postJson(route('online.event', $session), ['participant' => $t, 'kind' => 'sharing', 'payload' => ['active' => true]])->assertOk();
+        $this->actingAs($student)->getJson(route('online.poll', $session).'?participant='.$s)->assertSee('sharing');
+        $this->postJson(route('online.notes', $session), ['participant' => $t, 'text' => 'Impersonation', 'revision' => 2])->assertForbidden();
+        $this->actingAs($teacher)->post(route('online.end', $session))->assertRedirect();
+        $this->get(route('online.show', $session))->assertSee('Vocabulary: friendship and trust');
+        $this->postJson(route('online.notes', $session), ['participant' => $t, 'text' => 'After end', 'revision' => 2])->assertStatus(409);
     }
 }
