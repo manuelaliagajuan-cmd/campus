@@ -95,4 +95,10 @@ La migración `2026_11_14_000001_add_progress_certificates_and_notices` añade e
 
 Dentro del curso, las lecciones, actividades, intentos y materiales conservan un índice lateral por unidades. Identifica vídeo, lectura, práctica y test, resalta el elemento actual y marca las lecciones completadas y los tests superados. Puede ocultarse sin perder las respuestas; en móvil se abre como un panel. Las actividades reutilizadas conservan la unidad desde la que se accedió.
 
-El menú del avatar enlaza a aprendizaje, cursos y bonos, materiales, certificados y avisos. «Mis cursos y bonos» consulta los cursos a los que la cuenta tiene acceso realmente. Los bonos de sesiones de Gestión todavía no están sincronizados: véase [conexión con el ERP](docs/ERP-integration.md).
+El menú del avatar enlaza a aprendizaje, cursos y bonos, materiales, certificados y avisos. «Mis cursos y bonos» consulta los cursos a los que la cuenta tiene acceso realmente. La conexión de bonos de sesiones y cursos con Gestión se describe en [conexión con el ERP](docs/ERP-integration.md).
+
+## Conexión con Gestión CEC
+
+Los cursos, las matrículas y los bonos de sesiones de Gestión se comparten con el campus mediante un origen privado en IONOS. Al entrar o recargar, la cuenta con correo único coincidente y confirmado recibe sus cursos activos y puede consultar clases iniciales, utilizadas, restantes y caducidad de sus bonos. Las lecciones, los archivos, los ejercicios y el progreso permanecen en el campus.
+
+La primera conexión se realiza abriendo Gestión como administrador desde el navegador que conserva los datos actuales. Después se usa el servidor como referencia, con control de concurrencia y copias de seguridad. Sin SMTP, administración confirma la titularidad del correo desde Usuarios y permisos. Véanse [la configuración, permisos y pruebas de la integración](docs/ERP-integration.md).

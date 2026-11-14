@@ -24,7 +24,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/restablecer/{token}', [AuthController::class, 'resetForm'])->name('password.reset');
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', \App\Http\Middleware\SyncErp::class])->group(function () {
         Route::get('/certificados', [CertificateController::class, 'index'])->name('certificates.index');
         Route::get('/certificados/{certificate}', [CertificateController::class, 'show'])->name('certificates.show');
         Route::get('/certificados/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');
@@ -36,6 +36,9 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/docente/cursos/{course}/avisos', [NotificationController::class, 'store'])->name('staff.announcements.store');
         Route::delete('/docente/avisos/{announcement}', [NotificationController::class, 'destroy'])->name('staff.announcements.delete');
         Route::post('/salir', [AuthController::class, 'logout'])->name('logout');
+        Route::post('/cuenta/confirmar-correo', [\App\Http\Controllers\EmailVerificationController::class, 'send'])->middleware('throttle:3,1')->name('verification.send');
+        Route::get('/cuenta/confirmar-correo/{id}/{hash}', [\App\Http\Controllers\EmailVerificationController::class, 'verify'])->middleware(['signed','throttle:6,1'])->name('verification.verify');
+        Route::post('/docente/usuarios/{user}/confirmar-correo', [\App\Http\Controllers\EmailVerificationController::class, 'confirm'])->name('staff.verify-email');
         Route::get('/mis-accesos', [AccessController::class, 'index'])->name('accesses');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');

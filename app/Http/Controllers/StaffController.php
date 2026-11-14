@@ -62,7 +62,15 @@ class StaffController extends Controller
     public function update(Request $r, Course $course)
     {
         $this->manage($r, $course);
-        $course->update($this->courseData($r));
+        $data = $this->courseData($r);
+        if ($course->erp_id) {
+            unset($data['title'],$data['published']);
+        }
+        if ($r->user()->role === 'admin' && $r->filled('teacher_id')) {
+            $teacher = User::whereIn('role', ['admin', 'teacher'])->findOrFail($r->integer('teacher_id'));
+            $data['teacher_id'] = $teacher->id;
+        }
+        $course->update($data);
 
         return back()->with('status', __('Curso actualizado.'));
     }
@@ -104,7 +112,7 @@ class StaffController extends Controller
         $u = User::where('email', $r->input('email'))->first();
         if (! $u) {
             return back()->withErrors(['email' => __('El estudiante debe registrarse primero en el campus.')]);
-        }$course->students()->syncWithoutDetaching([$u->id]);
+        }$course->students()->syncWithoutDetaching([$u->id => ['source_manual' => true]]);
 
         return back()->with('status', __('Matrícula guardada.'));
     }
@@ -112,6 +120,9 @@ class StaffController extends Controller
     public function revoke(Request $r, Course $course, User $user)
     {
         $this->manage($r, $course);
+        if ($course->students()->where('users.id', $user->id)->wherePivot('source_erp', true)->exists()) {
+            return back()->withErrors(['email' => __('Esta matrícula viene de Gestión CEC. Modifícala allí para actualizar el acceso.')]);
+        }
         $course->students()->detach($user->id);
 
         return back()->with('status', __('Matrícula retirada.'));

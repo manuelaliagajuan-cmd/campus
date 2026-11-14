@@ -11,6 +11,8 @@ class AccessController extends Controller
     {
         $courses = Course::accessibleTo($request->user())->with('teacher')->orderBy('title')->get();
 
-        return view('accesses', compact('courses'));
+        $erp = $request->attributes->get('erp', ['state' => 'unavailable', 'passes' => [], 'updated_at' => null]);
+
+        return view('accesses', compact('courses', 'erp'));
     }
 }
