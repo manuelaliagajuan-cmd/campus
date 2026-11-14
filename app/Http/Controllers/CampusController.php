@@ -81,6 +81,14 @@ class CampusController extends Controller
         return Storage::disk('local')->response($resource->path, $resource->filename, ['X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store', 'X-Frame-Options' => 'SAMEORIGIN'], $inline ? 'inline' : 'attachment');
     }
 
+    public function cover(Request $r, Course $course)
+    {
+        abort_unless($course->accessibleBy($r->user()), 403);
+        abort_unless($course->cover_path && Storage::disk('local')->exists($course->cover_path), 404);
+
+        return Storage::disk('local')->response($course->cover_path, 'cabecera-curso.'.$course->id, ['Content-Type' => $course->cover_mime, 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store'], 'inline');
+    }
+
     public function results(Request $r)
     {
         $u = $r->user();

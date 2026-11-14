@@ -8,6 +8,7 @@ use App\Models\Lesson;
 use App\Models\Resource;
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
+use App\Services\CourseCover;
 use App\Services\Presentation;
 use App\Services\YouTube;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class StaffController extends Controller
         $this->staff($r);
         $d = $this->courseData($r);
         $d['teacher_id'] = $r->user()->id;
-        $c = Course::create($d);
+        $c = CourseCover::save($r, $d);
 
         return redirect()->route('staff.edit', $c)->with('status', __('Curso creado. Añade sus lecciones.'));
     }
@@ -46,6 +47,9 @@ class StaffController extends Controller
     private function courseData(Request $r): array
     {
         $d = $r->validate(['title' => 'required|string|max:180', 'description' => 'nullable|string|max:10000', 'language' => 'required|string|max:60', 'level' => 'required|string|max:20', 'duration_hours' => 'nullable|numeric|min:0.5|max:2000']);
+        $header = $r->validate(CourseCover::rules());
+        unset($header['cover_image'],$header['remove_cover_image']);
+        $d = array_merge($d, $header);
         $d['published'] = $r->boolean('published');
         $d['certificate_enabled'] = $r->has('certificate_enabled') ? $r->boolean('certificate_enabled') : true;
 
@@ -72,7 +76,7 @@ class StaffController extends Controller
             $teacher = User::whereIn('role', ['admin', 'teacher'])->findOrFail($r->integer('teacher_id'));
             $data['teacher_id'] = $teacher->id;
         }
-        $course->update($data);
+        CourseCover::save($r, $data, $course);
 
         return back()->with('status', __('Curso actualizado.'));
     }

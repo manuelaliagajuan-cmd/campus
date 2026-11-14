@@ -122,3 +122,7 @@ La eliminación retira el acceso, las actividades disponibles y los avisos corre
 Eliminar en el campus un curso procedente de Gestión no borra el curso ni sus datos económicos del ERP. La sincronización conserva el registro eliminado y no lo recrea. Al restaurarlo conserva su identidad y la disponibilidad actual del origen. Si se elimina también el curso de una actividad, primero se restaura el curso.
 
 Las cuentas nuevas de alumno ven un estado de inscripción en revisión, sin instrucciones internas de Gestión ni un botón de correo que no envía nada. Los avisos operativos y la revisión de identidades permanecen en administración.
+
+### Cabecera de las tarjetas de curso
+
+En Crear/Gestionar curso, «Diseño de la cabecera» permite ajustar fondo, color y opacidad de la imagen, texto, etiqueta, tipografía, tamaño y alineación con vista previa. Las imágenes JPG, PNG o WebP se recortan en el navegador (arrastre, zoom o flechas) y se guardan al guardar el curso. El archivo recortado permanece privado y solo se sirve a usuarios con acceso al curso. El profesor responsable y administración pueden editar el diseño, también en cursos sincronizados con el ERP sin alterar sus matrículas.

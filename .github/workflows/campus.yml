@@ -27,6 +27,7 @@ jobs:
           php artisan view:cache
           node --check public/assets/campus.js
           node --check public/assets/presentations.js
+          node --check public/assets/course-cover-editor.js
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test

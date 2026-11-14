@@ -51,6 +51,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/bonos/{pass}', [PassWorkspaceController::class, 'store'])->name('passes.store');
         Route::get('/mis-accesos', [AccessController::class, 'index'])->name('accesses');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
+        Route::get('/cursos/{course}/cabecera', [CampusController::class, 'cover'])->name('courses.cover');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');
         Route::get('/lecciones/{lesson}', [CampusController::class, 'lesson'])->name('lessons.show');
         Route::post('/lecciones/{lesson}/completar', [CampusController::class, 'complete'])->name('lessons.complete');

@@ -1,0 +1,7 @@
+@php($preview=$preview??false)
+@php($coverOpacity=$preview?old('cover_opacity',$course->cover_opacity):$course->cover_opacity)
+@php($coverPath=(!$preview||!old('remove_cover_image'))?$course->cover_path:null)
+<div class="card-art course-cover {{ $coverPath?'has-cover-image':'' }}" @if($preview) id="course-cover-preview" @endif style="--cover-bg:{{ $preview?old('cover_color',$course->cover_color):$course->cover_color }};--cover-ink:{{ $preview?old('cover_text_color',$course->cover_text_color):$course->cover_text_color }};--cover-opacity:{{ is_numeric($coverOpacity)?max(0,min(100,$coverOpacity))/100:1 }};--cover-font:{{ \App\Services\CourseCover::font($preview?old('cover_font',$course->cover_font):$course->cover_font) }};--cover-size:{{ $preview?old('cover_text_size',$course->cover_text_size):$course->cover_text_size }}px;--cover-align:{{ $preview?old('cover_align',$course->cover_align):$course->cover_align }};">
+@if($coverPath||$preview)<img class="course-cover-image" @if($preview) id="cover-preview-image" @endif @if($coverPath) src="{{ route('courses.cover',$course) }}" @else hidden @endif alt="" loading="lazy">@endif
+<span class="eyebrow course-cover-label" @if($preview) id="cover-preview-label" @endif>{{ ($preview?old('cover_label',$course->cover_label):$course->cover_label) ?: ($course->language??'Inglés').' · '.($course->level??'B1') }}</span><span class="letter course-cover-text" @if($preview) id="cover-preview-text" @endif>{{ $preview?old('cover_text',$course->cover_text):$course->cover_text }}</span>
+</div>

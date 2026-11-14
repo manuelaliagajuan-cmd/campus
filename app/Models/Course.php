@@ -10,7 +10,9 @@ class Course extends Model
 {
     use SoftDeletes;
 
-    protected $attributes = ['certificate_enabled' => true];
+    protected $attributes = ['certificate_enabled' => true, 'cover_color' => '#eff0f4', 'cover_text_color' => '#212a5e', 'cover_opacity' => 100, 'cover_text' => 'Aa', 'cover_font' => 'sans', 'cover_text_size' => 58, 'cover_align' => 'right'];
+
+    protected $hidden = ['cover_path'];
 
     protected $guarded = ['id'];
 
