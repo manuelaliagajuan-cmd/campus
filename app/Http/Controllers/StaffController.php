@@ -8,6 +8,7 @@ use App\Models\Lesson;
 use App\Models\Resource;
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
+use App\Services\Presentation;
 use App\Services\YouTube;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -92,6 +93,9 @@ class StaffController extends Controller
         if ($lesson) {
             abort_unless($lesson->course_id === $course->id, 404);
         }$d = $r->validate(['title' => 'required|string|max:180', 'unit' => 'required|string|max:120', 'content' => 'nullable|string|max:50000', 'youtube_url' => 'nullable|url|max:500', 'position' => 'required|integer|min:1|max:10000']);
+        $r->validate(['format' => 'nullable|in:standard,presentation', 'presentation' => 'nullable|string|max:150000']);
+        $d['format'] = $r->input('format') ?: 'standard';
+        $d['presentation'] = $d['format'] === 'presentation' ? Presentation::validate($course, $r->input('presentation')) : null;
         $id = YouTube::id($d['youtube_url'] ?? null);
         if (! empty($d['youtube_url']) && ! $id) {
             return back()->withErrors(['youtube_url' => __('Introduce una URL válida de YouTube.')])->withInput();
@@ -100,10 +104,30 @@ class StaffController extends Controller
         if ($lesson) {
             $lesson->update($d);
         } else {
-            $course->lessons()->create($d);
+            $lesson = $course->lessons()->create($d);
+        }
+
+        if ($d['presentation']) {
+            $lesson->activities()->syncWithoutDetaching(Presentation::activityIds($d['presentation']));
         }
 
         return redirect()->route('staff.edit', $course)->with('status', __('Lección guardada.'));
+    }
+
+    public function image(Request $r, Course $course)
+    {
+        $this->manage($r, $course);
+        $r->validate(['file' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120']);
+        $f = $r->file('file');
+        $path = $f->store('courses/'.$course->id, 'local');
+        try {
+            $resource = $course->resources()->create(['title' => $f->getClientOriginalName(), 'path' => $path, 'filename' => basename($f->getClientOriginalName()), 'mime' => $f->getMimeType(), 'size' => $f->getSize()]);
+        } catch (\Throwable $e) {
+            Storage::disk('local')->delete($path);
+            throw $e;
+        }
+
+        return response()->json(['id' => $resource->id, 'url' => route('resources.file', ['resource' => $resource, 'preview' => 1])]);
     }
 
     public function enroll(Request $r, Course $course)

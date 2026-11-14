@@ -25,6 +25,8 @@ jobs:
         run: |
           php artisan test
           php artisan view:cache
+          node --check public/assets/campus.js
+          node --check public/assets/presentations.js
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test

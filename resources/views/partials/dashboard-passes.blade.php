@@ -7,6 +7,6 @@
 <p class="dashboard-pass-balance"><strong>{{ $pass['remaining'] }}</strong> {{ __('clases restantes de') }} {{ $pass['sessions'] }}</p>
 <p class="small">{{ __('Clases utilizadas') }}: {{ $pass['used'] }} · {{ __('Caducidad') }}: {{ $pass['expires']?\Illuminate\Support\Carbon::parse($pass['expires'])->format('d/m/Y'):__('Sin caducidad') }}</p>
 <a href="{{ route('accesses') }}#mis-bonos">{{ __('Ver detalle del bono →') }}</a>
-</article>@endforeach</div>
+<p><a href="{{ route('passes.show',$pass['id']) }}">{{ __('Materiales del bono →') }}</a></p></article>@endforeach</div>
 </section>
 @endif

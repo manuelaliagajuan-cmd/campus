@@ -72,7 +72,7 @@ class CourseNavigation
                 }
                 $inContext = $currentLesson?->id === $lesson->id;
                 $active = $active || $inContext;
-                $items[] = ['id' => $lesson->id, 'title' => $lesson->title, 'type' => $lesson->youtube_id ? 'video' : 'reading', 'done' => $done->contains($lesson->id), 'active' => $lessonActive, 'context' => $inContext, 'url' => route('lessons.show', $lesson), 'activities' => $children];
+                $items[] = ['id' => $lesson->id, 'title' => $lesson->title, 'type' => $lesson->format === 'presentation' ? 'presentation' : ($lesson->youtube_id ? 'video' : 'reading'), 'done' => $done->contains($lesson->id), 'active' => $lessonActive, 'context' => $inContext, 'url' => route('lessons.show', $lesson), 'activities' => $children];
             }
             $units[] = ['key' => 'unit-'.count($units), 'title' => $name, 'active' => $active, 'lessons' => $items, 'standalone' => []];
         }

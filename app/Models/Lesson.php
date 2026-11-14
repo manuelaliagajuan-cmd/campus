@@ -8,6 +8,11 @@ class Lesson extends Model
 {
     protected $guarded = ['id'];
 
+    protected function casts(): array
+    {
+        return ['presentation' => 'array'];
+    }
+
     public function course()
     {
         return $this->belongsTo(Course::class);

@@ -102,3 +102,13 @@ El menú del avatar enlaza a aprendizaje, cursos y bonos, materiales, certificad
 Los cursos, las matrículas y los bonos de sesiones de Gestión se comparten con el campus mediante un origen privado en IONOS. Al entrar o recargar, la cuenta con correo único coincidente y confirmado recibe sus cursos activos y puede consultar clases iniciales, utilizadas, restantes y caducidad de sus bonos. Las lecciones, los archivos, los ejercicios y el progreso permanecen en el campus.
 
 La primera conexión se realiza abriendo Gestión como administrador desde el navegador que conserva los datos actuales. Después se usa el servidor como referencia, con control de concurrencia y copias de seguridad. Sin SMTP, administración confirma la titularidad del correo desde Usuarios y permisos. Véanse [la configuración, permisos y pruebas de la integración](docs/ERP-integration.md).
+
+## Materiales privados por bono y presentaciones
+
+Gestión permite asignar un profesor del campus a cada bono. El profesor abre «Bonos a mi cargo» y publica archivos privados (hasta 20 MB), textos o vídeos de YouTube para el alumno. Puede guardar borradores, publicar, ocultar y eliminar. La lectura y descarga comprueban la asignación vigente y la identidad del alumno; cambiar el profesor retira el acceso al anterior. Los contenidos ya publicados se conservan para el alumno y el nuevo responsable. Se necesita una cuenta del campus con rol Profesorado para aparecer en el selector de Gestión.
+
+El editor de lección ofrece «Texto y vídeo» o «Presentación interactiva». Cada presentación admite hasta 40 diapositivas y 15 bloques por diapositiva: texto, imagen JPG/PNG/WebP (hasta 5 MB), YouTube o una actividad publicada del mismo curso. Se pueden añadir, eliminar y reordenar diapositivas y bloques. Las imágenes se guardan como recursos privados del curso y siguen en su biblioteca si se retiran de la presentación.
+
+El alumno navega con Anterior/Siguiente y una barra de progreso de la presentación. Las actividades se realizan dentro de la diapositiva, con los intentos, permisos y corrección habituales; abrir una diapositiva no consume intentos. Completar la lección conserva el funcionamiento manual existente y los tests evaluables siguen contando para completar el curso. Los vídeos permanecen alojados en YouTube.
+
+La marca usa los SVG proporcionados por CEC, con el encuadre ajustado para el menú y las pantallas pequeñas. Los logos y favicons eligen la variante clara u oscura según `prefers-color-scheme` del navegador. No se ha activado una indexación pública de contenidos privados del campus.

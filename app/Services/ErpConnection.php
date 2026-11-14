@@ -44,6 +44,41 @@ class ErpConnection
         return $data;
     }
 
+    public static function workspaces(User $user): array
+    {
+        if (! $user->isStaff() && self::sync($user)['state'] !== 'connected') {
+            return [];
+        }
+        try {
+            $data = self::snapshot();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
+        if (! $data) {
+            return [];
+        }
+        $students = collect($data['students'])->where('active', true)->keyBy('id');
+        $teachers = User::whereIn('role', ['teacher', 'admin'])->get()->keyBy('id');
+        $result = [];
+        foreach ($data['passes'] as $pass) {
+            $student = $students->get($pass['student_id']);
+            if (! $student) {
+                continue;
+            }
+            $teacher = $teachers->get($pass['teacher_id'] ?? 0);
+            $manage = $user->role === 'admin' || ($user->role === 'teacher' && $teacher?->id === $user->id);
+            $own = $user->role === 'student' && $user->erp_student_id === $pass['student_id'];
+            if (! $manage && ! $own) {
+                continue;
+            }
+            $result[] = $pass + ['student_name' => $student['name'] ?? $student['id'], 'teacher_name' => $teacher?->name, 'manage' => $manage];
+        }
+
+        return $result;
+    }
+
     public static function diagnostics(): array
     {
         $path = config('erp.projection_path');

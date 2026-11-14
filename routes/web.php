@@ -5,10 +5,13 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PassWorkspaceController;
 use App\Http\Controllers\StaffController;
 use App\Http\Middleware\PrivateResponse;
+use App\Http\Middleware\SyncErp;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(PrivateResponse::class)->group(function () {
@@ -24,7 +27,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/restablecer/{token}', [AuthController::class, 'resetForm'])->name('password.reset');
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
-    Route::middleware(['auth', \App\Http\Middleware\SyncErp::class])->group(function () {
+    Route::middleware(['auth', SyncErp::class])->group(function () {
         Route::get('/certificados', [CertificateController::class, 'index'])->name('certificates.index');
         Route::get('/certificados/{certificate}', [CertificateController::class, 'show'])->name('certificates.show');
         Route::get('/certificados/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');
@@ -36,9 +39,15 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/docente/cursos/{course}/avisos', [NotificationController::class, 'store'])->name('staff.announcements.store');
         Route::delete('/docente/avisos/{announcement}', [NotificationController::class, 'destroy'])->name('staff.announcements.delete');
         Route::post('/salir', [AuthController::class, 'logout'])->name('logout');
-        Route::post('/cuenta/confirmar-correo', [\App\Http\Controllers\EmailVerificationController::class, 'send'])->middleware('throttle:3,1')->name('verification.send');
-        Route::get('/cuenta/confirmar-correo/{id}/{hash}', [\App\Http\Controllers\EmailVerificationController::class, 'verify'])->middleware(['signed','throttle:6,1'])->name('verification.verify');
-        Route::post('/docente/usuarios/{user}/confirmar-correo', [\App\Http\Controllers\EmailVerificationController::class, 'confirm'])->name('staff.verify-email');
+        Route::post('/cuenta/confirmar-correo', [EmailVerificationController::class, 'send'])->middleware('throttle:3,1')->name('verification.send');
+        Route::get('/cuenta/confirmar-correo/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+        Route::post('/docente/usuarios/{user}/confirmar-correo', [EmailVerificationController::class, 'confirm'])->name('staff.verify-email');
+        Route::get('/docente/bonos', [PassWorkspaceController::class, 'index'])->name('passes.index');
+        Route::get('/bonos/materiales/{content}/archivo', [PassWorkspaceController::class, 'file'])->name('passes.file');
+        Route::put('/bonos/materiales/{content}', [PassWorkspaceController::class, 'publish'])->name('passes.publish');
+        Route::delete('/bonos/materiales/{content}', [PassWorkspaceController::class, 'destroy'])->name('passes.destroy');
+        Route::get('/bonos/{pass}', [PassWorkspaceController::class, 'show'])->name('passes.show');
+        Route::post('/bonos/{pass}', [PassWorkspaceController::class, 'store'])->name('passes.store');
         Route::get('/mis-accesos', [AccessController::class, 'index'])->name('accesses');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');
@@ -57,6 +66,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::put('/docente/cursos/{course}/lecciones/{lesson}', [StaffController::class, 'lessonSave'])->name('staff.lesson.update');
         Route::post('/docente/cursos/{course}/matriculas', [StaffController::class, 'enroll'])->name('staff.enroll');
         Route::delete('/docente/cursos/{course}/matriculas/{user}', [StaffController::class, 'revoke'])->name('staff.revoke');
+        Route::post('/docente/cursos/{course}/imagenes', [StaffController::class, 'image'])->name('staff.images');
         Route::post('/docente/cursos/{course}/archivos', [StaffController::class, 'upload'])->name('staff.upload');
         Route::delete('/docente/archivos/{resource}', [StaffController::class, 'deleteFile'])->name('staff.file.delete');
         Route::get('/docente/usuarios', [StaffController::class, 'users'])->name('staff.users');

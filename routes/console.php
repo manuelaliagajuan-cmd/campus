@@ -31,7 +31,7 @@ Artisan::command('cec:empty-database', function () {
 });
 Artisan::command('cec:health', function () {
     DB::select('SELECT 1');
-    foreach (['users', 'courses', 'activities', 'attempts', 'sessions', 'certificates', 'announcements', 'announcement_reads'] as $table) {
+    foreach (['users', 'courses', 'activities', 'attempts', 'sessions', 'certificates', 'announcements', 'announcement_reads', 'pass_contents'] as $table) {
         if (! Schema::hasTable($table)) {
             return 1;
         }

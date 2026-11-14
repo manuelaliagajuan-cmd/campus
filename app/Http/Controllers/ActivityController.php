@@ -101,7 +101,7 @@ class ActivityController extends Controller
             return $activity->attempts()->create(['user_id' => $r->user()->id, 'questions' => $activity->questions, 'pass_percent' => $activity->pass_percent]);
         });
 
-        return redirect()->route('attempts.show', ['attempt' => $attempt, 'leccion' => $r->integer('leccion') ?: null]);
+        return redirect()->route('attempts.show', ['attempt' => $attempt, 'leccion' => $r->integer('leccion') ?: null, 'embed' => $r->boolean('embed') ? 1 : null]);
     }
 
     private function own(Request $r, Attempt $attempt): void
@@ -135,6 +135,6 @@ class ActivityController extends Controller
 
         Certificates::issueIfEligible($r->user(), $attempt->activity->course);
 
-        return redirect()->route('attempts.show', ['attempt' => $attempt, 'leccion' => $r->integer('leccion') ?: null]);
+        return redirect()->route('attempts.show', ['attempt' => $attempt, 'leccion' => $r->integer('leccion') ?: null, 'embed' => $r->boolean('embed') ? 1 : null]);
     }
 }

@@ -76,7 +76,7 @@ class CampusController extends Controller
     {
         abort_unless($resource->course->accessibleBy($r->user()), 403);
         abort_unless(Storage::disk('local')->exists($resource->path), 404);
-        $inline = ! $r->boolean('download') && in_array($resource->mime, ['application/pdf', 'image/jpeg', 'image/png', 'audio/mpeg', 'video/mp4']);
+        $inline = ! $r->boolean('download') && in_array($resource->mime, ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'audio/mpeg', 'video/mp4']);
 
         return Storage::disk('local')->response($resource->path, $resource->filename, ['X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store', 'X-Frame-Options' => 'SAMEORIGIN'], $inline ? 'inline' : 'attachment');
     }

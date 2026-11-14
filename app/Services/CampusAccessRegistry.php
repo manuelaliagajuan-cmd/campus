@@ -36,19 +36,23 @@ class CampusAccessRegistry
         try {
             $path = $dir.'/campus-accounts.php';
             $accounts = [];
+            $oldTeachers = [];
             if (is_file($path)) {
                 $raw = file_get_contents($path);
                 $prefix = "<?php exit; ?>\n";
                 if (! str_starts_with($raw, $prefix)) {
                     throw new RuntimeException('Invalid registry');
                 }
-                $accounts = json_decode(substr($raw, strlen($prefix)), true, 512, JSON_THROW_ON_ERROR)['accounts'];
+                $previous = json_decode(substr($raw, strlen($prefix)), true, 512, JSON_THROW_ON_ERROR);
+                $accounts = $previous['accounts'];
+                $oldTeachers = $previous['teachers'] ?? [];
             }
             $next = $change($accounts);
-            if ($accounts === $next && is_file($path)) {
+            $teachers = User::whereIn('role', ['admin', 'teacher'])->orderBy('name')->get(['id', 'name', 'email', 'role'])->toArray();
+            if ($accounts === $next && $teachers === $oldTeachers && is_file($path)) {
                 return;
             }
-            $value = ['schema' => 1, 'updated_at' => now()->toIso8601String(), 'accounts' => array_values($next)];
+            $value = ['schema' => 1, 'updated_at' => now()->toIso8601String(), 'accounts' => array_values($next), 'teachers' => $teachers];
             $raw = "<?php exit; ?>\n".json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
             $temp = tempnam($dir, 'campus-accounts-');
             chmod($temp, 0600);

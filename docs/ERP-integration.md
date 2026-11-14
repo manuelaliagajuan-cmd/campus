@@ -42,3 +42,9 @@ Pruebas: la suite Laravel cubre vinculación, correo confirmado, duplicados, ais
 Gestión escribe la aprobación explícita en `campus-links.php` bajo el mismo bloqueo académico. Se conserva quién revisó la identidad, cuándo, el correo revisado y un ID de revisión. El campus consume esa aprobación al entrar o recargar, vincula la ficha y permite consultar sus cursos y bonos. Una revisión expresa permite resolver correos compartidos o distintos sin modificar las fichas originales. No permite ocupar la ficha de otra cuenta ni sustituir un vínculo existente sin revisión adicional. Los cambios de correo invalidan aprobaciones anteriores. Estas revisiones y su auditoría deben incluirse en las copias de seguridad.
 
 `cec:erp-diagnostics` emite solo indicadores y recuentos de conexión y confirmación, sin nombres, correos ni saldos, para diagnosticar un acceso pendiente sin publicar datos personales.
+
+## Profesor del bono y materiales
+
+El registro privado del campus incluye una lista mínima de profesorado (ID, nombre, correo y rol) para el selector de Gestión. Solo administración puede cambiar el profesor del bono. La proyección incluye el ID asignado y el nombre del alumno; no expone datos bancarios. El campus contrasta ese ID con el rol actual en su base de datos.
+
+«Bonos a mi cargo» solo muestra los bonos asignados al profesor y con alumno activo; administración puede gestionar todos. Los alumnos vinculados consultan únicamente los contenidos publicados de sus propios bonos. Las asignaciones se comprueban también al publicar, ocultar, eliminar y descargar. No basta con conocer el ID de un archivo o haberlo creado antes de una reasignación. La retirada de una asignación no borra contenidos históricos ya publicados. Los archivos se guardan en el almacenamiento privado compartido del campus y deben incluirse en sus copias de seguridad.
