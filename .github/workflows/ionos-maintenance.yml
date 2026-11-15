@@ -1,0 +1,29 @@
+name: Revisar espacio y limpiar versiones antiguas
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Inspección o limpieza de versiones de código inactivas, conservando actual y dos anteriores
+        type: choice
+        options: [audit, prune-releases]
+        default: audit
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: ionos-connection-check
+  cancel-in-progress: false
+jobs:
+  maintenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: python -m pip install --disable-pip-version-check paramiko==4.0.0
+      - name: Revisar instalación sin leer datos de alumnos ni credenciales
+        env:
+          IONOS_HOST: ${{ secrets.IONOS_HOST }}
+          IONOS_USER: ${{ secrets.IONOS_USER }}
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+          MAINTENANCE_MODE: ${{ inputs.mode }}
+        run: python scripts/ionos_maintenance.py
