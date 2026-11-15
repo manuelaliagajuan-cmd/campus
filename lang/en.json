@@ -406,7 +406,7 @@
     "Consulta tus accesos al campus y tus bonos de sesiones.": "View your campus access and session passes.",
     "Cursos disponibles": "Available courses",
     "Tu profesor podrá matricularte en los cursos utilizando el correo de tu cuenta.": "Your teacher can enrol you in courses using your account email.",
-    "Bonos de sesiones": "Session passes",
+    "Bonos de sesiones": "Class packages",
     "Tus bonos de clases": "Your class session passes",
     "El saldo de tus bonos todavía no está disponible en el campus. Consulta con el centro.": "Your session pass balance is not yet available in the campus. Please contact the centre.",
     "La vinculación con Gestión CEC está pendiente. Sus datos académicos se guardan actualmente en el navegador del ERP.": "The connection to Gestión CEC is pending. Its academic data is currently stored in the ERP browser.",
@@ -797,5 +797,7 @@
     "Disponibilidad mensual": "Monthly availability",
     "Materias": "Subjects",
     "Puedes entrar al aula con antelación para comprobar la cámara y el micrófono.": "You can enter the classroom early to check your camera and microphone.",
-    "Esta clase ya no está disponible. Revisa el horario actualizado.": "This class is no longer available. Check the updated schedule."
+    "Esta clase ya no está disponible. Revisa el horario actualizado.": "This class is no longer available. Check the updated schedule.",
+    "Selecciona un bono": "Select a class package",
+    "Cursos del campus": "Campus courses"
 }
