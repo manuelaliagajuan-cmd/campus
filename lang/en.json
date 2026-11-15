@@ -700,5 +700,15 @@
     "Apuntes actualizados.": "Notes updated.",
     "Apuntes guardados y compartidos.": "Notes saved and shared.",
     "Audio y vídeo conectados.": "Audio and video connected.",
-    "Has dejado de compartir pantalla.": "You have stopped sharing your screen."
+    "Has dejado de compartir pantalla.": "You have stopped sharing your screen.",
+    "Permiso de cámara o micrófono bloqueado. En iPhone, abre el campus en Safari y permite el acceso en los ajustes del sitio.": "Camera or microphone permission is blocked. On iPhone, open the campus in Safari and allow access in the website settings.",
+    "La cámara está ocupada. Cierra otras aplicaciones o pestañas que la estén utilizando.": "The camera is busy. Close other apps or tabs using it.",
+    "No se ha encontrado una cámara o un micrófono disponible.": "No available camera or microphone was found.",
+    "El dispositivo seleccionado no está disponible. Elige otro en Ajustes.": "The selected device is unavailable. Choose another in Settings.",
+    "La cámara se ha desconectado. Actívala de nuevo.": "The camera disconnected. Activate it again.",
+    "Tu cámara está apagada.": "Your camera is off.",
+    "Activa tu cámara para mostrar tu imagen.": "Activate your camera to show your video.",
+    "Activar sonido": "Enable sound",
+    "Esperando imagen de la otra persona…": "Waiting for the other person’s video…",
+    "No se recibe imagen. Comprueba que la otra persona haya activado su cámara.": "No video is being received. Check that the other person has activated their camera."
 }
