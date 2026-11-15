@@ -30,6 +30,8 @@ jobs:
           node --check public/assets/course-cover-editor.js
           node --check public/assets/audio-picker.js
           node --check public/assets/online-classroom.js
+          node --check public/assets/class-schedule.js
+          node --check public/assets/store.js
       - name: Probar aula con dos navegadores y medios WebRTC reales
         env:
           APP_ENV: testing
@@ -75,6 +77,8 @@ jobs:
           IONOS_DB_NAME: ${{ secrets.IONOS_DB_NAME }}
           IONOS_DB_USER: ${{ secrets.IONOS_DB_USER }}
           IONOS_DB_PASSWORD: ${{ secrets.IONOS_DB_PASSWORD }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           CEC_RTC_ICE_SERVERS: ${{ secrets.CEC_RTC_ICE_SERVERS }}
           CEC_MAIL_HOST: ${{ secrets.CEC_MAIL_HOST }}
           CEC_MAIL_USER: ${{ secrets.CEC_MAIL_USER }}

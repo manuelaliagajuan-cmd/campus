@@ -11,12 +11,14 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnlineController;
 use App\Http\Controllers\PassWorkspaceController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TrashController;
 use App\Http\Middleware\PrivateResponse;
 use App\Http\Middleware\SyncErp;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(PrivateResponse::class)->group(function () {
+    Route::post('/pagos/stripe/webhook', [StoreController::class, 'webhook'])->middleware('throttle:120,1')->name('store.webhook');
     Route::redirect('/', '/campus');
     Route::post('/idioma', [LocaleController::class, 'update'])->name('locale');
     Route::middleware('guest')->group(function () {
@@ -30,6 +32,10 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
     Route::middleware(['auth', SyncErp::class])->group(function () {
+        Route::get('/comprar', [StoreController::class, 'index'])->name('store.index');
+        Route::get('/comprar/catalogo', [StoreController::class, 'state'])->name('store.state');
+        Route::post('/comprar/pagar', [StoreController::class, 'checkout'])->middleware('throttle:10,1')->name('store.checkout');
+        Route::get('/mis-compras/{order}', [StoreController::class, 'order'])->name('store.order');
         Route::get('/certificados', [CertificateController::class, 'index'])->name('certificates.index');
         Route::get('/certificados/{certificate}', [CertificateController::class, 'show'])->name('certificates.show');
         Route::get('/certificados/{certificate}/pdf', [CertificateController::class, 'pdf'])->name('certificates.pdf');

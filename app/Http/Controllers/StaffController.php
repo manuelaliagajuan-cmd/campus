@@ -55,6 +55,18 @@ class StaffController extends Controller
         if ($r->has('online_enabled')) {
             $d['online_enabled'] = $r->boolean('online_enabled');
         }
+        if ($r->has('store_price')) {
+            $raw = $r->input('store_price');
+            $r->validate(['store_price' => ['nullable', 'regex:/^\d{1,5}(?:\.\d{1,2})?$/']]);
+            $parts = explode('.', (string) $raw);
+            $d['store_price_cents'] = $raw !== null && $raw !== '' ? (int) $parts[0] * 100 + (int) str_pad($parts[1] ?? '', 2, '0') : null;
+        }
+        if ($r->has('store_listed')) {
+            $d['store_listed'] = $r->boolean('store_listed');
+            if ($d['store_listed'] && ($d['store_price_cents'] ?? 0) < 50) {
+                throw ValidationException::withMessages(['store_price' => __('Indica un precio de al menos 0,50 € para publicar la venta.')]);
+            }
+        }
         $d['published'] = $r->boolean('published');
         $d['certificate_enabled'] = $r->has('certificate_enabled') ? $r->boolean('certificate_enabled') : true;
 

@@ -205,7 +205,8 @@ class ErpConnection
         } elseif (! $user->erp_student_id) {
             $user->forceFill(['erp_student_id' => $student['id']])->save();
         }
-        $ids = Course::whereIn('erp_id', $student['courses'])->where('published', true)->pluck('id')->all();
+        $digital = collect($data['courses'])->filter(fn ($c) => ! empty($c['campus_course_id']) && $c['active'] && in_array($c['id'], $student['courses'], true))->pluck('campus_course_id')->all();
+        $ids = Course::where('published', true)->where(fn ($q) => $q->whereIn('erp_id', $student['courses'])->orWhereIn('id', $digital))->pluck('id')->all();
         self::reconcile($user, $ids);
         $date = now('Europe/Madrid')->toDateString();
         $passes = collect($data['passes'])->where('student_id', $student['id'])->map(function ($p) use ($date) {
@@ -235,6 +236,9 @@ class ErpConnection
             }
             $ids = [];
             foreach ($data['courses'] as $source) {
+                if (! empty($source['campus_course_id'])) {
+                    continue;
+                }
                 $course = Course::withTrashed()->firstOrNew(['erp_id' => $source['id']]);
                 if (! $course->exists) {
                     $course->forceFill(['teacher_id' => $admin->id, 'language' => '—', 'level' => '—', 'certificate_enabled' => false]);
