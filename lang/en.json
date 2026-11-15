@@ -799,5 +799,14 @@
     "Puedes entrar al aula con antelación para comprobar la cámara y el micrófono.": "You can enter the classroom early to check your camera and microphone.",
     "Esta clase ya no está disponible. Revisa el horario actualizado.": "This class is no longer available. Check the updated schedule.",
     "Selecciona un bono": "Select a class package",
-    "Cursos del campus": "Campus courses"
+    "Cursos del campus": "Campus courses",
+    "Cancelación sin penalización hasta :hours horas antes.": "Cancel without penalty up to :hours hours before class.",
+    "Cancelar clase": "Cancel class",
+    "Motivo de la cancelación": "Reason for cancellation",
+    "Confirmar cancelación": "Confirm cancellation",
+    "El plazo de cancelación ha terminado o la sesión ya está registrada. Contacta con el centro.": "The cancellation deadline has passed or the session is already recorded. Contact the centre.",
+    "Clase cancelada sin penalización. Hemos avisado al centro.": "Class cancelled without penalty. The centre has been notified.",
+    "No se pudo confirmar la cancelación. Actualiza la página y vuelve a intentarlo.": "Cancellation could not be confirmed. Refresh the page and try again.",
+    "Si el profesor está presente durante la clase y no te conectas ni has cancelado, la sesión se descontará del bono.": "If the teacher is present during class and you do not join or cancel, one session will be deducted from your package.",
+    ":count de 5 estrellas": ":count out of 5 stars"
 }

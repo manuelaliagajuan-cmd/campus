@@ -6,6 +6,7 @@ use App\Models\OnlineSession;
 use App\Models\User;
 use App\Services\ErpConnection;
 use App\Services\OnlineClassrooms;
+use App\Services\OnlineLessonRecords;
 use App\Services\ScheduledClasses;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
@@ -16,6 +17,11 @@ class OnlineController extends Controller
 {
     public function index(Request $r)
     {
+        try {
+            OnlineLessonRecords::reconcile();
+        } catch (\Throwable $e) {
+            report($e);
+        }
         $rooms = OnlineClassrooms::available($r->user());
         $sessions = OnlineSession::where(function ($q) use ($rooms, $r) {
             $q->whereIn('scope', array_keys($rooms))->orWhere(function ($past) use ($r) {
@@ -36,6 +42,26 @@ class OnlineController extends Controller
         }
 
         return view('online.index', compact('rooms', 'sessions', 'ratings', 'upcoming', 'sourceRevision'));
+    }
+
+    public function cancel(Request $r)
+    {
+        abort_unless($r->user()->role === 'student', 403);
+        $d = $r->validate(['scope' => 'required|string|max:230', 'booking_id' => 'required|string|max:100', 'reason' => 'required|string|max:1000']);
+        $room = OnlineClassrooms::room($r->user(), $d['scope']);
+        $entry = ScheduledClasses::find($room, $d['booking_id']);
+        abort_unless($entry, 404);
+        try {
+            OnlineLessonRecords::cancel($r->user(), $room, $entry, $d['reason']);
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['reason' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withErrors(['reason' => __('No se pudo confirmar la cancelación. Actualiza la página y vuelve a intentarlo.')]);
+        }
+
+        return redirect()->route('online.index')->with('status', __('Clase cancelada sin penalización. Hemos avisado al centro.'));
     }
 
     public function scheduleState(Request $r)
@@ -74,7 +100,7 @@ class OnlineController extends Controller
             }
         }
         try {
-            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $scheduledStudent ? (int) $room['pass']['teacher_id'] : $r->user()->id, 'booking_id' => $entry['id'] ?? null, 'booking_signature' => $entry['signature'] ?? null, 'booking_start_at' => isset($entry) ? $entry['start']->copy()->utc() : null, 'booking_end_at' => isset($entry) ? $entry['end']->copy()->utc() : null, 'title' => mb_substr($room['title'], 0, 180)]);
+            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $scheduledStudent ? (int) $room['pass']['teacher_id'] : $r->user()->id, 'booking_id' => $entry['id'] ?? null, 'booking_signature' => $entry['signature'] ?? null, 'booking_start_at' => isset($entry) ? $entry['start']->copy()->tz(config('app.timezone')) : null, 'booking_end_at' => isset($entry) ? $entry['end']->copy()->tz(config('app.timezone')) : null, 'title' => mb_substr($room['title'], 0, 180)]);
         } catch (UniqueConstraintViolationException $e) {
             $s = OnlineSession::where('active_key', $d['scope'])->firstOrFail();
         }
@@ -127,6 +153,8 @@ class OnlineController extends Controller
             return $id;
         });
 
+        OnlineLessonRecords::observe($session);
+
         return response()->json(['participant' => $id, 'iceServers' => config('online.ice_servers')]);
     }
 
@@ -134,6 +162,7 @@ class OnlineController extends Controller
     {
         $this->access($r, $session);
         $p = $this->participant($r, $session);
+        OnlineLessonRecords::observe($session);
         $r->validate(['after' => 'nullable|integer|min:0']);
         $peers = DB::table('online_participants')->join('users', 'users.id', '=', 'online_participants.user_id')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->select('online_participants.id', 'users.name')->get();
         $events = DB::table('online_events')->where('online_session_id', $session->id)->where('id', '>', $r->integer('after'))->where(fn ($q) => $q->whereNull('recipient_id')->orWhere('recipient_id', $p->id))->orderBy('id')->limit(150)->get()->map(function ($e) {

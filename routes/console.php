@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
 use App\Services\ErpConnection;
+use App\Services\OnlineLessonRecords;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -57,3 +58,8 @@ Artisan::command('cec:erp-diagnostics', function () {
 
     return 0;
 })->purpose('Comprobar la conexión de Gestión sin mostrar nombres, correos ni saldos');
+
+Artisan::command('cec:process-lessons', function () {
+    OnlineLessonRecords::reconcile();
+    $this->info('Clases y correos procesados.');
+});

@@ -12,7 +12,7 @@ class ScheduledClasses
         if (! isset($room['pass'])) {
             return [];
         }foreach ($room['pass']['bookings'] ?? [] as $b) {
-            if ($b['completed']) {
+            if ($b['completed'] && empty($b['online_consumed'])) {
                 continue;
             }try {
                 $start = Carbon::createFromFormat('!Y-m-d H:i', $b['date'].' '.$b['start'], 'Europe/Madrid');
@@ -25,7 +25,7 @@ class ScheduledClasses
             }if ((! empty($room['pass']['start']) && $b['date'] < $room['pass']['start']) || (! empty($room['pass']['expires']) && $b['date'] > $room['pass']['expires'])) {
                 continue;
             }
-            $rows[] = ['id' => $b['id'], 'room' => $room, 'start' => $start, 'end' => $end, 'closes' => $end->copy()->addMinutes(15), 'signature' => hash('sha256', json_encode([$room['key'], $b, $room['pass']['teacher_id'] ?? null]))];
+            $rows[] = ['id' => $b['id'], 'room' => $room, 'start' => $start, 'end' => $end, 'closes' => $end->copy()->addMinutes(15), 'signature' => hash('sha256', json_encode([$room['key'], ['id' => $b['id'], 'date' => $b['date'], 'start' => $b['start'], 'end' => $b['end'], 'completed' => false], $room['pass']['teacher_id'] ?? null]))];
         }
 
         return $rows;
@@ -43,6 +43,9 @@ class ScheduledClasses
             foreach (self::forRoom($room) as $entry) {
                 if ($entry['closes']->gte(now())) {
                     $entry['open'] = now()->lte($entry['closes']);
+                    $hours = (int) (ErpConnection::snapshot()['cancellation_hours'] ?? 24);
+                    $entry['cancellation_hours'] = $hours;
+                    $entry['can_cancel'] = empty($entry['room']['pass']['manage']) && empty(collect($entry['room']['pass']['bookings'])->firstWhere('id', $entry['id'])['completed']) && now()->lte($entry['start']->copy()->subHours($hours));
                     $entry['label'] = self::label($entry);
                     $rows[] = $entry;
                 }

@@ -1,0 +1,28 @@
+name: Actualizar asistencias y avisos de clases
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: lesson-attendance-processing
+  cancel-in-progress: false
+jobs:
+  process:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Confirmar ausencias y reintentar correos pendientes
+        env:
+          IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import hashlib,hmac,os,time,urllib.request
+          key=hashlib.sha256(('cec-lesson-jobs:'+os.environ['IONOS_PASSWORD']).encode()).hexdigest()
+          stamp=str(int(time.time()))
+          signature=hmac.new(key.encode(),stamp.encode(),hashlib.sha256).hexdigest()
+          request=urllib.request.Request('https://campus.cecalicante.es/interno/clases/procesar',data=b'',headers={'X-CEC-Time':stamp,'X-CEC-Signature':signature},method='POST')
+          with urllib.request.urlopen(request,timeout=100) as response:
+              if response.status!=200:raise RuntimeError('No se pudo confirmar el procesamiento.')
+              print('Procesamiento confirmado.')
+          PY

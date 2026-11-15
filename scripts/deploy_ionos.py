@@ -136,6 +136,7 @@ try:
         with sftp.open(dbmarker) as f:
             if not hmac.compare_digest(f.read().decode().strip(),targethash):raise RuntimeError('Los secretos apuntan a otra base de datos; se ha detenido el despliegue.')
     config={'CEC_ERP_PROJECTION_PATH':posixpath.join(home,'.cec-gestion-private/campus.php'),'APP_NAME':'Campus CEC','APP_ENV':'production','APP_KEY':appkey,'APP_DEBUG':'false','APP_URL':'https://campus.cecalicante.es','APP_LOCALE':'es','APP_FALLBACK_LOCALE':'es','DB_CONNECTION':'mysql','DB_HOST':os.environ['IONOS_DB_HOST'].strip(),'DB_PORT':'3306','DB_DATABASE':os.environ['IONOS_DB_NAME'].strip(),'DB_USERNAME':os.environ['IONOS_DB_USER'].strip(),'DB_PASSWORD':os.environ['IONOS_DB_PASSWORD'],'SESSION_DRIVER':'database','SESSION_LIFETIME':'120','SESSION_ENCRYPT':'true','SESSION_SECURE_COOKIE':'true','SESSION_HTTP_ONLY':'true','SESSION_SAME_SITE':'lax','SESSION_COOKIE':'cec_campus_session','CACHE_STORE':'file','QUEUE_CONNECTION':'sync','LOG_CHANNEL':'single','LOG_LEVEL':'warning','MAIL_MAILER':'log','MAIL_FROM_ADDRESS':'campus@cecalicante.es','MAIL_FROM_NAME':'Campus CEC'}
+    config['CEC_LESSON_JOBS_KEY']=hashlib.sha256(('cec-lesson-jobs:'+os.environ['IONOS_PASSWORD']).encode()).hexdigest()
     purchase_core=posixpath.join(home,'gestion/online-purchases-core.php')
     if exists(purchase_core):config['CEC_ERP_PURCHASE_CORE']=purchase_core
     for payment_key in ['STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET']:
@@ -150,6 +151,7 @@ try:
         if not isinstance(ice,list) or len(ice)>10: raise RuntimeError('Configuración ICE no válida.')
         config['CEC_RTC_ICE_SERVERS']=json.dumps(ice,separators=(',',':'))
         sensitive.append(os.environ['CEC_RTC_ICE_SERVERS'])
+    print('CEC_CORREO_CONFIGURACION='+('SMTP' if config['MAIL_MAILER']=='smtp' else 'PENDIENTE_SMTP'))
     # Existing env is backed up without printing its contents.
     if exists(envpath):
         with sftp.open(envpath) as f:prior_env=f.read()

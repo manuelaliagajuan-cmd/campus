@@ -10,6 +10,6 @@ class OnlineSession extends Model
 
     protected function casts(): array
     {
-        return ['ended_at' => 'datetime', 'notes_revision' => 'integer', 'booking_start_at' => 'datetime', 'booking_end_at' => 'datetime'];
+        return ['attendance_settled_at' => 'datetime', 'teacher_seen_at' => 'datetime', 'consumed_at' => 'datetime', 'ended_at' => 'datetime', 'notes_revision' => 'integer', 'booking_start_at' => 'datetime', 'booking_end_at' => 'datetime'];
     }
 }

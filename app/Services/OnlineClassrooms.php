@@ -18,7 +18,7 @@ class OnlineClassrooms
             }
         }$today = now('Europe/Madrid')->toDateString();
         foreach (ErpConnection::workspaces($u) as $p) {
-            if (($p['online_enabled'] ?? false) === true && $p['remaining'] > 0 && (! $p['expires'] || $p['expires'] >= $today)) {
+            if (($p['online_enabled'] ?? false) === true && ($p['remaining'] > 0 || collect($p['bookings'] ?? [])->contains(fn ($b) => ! empty($b['online_consumed']) && $b['date'] >= $today)) && (! $p['expires'] || $p['expires'] >= $today)) {
                 $key = 'pass:'.$p['id'].':'.$p['student_id'];
                 $rooms[$key] = ['key' => $key, 'title' => $p['name'].' · '.$p['student_name'], 'manage' => $p['manage'], 'pass' => $p];
             }

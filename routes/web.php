@@ -15,6 +15,9 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TrashController;
 use App\Http\Middleware\PrivateResponse;
 use App\Http\Middleware\SyncErp;
+use App\Services\OnlineLessonRecords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(PrivateResponse::class)->group(function () {
@@ -60,6 +63,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/bonos/{pass}', [PassWorkspaceController::class, 'store'])->name('passes.store');
         Route::get('/clases-online', [OnlineController::class, 'index'])->name('online.index');
         Route::post('/clases-online', [OnlineController::class, 'start'])->middleware('throttle:online-start')->name('online.start');
+        Route::post('/clases-online/cancelar', [OnlineController::class, 'cancel'])->middleware('throttle:online-start')->name('online.cancel');
         Route::get('/clases-online/horario', [OnlineController::class, 'scheduleState'])->name('online.schedule-state');
         Route::get('/clases-online/conexion', fn () => response()->json(['ok' => true, 'time' => now()->toIso8601String()]))->name('online.check');
         Route::get('/clases-online/{session}', [OnlineController::class, 'show'])->name('online.show');
@@ -110,4 +114,21 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/intentos/{attempt}', [ActivityController::class, 'show'])->name('attempts.show');
         Route::post('/intentos/{attempt}', [ActivityController::class, 'submit'])->name('attempts.submit');
     });
+});
+
+Route::post('/interno/clases/procesar', function (Request $r) {
+    $time = $r->header('X-CEC-Time', '');
+    $key = config('erp.jobs_key');
+    abort_unless($key && ctype_digit($time) && abs(time() - (int) $time) <= 300 && hash_equals(hash_hmac('sha256', $time, $key), $r->header('X-CEC-Signature', '')), 403);
+    $lock = Cache::lock('cec-lesson-reconcile', 120);
+    if (! $lock->get()) {
+        return response()->json(['busy' => true]);
+    }
+    try {
+        OnlineLessonRecords::reconcile();
+    } finally {
+        $lock->release();
+    }
+
+    return response()->json(['ok' => true]);
 });
