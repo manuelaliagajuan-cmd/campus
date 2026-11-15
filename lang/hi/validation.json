@@ -1,0 +1,54 @@
+{
+    "date": ":attribute के लिए एक वैध तिथि दर्ज करें।",
+    "numeric": ":attribute फ़ील्ड संख्यात्मक होनी चाहिए।",
+    "required": ":attribute फ़ील्ड आवश्यक है।",
+    "string": ":attribute फ़ील्ड टेक्स्ट होना चाहिए।",
+    "email": "कृपया एक वैध ईमेल दर्ज करें।",
+    "unique": "उस ईमेल वाला एक खाता पहले से मौजूद है।",
+    "confirmed": ":attribute कमिट मेल नहीं खाता।",
+    "min": {
+        "string": ":attribute में कम से कम :min अक्षर होने चाहिए।",
+        "numeric": ":attribute कम से कम :min होना चाहिए।",
+        "array": ":attribute में कम से कम :min तत्व होने चाहिए।"
+    },
+    "max": {
+        "string": ":attribute :max वर्णों से अधिक नहीं होना चाहिए।",
+        "numeric": ":attribute :max से अधिक नहीं होना चाहिए।",
+        "array": ":attribute में :max से अधिक तत्व नहीं होने चाहिए।",
+        "file": "फ़ाइल :max KB सीमा से अधिक है।"
+    },
+    "in": ":attribute के लिए एक वैध मान चुनें।",
+    "integer": ":attribute एक पूर्णांक होना चाहिए।",
+    "array": ":attribute एक सूची होनी चाहिए।",
+    "list": ":attribute एक ऑर्डर की गई सूची होनी चाहिए।",
+    "exists": ":attribute मौजूद नहीं है।",
+    "url": "कृपया एक वैध यूआरएल दर्ज करें।",
+    "mimes": "फ़ाइल प्रारूप की अनुमति नहीं है।",
+    "password": {
+        "letters": "पासवर्ड में अक्षर अवश्य होने चाहिए।",
+        "numbers": "पासवर्ड में नंबर होने चाहिए।"
+    },
+    "attributes": {
+        "duration_hours": "पाठ्यक्रम अवधि",
+        "body": "संदेश",
+        "kind": "नोटिस का प्रकार",
+        "publish_at": "प्रकाशन तिथि",
+        "locale": "भाषा",
+        "email": "ईमेल",
+        "password": "पासवर्ड",
+        "name": "नाम",
+        "title": "शीर्षक",
+        "course_id": "कोर्स",
+        "mode": "गतिविधि का प्रकार",
+        "max_attempts": "अधिकतम प्रयास",
+        "pass_percent": "न्यूनतम लक्ष्य",
+        "questions.*.prompt": "प्रश्न कथन :position",
+        "options.*": "विकल्प :position",
+        "correct": "सही उत्तर",
+        "text": "अंतराल के साथ पाठ",
+        "pairs.*.*": "संकल्पना या युगल",
+        "items.*": "अनुक्रम तत्व",
+        "questions": "प्रश्न",
+        "questions_json": "गतिविधि प्रश्न"
+    }
+}

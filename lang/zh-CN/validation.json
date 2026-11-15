@@ -1,0 +1,54 @@
+{
+    "date": "输入 :attribute 的有效日期。",
+    "numeric": ":attribute 字段必须是数字。",
+    "required": ":attribute 字段为必填字段。",
+    "string": ":attribute 字段必须是文本。",
+    "email": "请输入有效的电子邮件。",
+    "unique": "使用该电子邮件地址的帐户已存在。",
+    "confirmed": ":attribute 提交不匹配。",
+    "min": {
+        "string": ":attribute 必须至少有 :min 个字符。",
+        "numeric": ":attribute 必须至少为 :min。",
+        "array": ":attribute 必须至少包含 :min 元素。"
+    },
+    "max": {
+        "string": ":attribute 不得超过 :max 个字符。",
+        "numeric": ":attribute 不得超过 :max。",
+        "array": ":attribute 不得包含超过 :max 的元素。",
+        "file": "文件超出 :max KB 限制。"
+    },
+    "in": "选择 :attribute 的有效值。",
+    "integer": ":attribute 必须是整数。",
+    "array": ":attribute 必须是一个列表。",
+    "list": ":attribute 必须是有序列表。",
+    "exists": ":attribute 不存在。",
+    "url": "请输入有效的网址。",
+    "mimes": "不允许的文件格式。",
+    "password": {
+        "letters": "密码必须包含字母。",
+        "numbers": "密码必须包含数字。"
+    },
+    "attributes": {
+        "duration_hours": "课程时长",
+        "body": "留言",
+        "kind": "通知类型",
+        "publish_at": "发表日期",
+        "locale": "语言",
+        "email": "邮箱",
+        "password": "密码",
+        "name": "姓名",
+        "title": "标题",
+        "course_id": "课程",
+        "mode": "活动类型",
+        "max_attempts": "最大尝试次数",
+        "pass_percent": "最低目标",
+        "questions.*.prompt": "问题陈述 :position",
+        "options.*": "选项 :position",
+        "correct": "正确答案",
+        "text": "有间隙的文本",
+        "pairs.*.*": "概念或情侣",
+        "items.*": "序列元素",
+        "questions": "问题",
+        "questions_json": "活动问题"
+    }
+}

@@ -10,6 +10,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnlineController;
 use App\Http\Controllers\PassWorkspaceController;
+use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TrashController;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(PrivateResponse::class)->group(function () {
     Route::post('/pagos/stripe/webhook', [StoreController::class, 'webhook'])->middleware('throttle:120,1')->name('store.webhook');
+    Route::get('/catalogo-publico', [PublicCatalogController::class, 'catalog'])->middleware('throttle:120,1')->name('store.public-catalog');
+    Route::get('/comprar/desde-web', [PublicCatalogController::class, 'enter'])->name('store.web-entry');
     Route::redirect('/', '/campus');
     Route::post('/idioma', [LocaleController::class, 'update'])->name('locale');
     Route::middleware('guest')->group(function () {

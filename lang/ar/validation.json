@@ -1,0 +1,54 @@
+{
+    "date": "أدخل تاريخًا صالحًا لـ :attribute.",
+    "numeric": "يجب أن يكون الحقل :attribute رقميًا.",
+    "required": "الحقل :attribute مطلوب.",
+    "string": "يجب أن يكون الحقل :attribute نصًا.",
+    "email": "الرجاء إدخال بريد إلكتروني صالح.",
+    "unique": "حساب بهذا البريد الإلكتروني موجود بالفعل.",
+    "confirmed": "التزام :attribute غير متطابق.",
+    "min": {
+        "string": ":attribute يجب أن يحتوي على أحرف :min على الأقل.",
+        "numeric": ":attribute يجب أن يكون على الأقل :min.",
+        "array": ":attribute يجب أن يحتوي على عناصر :min على الأقل."
+    },
+    "max": {
+        "string": ":attribute يجب ألا يتجاوز عدد الأحرف :max.",
+        "numeric": "يجب ألا يتجاوز :attribute :max.",
+        "array": "يجب ألا يحتوي :attribute على أكثر من عناصر :max.",
+        "file": "يتجاوز الملف حد :max كيلوبايت."
+    },
+    "in": "حدد قيمة صالحة لـ :attribute.",
+    "integer": ":attribute يجب أن يكون عددًا صحيحًا.",
+    "array": ":attribute يجب أن تكون قائمة.",
+    "list": ":attribute يجب أن تكون قائمة مرتبة.",
+    "exists": ":attribute غير موجود.",
+    "url": "الرجاء إدخال عنوان URL صالح.",
+    "mimes": "تنسيق الملف غير مسموح به.",
+    "password": {
+        "letters": "كلمة المرور يجب أن تحتوي على أحرف.",
+        "numbers": "كلمة المرور يجب أن تحتوي على أرقام."
+    },
+    "attributes": {
+        "duration_hours": "مدة الدورة",
+        "body": "الرسالة",
+        "kind": "نوع الإشعار",
+        "publish_at": "تاريخ النشر",
+        "locale": "اللغة",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "name": "الاسم",
+        "title": "العنوان",
+        "course_id": "الدورة",
+        "mode": "نوع النشاط",
+        "max_attempts": "الحد الأقصى للمحاولات",
+        "pass_percent": "الحد الأدنى للهدف",
+        "questions.*.prompt": "بيان السؤال :position",
+        "options.*": "الخيار :position",
+        "correct": "الإجابة الصحيحة",
+        "text": "نص به فجوات",
+        "pairs.*.*": "مفهوم أو زوجين",
+        "items.*": "عنصر التسلسل",
+        "questions": "أسئلة",
+        "questions_json": "أسئلة النشاط"
+    }
+}

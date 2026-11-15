@@ -1,0 +1,54 @@
+{
+    "date": "Enter a valid date for :attribute.",
+    "numeric": "The :attribute field must be numeric.",
+    "required": "The :attribute field is required.",
+    "string": "The :attribute field must be text.",
+    "email": "Please enter a valid email.",
+    "unique": "An account with that email already exists.",
+    "confirmed": ":attribute commit does not match.",
+    "min": {
+        "string": ":attribute must have at least :min characters.",
+        "numeric": ":attribute must be at least :min.",
+        "array": ":attribute must contain at least :min elements."
+    },
+    "max": {
+        "string": ":attribute must not exceed :max characters.",
+        "numeric": ":attribute must not exceed :max.",
+        "array": ":attribute must not contain more than :max elements.",
+        "file": "The file exceeds the :max KB limit."
+    },
+    "in": "Select a valid value for :attribute.",
+    "integer": ":attribute must be an integer.",
+    "array": ":attribute must be a list.",
+    "list": ":attribute must be an ordered list.",
+    "exists": ":attribute does not exist.",
+    "url": "Please enter a valid URL.",
+    "mimes": "File format not allowed.",
+    "password": {
+        "letters": "The password must contain letters.",
+        "numbers": "The password must contain numbers."
+    },
+    "attributes": {
+        "duration_hours": "course duration",
+        "body": "message",
+        "kind": "type of notice",
+        "publish_at": "publication date",
+        "locale": "language",
+        "email": "email",
+        "password": "password",
+        "name": "name",
+        "title": "title",
+        "course_id": "course",
+        "mode": "type of activity",
+        "max_attempts": "maximum attempts",
+        "pass_percent": "minimum target",
+        "questions.*.prompt": "question statement :position",
+        "options.*": "option :position",
+        "correct": "correct answer",
+        "text": "text with gaps",
+        "pairs.*.*": "concept or couple",
+        "items.*": "sequence element",
+        "questions": "questions",
+        "questions_json": "activity questions"
+    }
+}

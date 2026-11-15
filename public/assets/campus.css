@@ -98,3 +98,5 @@ body.online-class-page:has(#online-room){background:#111015;color:#fff}.online-c
 .store-product .button:disabled{opacity:.5;cursor:not-allowed}
 .availability-calendar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}.availability-calendar article{padding:18px;border:1px solid var(--line);border-radius:9px;background:#fafbfe}.availability-calendar h3{font-size:16px;margin:0 0 12px;text-transform:capitalize}.availability-calendar p{font-size:13px;border-top:1px solid var(--line);padding-top:10px;margin:10px 0 0}.availability-calendar span{display:block;margin-top:5px;color:#24623d}
 .availability-calendar{max-height:560px;overflow-y:auto;overscroll-behavior:contain;padding-right:4px}@media(max-width:600px){.availability-calendar{max-height:420px}}
+
+.language-options{max-height: min(70vh,440px);overflow-y:auto}.language-options button{min-height:44px}html[dir=rtl] .field,html[dir=rtl] .header-language{text-align:right}html[dir=rtl] .language-options{right:auto;left:0}

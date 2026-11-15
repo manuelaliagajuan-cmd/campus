@@ -30,7 +30,7 @@ class OnlinePurchaseFulfillment
             $prior = getenv('CEC_ACADEMIC_STORE_DIR');
             putenv('CEC_ACADEMIC_STORE_DIR='.dirname(config('erp.projection_path')));
             try {
-                $result = \campus_record_paid_purchase(['id' => $o->id, 'campus_user_id' => $o->user_id, 'student_id' => $o->erp_student_id, 'payment_id' => $o->payment_id, 'buyer_name' => $o->buyer_name, 'buyer_email' => $o->buyer_email, 'payer_name' => $o->payer_name ?? '', 'payer_email' => $o->payer_email ?? '', 'paid_at' => $o->paid_at->toIso8601String(), 'product_name' => $o->product_name, 'method' => $o->method, 'kind' => $o->kind, 'product' => $o->product, 'amount' => $o->amount, 'currency' => $o->currency, 'live' => true]);
+                $result = \campus_record_paid_purchase(['id' => $o->id, 'sales_origin' => $o->sales_origin, 'checkout_host' => parse_url(config('app.url'), PHP_URL_HOST), 'campus_user_id' => $o->user_id, 'student_id' => $o->erp_student_id, 'payment_id' => $o->payment_id, 'buyer_name' => $o->buyer_name, 'buyer_email' => $o->buyer_email, 'payer_name' => $o->payer_name ?? '', 'payer_email' => $o->payer_email ?? '', 'paid_at' => $o->paid_at->toIso8601String(), 'product_name' => $o->product_name, 'method' => $o->method, 'kind' => $o->kind, 'product' => $o->product, 'amount' => $o->amount, 'currency' => $o->currency, 'live' => true]);
             } finally {
                 $prior === false ? putenv('CEC_ACADEMIC_STORE_DIR') : putenv('CEC_ACADEMIC_STORE_DIR='.$prior);
             }$o->update(['status' => 'fulfilled', 'fulfilled_at' => now(), 'erp_result' => $result]);

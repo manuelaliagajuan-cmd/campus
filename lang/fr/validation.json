@@ -1,0 +1,54 @@
+{
+    "date": "Entrez une date valide pour :attribute.",
+    "numeric": "Le champ :attribute doit être numérique.",
+    "required": "Le champ :attribute est obligatoire.",
+    "string": "Le champ :attribute doit être du texte.",
+    "email": "Veuillez saisir une adresse e-mail valide.",
+    "unique": "Un compte avec cette adresse e-mail existe déjà.",
+    "confirmed": "La validation :attribute ne correspond pas.",
+    "min": {
+        "string": ":attribute doit contenir au moins des caractères :min.",
+        "numeric": ":attribute doit être au moins :min.",
+        "array": ":attribute doit contenir au moins des éléments :min."
+    },
+    "max": {
+        "string": ":attribute ne doit pas dépasser les caractères :max.",
+        "numeric": ":attribute ne doit pas dépasser :max.",
+        "array": ":attribute ne doit pas contenir plus d'éléments :max.",
+        "file": "Le fichier dépasse la limite de Ko :max."
+    },
+    "in": "Sélectionnez une valeur valide pour :attribute.",
+    "integer": ":attribute doit être un nombre entier.",
+    "array": ":attribute doit être une liste.",
+    "list": ":attribute doit être une liste ordonnée.",
+    "exists": ":attribute n'existe pas.",
+    "url": "Veuillez saisir une URL valide.",
+    "mimes": "Format de fichier non autorisé.",
+    "password": {
+        "letters": "Le mot de passe doit contenir des lettres.",
+        "numbers": "Le mot de passe doit contenir des chiffres."
+    },
+    "attributes": {
+        "duration_hours": "durée du cours\nMessage",
+        "body": "",
+        "kind": "type d'avis",
+        "publish_at": "date de publication",
+        "locale": "langue",
+        "email": "e-mail",
+        "password": "mot de passe",
+        "name": "nom",
+        "title": "titre",
+        "course_id": "cours",
+        "mode": "type d'activité",
+        "max_attempts": "tentatives maximales",
+        "pass_percent": "cible minimale",
+        "questions.*.prompt": "énoncé de question :position\nOption",
+        "options.*": ":position",
+        "correct": "bonne réponse",
+        "text": "texte avec des lacunes",
+        "pairs.*.*": "concept ou couple",
+        "items.*": "élément de séquence",
+        "questions": "questions",
+        "questions_json": "questions d'activité"
+    }
+}

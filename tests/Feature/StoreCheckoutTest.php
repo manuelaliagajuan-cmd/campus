@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Course;
 use App\Models\StoreOrder;
 use App\Models\User;
+use App\Services\StoreOrigin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -180,5 +181,15 @@ class StoreCheckoutTest extends TestCase
         $this->getJson(route('store.availability', 'TIP-1').'?month=2026-11&subject=English')->assertJsonPath('days.0.windows.0.end', '14:00');
         $this->getJson(route('store.availability', 'TIP-1').'?month=2025-01')->assertUnprocessable();
         $this->get(route('store.pass', 'TIP-1'))->assertOk()->assertSee('Consulta la disponibilidad antes de comprar');
+    }
+
+    public function test_website_origin_is_frozen_in_order_and_stripe_metadata(): void
+    {
+        $token = StoreOrigin::token('cecalicante.es');
+        Http::fake(['api.stripe.com/v1/checkout/sessions' => Http::response(['id' => 'cs_origin', 'url' => 'https://checkout.stripe.com/c/pay/test'])]);
+        $this->actingAs($this->student)->post(route('store.checkout'), ['product' => 'pass:TIP-1', 'token' => (string) Str::uuid(), 'source_token' => $token])->assertRedirect();
+        $this->assertSame('cecalicante.es', StoreOrder::firstOrFail()->sales_origin);
+        Http::assertSent(fn ($r) => $r['metadata']['sales_origin'] === 'cecalicante.es');
+        $this->postJson(route('store.checkout'), ['product' => 'pass:TIP-1', 'token' => (string) Str::uuid(), 'source_token' => 'forged'])->assertUnprocessable();
     }
 }

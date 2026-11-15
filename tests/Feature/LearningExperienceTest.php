@@ -141,7 +141,7 @@ class LearningExperienceTest extends TestCase
         $this->assertSame('en', $s->fresh()->locale);
         $this->get('/campus')->assertOk()->assertSee('WELCOME TO YOUR CAMPUS.')->assertSee('My certificates');
         $this->get('/lecciones/'.$l->id)->assertOk()->assertSee('Este contenido no debe traducirse.')->assertSee('Mark as complete');
-        $this->post('/idioma', ['locale' => 'fr'])->assertSessionHasErrors('locale');
+        $this->post('/idioma', ['locale' => 'invalid'])->assertSessionHasErrors('locale');
         $this->post('/idioma', ['locale' => 'es'])->assertRedirect();
         $this->get('/campus')->assertOk()->assertSee('BIENVENIDO A TU CAMPUS.');
     }
@@ -154,6 +154,6 @@ class LearningExperienceTest extends TestCase
         $this->actingAs($s)->post('/actividades/'.$a->id.'/empezar');
         $attempt = Attempt::first();
         $this->post('/intentos/'.$attempt->id, ['answers' => [1, 0]]);
-        $this->get('/intentos/'.$attempt->id)->assertOk()->assertSee('feedback-card is-correct', false)->assertSee('feedback-card is-error',false)->assertSee('feedback-solution',false)->assertSee('Tu respuesta')->assertSee('Solución correcta');
+        $this->get('/intentos/'.$attempt->id)->assertOk()->assertSee('feedback-card is-correct', false)->assertSee('feedback-card is-error', false)->assertSee('feedback-solution', false)->assertSee('Tu respuesta')->assertSee('Solución correcta');
     }
 }

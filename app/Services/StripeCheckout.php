@@ -19,7 +19,7 @@ class StripeCheckout
     {
         if ($order->checkout_url) {
             return $order->checkout_url;
-        }$response = self::http()->withHeaders(['Idempotency-Key' => 'campus-order-'.$order->id])->post('https://api.stripe.com/v1/checkout/sessions', ['mode' => 'payment', 'client_reference_id' => $order->id, 'customer_email' => $order->buyer_email, 'metadata' => ['campus_order' => $order->id], 'line_items' => [['price_data' => ['currency' => 'eur', 'unit_amount' => $order->amount, 'product_data' => ['name' => $order->product_name]], 'quantity' => 1]], 'success_url' => route('store.order', $order).'?payment_return=1', 'cancel_url' => route('store.order', $order), 'expires_at' => now()->addMinutes(30)->timestamp]);
+        }$response = self::http()->withHeaders(['Idempotency-Key' => 'campus-order-'.$order->id])->post('https://api.stripe.com/v1/checkout/sessions', ['mode' => 'payment', 'client_reference_id' => $order->id, 'customer_email' => $order->buyer_email, 'metadata' => ['campus_order' => $order->id, 'sales_origin' => $order->sales_origin], 'line_items' => [['price_data' => ['currency' => 'eur', 'unit_amount' => $order->amount, 'product_data' => ['name' => $order->product_name]], 'quantity' => 1]], 'success_url' => route('store.order', $order).'?payment_return=1', 'cancel_url' => route('store.order', $order), 'expires_at' => now()->addMinutes(30)->timestamp]);
         if (! $response->successful() || ! is_string($response->json('id')) || ! str_starts_with($response->json('url') ?? '', 'https://checkout.stripe.com/')) {
             throw new \RuntimeException('No se pudo abrir el pago.');
         }$order->update(['stripe_session_id' => $response->json('id'), 'checkout_url' => $response->json('url')]);

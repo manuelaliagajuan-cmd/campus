@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Optimización SEO Principal -->
+    <title>Comprar clases y cursos | CEC Alicante</title>
+    <meta name="description" content="CEC Alicante (Centro de Estudios Campoamor). Academia de idiomas en Alicante. Cursos de inglés y español para extranjeros, grupos reducidos de máximo 7 alumnos, preparación de exámenes y alquiler de aulas.">
+    <meta name="keywords" content="CEC Alicante, academia de idiomas alicante, aprender español alicante, clases de ingles alicante, centro de estudios campoamor, DELE, Cambridge, actividades culturales">
+    <meta name="author" content="Centro de Estudios Campoamor">
+    <link rel="canonical" href="https://cecalicante.es/comprar.html" />
+    
+    <!-- Open Graph (Previsualización para Redes Sociales y WhatsApp) -->
+    <meta property="og:title" content="CEC Alicante | Academia de Español e Inglés">
+    <meta property="og:description" content="Academia de idiomas en Alicante. Grupos reducidos, atención personalizada y preparación de exámenes oficiales.">
+    <meta property="og:image" content="https://cecalicante.es/img/sobre-nosotros.jpg">
+    <meta property="og:url" content="https://cecalicante.es/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Schema.org JSON-LD para SEO Local y Reconocimiento de Marca -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Centro de Estudios Campoamor",
+      "alternateName": ["CEC Alicante", "CEC"],
+      "url": "https://cecalicante.es",
+      "logo": "https://cecalicante.es/img/logo.svg",
+      "description": "Academia de idiomas en Alicante especializada en clases de inglés y español para extranjeros con grupos muy reducidos y actividades culturales.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Calle Teniente Llorca, 4",
+        "addressLocality": "Alicante",
+        "postalCode": "03009",
+        "addressCountry": "ES"
+      },
+      "telephone": "+34966221516",
+      "email": "info@cecalicante.es",
+      "sameAs": [
+        "https://instagram.com/cecalicante"
+      ],
+      "offers": {
+        "@type": "AggregateOffer",
+        "offerCount": "5",
+        "priceCurrency": "EUR",
+        "description": "Cursos de idiomas, preparación de exámenes, actividades culturales y alquiler de aulas."
+      }
+    }
+    </script>
+    
+    <!-- Favicon para modo CLARO (El navegador es blanco/gris) -->
+    <link rel="icon" type="image/svg+xml" href="img/favicon-blanco.svg" media="(prefers-color-scheme: light)">
+    
+    <!-- Favicon para modo OSCURO (El navegador es oscuro/negro) -->
+    <link rel="icon" type="image/svg+xml" href="img/favicon-oscuro.svg" media="(prefers-color-scheme: dark)">
+    
+    <!-- Favicon "Plan B" en formato ICO para navegadores antiguos -->
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    
+    <!-- Cargamos Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* PALETA DE COLOR CORPORATIVA COMPLETA (Sección 8.1 y 8.2) */
+                        campoamor: '#212A5E',    /* 100% */
+                        campoamor80: '#4D557E',  /* 80% */
+                        campoamor60: '#7A7F9E',  /* 60% */
+                        campoamor40: '#A6AABF',  /* 40% */
+                        campoamor20: '#D3D4DF',  /* 20% */
+                        campoamor10: '#E9EAEF',  /* 10% */
+                    },
+                    fontFamily: {
+                        /* Uso oficial de Arial como tipografía de sustitución (Sección 9.4) */
+                        sans: ['Arial', 'Helvetica', 'sans-serif'],
+                    },
+                    /* Jerarquia tipografica corporativa (Sec 9.2 y 9.3) */
+                    fontSize: {
+                        'impacto': ['48px', '1.15'],
+                        't1': ['39px', '1.15'],
+                        't2': ['31px', '1.2'],
+                        't3': ['25px', '1.3'],
+                        'entradilla': ['20px', '1.5'],
+                        'texto': ['16px', '1.5'],
+                        'nota': ['13px', '1.5'],
+                    },
+                    letterSpacing: {
+                        'titulares': '0.02em', /* +2% exigido por manual para mayusculas */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Cortes corporativos a 45 grados pequeños */
+        .corte-superior-derecho { clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 0 100%); }
+        .boton-corte { clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%); }
+        
+        /* CORTES GIGANTES PARA ROMPER SECCIONES */
+        .corte-inferior-derecho-gigante { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 120px), calc(100% - 120px) 100%, 0 100%); }
+        .corte-superior-derecho-gigante { clip-path: polygon(0 0, calc(100% - 120px) 0, 100% 120px, 100% 100%, 0 100%); }
+        
+        /* Trama de marca discreta (azul al 7%) */
+        .trama-fondo {
+            background-image: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(33, 42, 94, 0.07) 10px, rgba(33, 42, 94, 0.07) 20px);
+        }
+
+        /* =======================================================
+           BLOQUEO DEFINITIVO DE LA BARRA DE GOOGLE TRANSLATE
+           ======================================================= */
+        iframe.goog-te-banner-frame, .goog-te-banner-frame, #google_translate_element, .VIpgJd-ZVi9od-ORHb-OEVmcd {
+            display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important; width: 0 !important; pointer-events: none !important;
+        }
+        body > .skiptranslate { display: none !important; height: 0px !important; min-height: 0px !important; margin: 0px !important; padding: 0px !important; opacity: 0 !important; position: absolute !important; z-index: -1000 !important; }
+        html, body { top: 0px !important; margin-top: 0px !important; padding-top: 0px !important; }
+
+        /* Ocultar barra de desplazamiento en los carruseles horizontales */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Efecto difuminado en los laterales de los carruseles */
+        .mascara-carrusel {
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        /* Animación para el Ticker Infinito */
+        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+        .animate-marquee { animation: marquee 35s linear infinite; }
+        .contenedor-marquee:hover .animate-marquee { animation-play-state: paused; }
+    </style>
+<style>
+.cec-site-brand{width:220px;min-width:220px}.cec-desktop-links{gap:16px!important}.cec-desktop-links>:not([hidden])~:not([hidden]){margin-left:0!important}.cec-desktop-links>a{font-size:14px!important}.cec-desktop-links>a.boton-corte{padding-left:16px!important;padding-right:16px!important}@media(max-width:1279px){nav .cec-desktop-links{display:none!important}nav #btn-menu-movil{display:block!important}.cec-site-brand{width:200px;min-width:200px}}
+.cec-language-menu{position:relative;flex-shrink:0}.cec-language-menu>summary{display:flex;align-items:center;gap:4px;cursor:pointer;list-style:none;padding:8px 0;border-bottom:2px solid transparent;color:#212a5e;font-weight:700}.cec-language-menu>summary::-webkit-details-marker{display:none}.cec-language-menu[open]>summary{border-bottom-color:#212a5e}.cec-language-options{position:absolute;right:0;top:calc(100% + 10px);width:160px;max-height:calc(100svh - 130px);overflow-y:auto;padding:6px;background:#fff;border:1px solid #e7e8ef;border-radius:8px;box-shadow:0 12px 30px #212a5e26;z-index:200}.cec-language-options button{display:block;width:100%;min-height:44px;padding:10px;text-align:start;font-size:14px;font-weight:700;color:#212a5e;border-radius:4px}.cec-language-options button:hover,.cec-language-options button:focus-visible{background:#f0f1f6;outline:2px solid #212a5e;outline-offset:-2px}.cec-buy-link{white-space:nowrap}
+@media(min-width:768px) and (max-width:1199px){nav .md\:flex{gap:14px!important}nav .md\:flex>a{font-size:14px!important}nav .md\:gap-8{gap:14px!important}.cec-buy-link{padding:10px 12px!important}}
+</style>
+</head>
+<body class="bg-white text-campoamor antialiased relative text-left">
+
+    <!-- Navegación Fija (Sticky) y Menú Móvil -->
+    <nav class="bg-white border-b border-campoamor10 sticky top-0 z-[100] shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white relative z-20">
+            <div class="flex justify-between h-20 md:h-24 items-center overflow-visible">
+                <!-- Logotipo Principal SVG -->
+                <a href="/" class="cec-site-brand flex-shrink-0 flex items-center hover:opacity-80 transition overflow-visible h-full py-2">
+                    <img src="img/logo.svg" alt="Logotipo CEC Alicante - Centro de Estudios Campoamor" class="h-10 md:h-12 w-auto transform scale-[3.5] md:scale-[4.5] origin-left my-2">
+                </a>
+                
+                <!-- Contenedor Derecho -->
+                <div class="flex items-center gap-3 md:gap-8">
+                    
+                    <!-- Menú de Enlaces (Oculto en móvil, visible en PC) -->
+                    <div class="cec-desktop-links hidden md:flex space-x-6 lg:space-x-8 items-center">
+                        <a href="/#nosotros" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Nosotros</a>
+                        <a href="/#cursos" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Cursos</a>
+                        <a href="/#actividades" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Actividades</a>
+                        <a href="/#faqs" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">FAQs</a>
+                        <a href="/#aulas" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Aulas</a>
+                        
+                        <!-- Botón Acceso al Campus Virtual -->
+                        <a href="https://campus.cecalicante.es" class="boton-corte bg-campoamor10 text-campoamor text-texto px-5 py-3 font-bold hover:bg-campoamor20 transition flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                            Campus
+                        </a>
+
+                        <a href="/comprar.html" class="cec-buy-link boton-corte bg-campoamor10 text-campoamor text-texto px-5 py-3 font-bold hover:bg-campoamor20 transition">Comprar clases</a>
+
+                        <a href="/#contacto" class="boton-corte bg-campoamor text-white text-texto px-6 py-3 font-bold hover:bg-campoamor80 transition">
+                            Contactar
+                        </a>
+                    </div>
+                    
+                    <!-- Menú de Idiomas Personalizado -->
+                    <details class="cec-language-menu notranslate"><summary aria-label="Cambiar idioma"><svg class="w-6 h-6 md:w-5 md:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="hidden sm:inline">Idioma</span></summary><div class="cec-language-options"><button type="button" onclick="cambiarIdioma('es')" lang="es" dir="auto">Español</button><button type="button" onclick="cambiarIdioma('en')" lang="en" dir="auto">English</button><button type="button" onclick="cambiarIdioma('fr')" lang="fr" dir="auto">Français</button><button type="button" onclick="cambiarIdioma('ru')" lang="ru" dir="auto">Русский</button><button type="button" onclick="cambiarIdioma('uk')" lang="uk" dir="auto">Українська</button><button type="button" onclick="cambiarIdioma('ar')" lang="ar" dir="auto">العربية</button><button type="button" onclick="cambiarIdioma('hi')" lang="hi" dir="auto">हिन्दी</button><button type="button" onclick="cambiarIdioma('zh-CN')" lang="zh-CN" dir="auto">中文</button></div></details>
+
+                    <!-- Botón Menú Hamburguesa (SÓLO MÓVIL) -->
+                    <button id="btn-menu-movil" class="md:hidden text-campoamor p-2 focus:outline-none hover:text-campoamor60 transition">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div id="google_translate_element" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú Desplegable Móvil -->
+        <div id="menu-movil" class="absolute top-full left-0 w-full bg-white shadow-[0_10px_20px_rgba(33,42,94,0.1)] border-t border-campoamor10 hidden flex-col text-left origin-top transform transition-all duration-300">
+            <a href="/#nosotros" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor border-b border-campoamor10 hover:bg-campoamor10 transition">Nosotros</a>
+            <a href="/#cursos" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor border-b border-campoamor10 hover:bg-campoamor10 transition">Cursos</a>
+            <a href="/#actividades" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor border-b border-campoamor10 hover:bg-campoamor10 transition">Actividades</a>
+            <a href="/#faqs" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor border-b border-campoamor10 hover:bg-campoamor10 transition">FAQs</a>
+            <a href="/#aulas" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor border-b border-campoamor10 hover:bg-campoamor10 transition">Alquiler de Aulas</a>
+            <a href="https://campus.cecalicante.es" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor bg-campoamor10 border-b border-campoamor20 hover:bg-campoamor20 transition flex items-center justify-start">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                Campus Virtual
+            </a>
+            <a href="/comprar.html" class="link-movil block px-6 py-4 text-texto font-bold text-campoamor bg-campoamor10 border-b border-campoamor20">Comprar clases</a>
+            <a href="/#contacto" class="link-movil block px-6 py-5 text-texto font-bold text-white bg-campoamor hover:bg-campoamor80 transition flex items-center justify-start">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Contactar
+            </a>
+        </div>
+    </nav>
+<main id="comprar" class="max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-20"><p class="text-nota font-bold uppercase tracking-widest mb-3">Sigue aprendiendo con CEC</p><h1 class="text-t1 font-extrabold uppercase mb-5">Comprar clases y cursos</h1><p class="text-texto mb-8">Elige tu bono de sesiones o un curso del campus. Precios y disponibilidad actualizados con el centro.</p><p id="catalog-status" role="status" class="mb-6"></p><section class="border border-campoamor20 p-6 md:p-8 mb-10" id="public-pass-section" hidden><h2 class="text-t2 font-bold mb-5">Bonos de sesiones</h2><label for="public-pass-select" class="block font-bold mb-2">Selecciona un bono</label><select id="public-pass-select" class="w-full border border-campoamor20 bg-white p-3 mb-6" aria-controls="public-pass-details"></select><div id="public-pass-details" aria-live="polite"></div></section><section id="public-courses-section" hidden><h2 class="text-t2 font-bold mb-5">Cursos del campus</h2><div id="public-courses" class="grid md:grid-cols-2 gap-6"></div></section><p class="text-nota mt-8">Para comprar, iniciarás sesión en tu cuenta del campus. El pago se confirma mediante Stripe y tu compra queda registrada en el centro.</p><noscript><p>Activa JavaScript para consultar el catálogo actualizado o <a href="https://campus.cecalicante.es/comprar/desde-web">abre el catálogo del campus</a>.</p></noscript></main>
+    <!-- Pie de página -->
+    <footer class="bg-campoamor fondo-oscuro text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div>
+                <div class="mb-6 overflow-hidden">
+                    <img src="img/logo-blanco.svg" alt="Logotipo en blanco Academia CEC Alicante" class="h-12 w-auto transform scale-[3.2] origin-left my-2">
+                </div>
+                <p class="text-texto font-normal text-campoamor10 mb-6 max-w-xs">
+                    Acompañando a los alumnos en el aprendizaje de idiomas con rigor y cercanía en Alicante.
+                </p>
+                
+                <div class="mb-8">
+                    <a href="https://instagram.com/cecalicante" target="_blank" class="inline-flex items-center text-campoamor10 hover:text-white transition group">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                        <span class="text-texto font-normal">@cecalicante</span>
+                    </a>
+                </div>
+
+                <div class="border-l-2 border-white/20 pl-4 py-1">
+                    <p class="text-nota font-bold text-campoamor10 mb-2 uppercase tracking-titulares flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Horario de atención
+                    </p>
+                    <p class="text-nota font-normal text-campoamor10">Lunes a viernes: 9:00 - 21:00</p>
+                    <p class="text-nota font-normal text-campoamor10">Sábados: 9:00 - 14:00</p>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-entradilla font-bold mb-6 flex items-center">
+                    <span class="w-2 h-2 bg-white transform rotate-45 mr-3"></span> Contacto
+                </h3>
+                
+                <div class="mb-8 space-y-2 text-texto font-normal">
+                    <p>Calle Teniente Llorca, 4<br>03009 Alicante, España</p>
+                    <p class="font-bold"><a href="tel:+34966221516" class="hover:text-campoamor60 transition cursor-pointer">966 22 15 16</a></p>
+                    <p class="font-bold"><a href="mailto:info@cecalicante.es" class="hover:text-campoamor60 transition cursor-pointer">info@cecalicante.es</a></p>
+                </div>
+                
+                <div class="boton-corte overflow-hidden shadow-lg border border-white/10 h-32 w-full">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3128.78517432987!2d-0.48979642356693726!3d38.3539539785857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6237ab3904eaa9%3A0x6651a8028a44e813!2sC.%20Teniente%20Llorca%2C%204%2C%2003009%20Alicante!5e0!3m2!1ses!2ses!4v1791133835151!5m2!1ses!2ses" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-entradilla font-bold mb-6 flex items-center">
+                    <span class="w-2 h-2 bg-white transform rotate-45 mr-3"></span> Legal
+                </h3>
+                <div class="space-y-3 text-texto font-normal">
+                    <a href="aviso-legal" class="block hover:text-campoamor60 transition">Aviso Legal</a>
+                    <a href="privacidad" class="block hover:text-campoamor60 transition">Política de Privacidad</a>
+                    <a href="cookies" class="block hover:text-campoamor60 transition">Política de Cookies</a>
+                    <a href="https://campus.cecalicante.es" class="block text-campoamor10 font-bold hover:text-white transition pt-4 border-t border-white/10">→ Acceso Campus Virtual</a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-start items-center text-nota font-light text-campoamor80">
+            <p>&copy; 2026 Centro de Estudios Campoamor (CEC Alicante).</p>
+        </div>
+    </footer>
+
+    <!-- BANNER DE COOKIES -->
+    <div id="cookie-banner" class="fixed bottom-0 w-full bg-white border-t-4 border-campoamor shadow-[0_-10px_20px_rgba(0,0,0,0.1)] z-[100] transform translate-y-full transition-transform duration-500 ease-in-out hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6 text-left">
+            <div class="text-texto font-normal text-campoamor flex-1 max-w-3xl">
+                <p class="font-bold text-campoamor mb-1 text-entradilla">Utilizamos cookies</p>
+                <p class="text-black">Usamos cookies propias y de terceros para analizar el tráfico de nuestra web y ofrecerte una mejor experiencia. Puedes aceptar todas las cookies pulsando el botón "Aceptar" o rechazarlas. Lee nuestra <a href="cookies" class="font-bold underline text-campoamor hover:text-campoamor80">Política de Cookies</a> para más información.</p>
+            </div>
+            <div class="flex gap-4 w-full md:w-auto flex-shrink-0">
+                <button onclick="rechazarCookies()" class="flex-1 md:flex-none px-6 py-3 bg-campoamor10 text-campoamor font-bold text-texto hover:bg-campoamor60 hover:text-white transition boton-corte">Rechazar</button>
+                <button onclick="aceptarCookies()" class="flex-1 md:flex-none px-6 py-3 bg-campoamor text-white font-bold text-texto hover:bg-campoamor80 transition boton-corte">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de funcionalidad general -->
+    <script type="text/javascript">
+        const GA_TRACKING_ID = 'G-9XBGVMDXZG';
+
+        function comprobarCookies() {
+            const estadoCookies = localStorage.getItem('cookiesAceptadas');
+            const banner = document.getElementById('cookie-banner');
+            
+            if (!estadoCookies) {
+                banner.classList.remove('hidden');
+                setTimeout(() => banner.classList.remove('translate-y-full'), 100);
+            } else if (estadoCookies === 'si') {
+                cargarAnalytics();
+            }
+        }
+
+        function aceptarCookies() {
+            localStorage.setItem('cookiesAceptadas', 'si');
+            ocultarBannerCookies();
+            cargarAnalytics();
+        }
+
+        function rechazarCookies() {
+            localStorage.setItem('cookiesAceptadas', 'no');
+            ocultarBannerCookies();
+        }
+
+        function ocultarBannerCookies() {
+            const banner = document.getElementById('cookie-banner');
+            banner.classList.add('translate-y-full');
+            setTimeout(() => banner.classList.add('hidden'), 500);
+        }
+
+        function cargarAnalytics() {
+            let script = document.createElement('script');
+            script.async = true;
+            script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+            document.head.appendChild(script);
+
+            script.onload = function() {
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', GA_TRACKING_ID);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', comprobarCookies);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.remove('opacity-0', 'translate-y-8');
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.titulo-animado').forEach(elemento => {
+                observer.observe(elemento);
+            });
+        });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'es', 
+                includedLanguages: 'es,ru,fr,ar,hi,en,uk,zh-CN', 
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function cambiarIdioma(langCode) {
+            document.querySelectorAll('.cec-language-menu').forEach(menu=>menu.open=false);
+            var selectElement = document.querySelector('.goog-te-combo');
+            if (selectElement) {
+                selectElement.value = langCode;
+                selectElement.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // CONTROL CARRUSEL POSTS
+        const sliderPosts = document.getElementById('slider-posts');
+        let postsInterval;
+
+        function autoScrollPosts() {
+            if (!sliderPosts) return;
+            const primeraTarjeta = sliderPosts.firstElementChild;
+            if (!primeraTarjeta) return;
+            
+            const gap = 24; 
+            const itemWidth = primeraTarjeta.offsetWidth + gap;
+
+            if (sliderPosts.scrollLeft + sliderPosts.clientWidth >= sliderPosts.scrollWidth - 50) {
+                sliderPosts.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                sliderPosts.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            }
+        }
+
+        function moverPostManual(direccion) {
+            if (!sliderPosts) return;
+            clearInterval(postsInterval);
+            const gap = 24;
+            const itemWidth = sliderPosts.firstElementChild.offsetWidth + gap;
+            sliderPosts.scrollBy({ left: itemWidth * direccion, behavior: 'smooth' });
+            iniciarCarruselPosts();
+        }
+
+        function iniciarCarruselPosts() {
+            clearInterval(postsInterval);
+            postsInterval = setInterval(autoScrollPosts, 2500);
+        }
+
+        iniciarCarruselPosts();
+
+        if(sliderPosts && sliderPosts.parentElement) {
+            sliderPosts.parentElement.addEventListener('mouseenter', () => clearInterval(postsInterval));
+            sliderPosts.parentElement.addEventListener('mouseleave', iniciarCarruselPosts);
+        }
+        
+        if (sliderPosts) {
+            sliderPosts.addEventListener('touchstart', () => clearInterval(postsInterval), {passive: true});
+            sliderPosts.addEventListener('touchend', iniciarCarruselPosts, {passive: true});
+        }
+
+        // CONTROL CARRUSEL ACTIVIDADES
+        const sliderActividades = document.getElementById('slider-actividades');
+        let actividadesInterval;
+
+        function autoScrollActividades() {
+            if (!sliderActividades) return;
+            const primeraTarjeta = sliderActividades.firstElementChild;
+            if (!primeraTarjeta) return;
+            const gap = 24; 
+            const itemWidth = primeraTarjeta.offsetWidth + gap;
+            if (sliderActividades.scrollLeft + sliderActividades.clientWidth >= sliderActividades.scrollWidth - 50) {
+                sliderActividades.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                sliderActividades.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            }
+        }
+
+        function moverActividadManual(direccion) {
+            if (!sliderActividades) return;
+            clearInterval(actividadesInterval);
+            const gap = 24;
+            const itemWidth = sliderActividades.firstElementChild.offsetWidth + gap;
+            sliderActividades.scrollBy({ left: itemWidth * direccion, behavior: 'smooth' });
+            iniciarCarruselActividades();
+        }
+
+        function iniciarCarruselActividades() {
+            clearInterval(actividadesInterval);
+            actividadesInterval = setInterval(autoScrollActividades, 3000); 
+        }
+
+        iniciarCarruselActividades();
+
+        if(sliderActividades && sliderActividades.parentElement) {
+            sliderActividades.parentElement.addEventListener('mouseenter', () => clearInterval(actividadesInterval));
+            sliderActividades.parentElement.addEventListener('mouseleave', iniciarCarruselActividades);
+        }
+        
+        if (sliderActividades) {
+            sliderActividades.addEventListener('touchstart', () => clearInterval(actividadesInterval), {passive: true});
+            sliderActividades.addEventListener('touchend', iniciarCarruselActividades, {passive: true});
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault(); 
+                const destino = document.querySelector(this.getAttribute('href'));
+                if (destino) {
+                    destino.scrollIntoView({ behavior: 'smooth' });
+                    history.pushState(null, null, window.location.pathname);
+                }
+            });
+        });
+
+        // FAQs
+        document.querySelectorAll('.faq-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('svg');
+                
+                document.querySelectorAll('.faq-content').forEach(otherContent => {
+                    if (otherContent !== content && otherContent.style.maxHeight) {
+                        otherContent.style.maxHeight = null;
+                        const otherIcon = otherContent.previousElementSibling.querySelector('svg');
+                        otherIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>';
+                        otherIcon.classList.remove('rotate-180', 'text-campoamor60');
+                    }
+                });
+
+                if (!content.style.maxHeight) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>';
+                    icon.classList.add('rotate-180', 'text-campoamor60');
+                } else {
+                    content.style.maxHeight = null;
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>';
+                    icon.classList.remove('rotate-180', 'text-campoamor60');
+                }
+            });
+        });
+
+        const btnMenu = document.getElementById('btn-menu-movil');
+        const menuMovil = document.getElementById('menu-movil');
+        const linksMovil = document.querySelectorAll('.link-movil');
+
+        if (btnMenu && menuMovil) {
+            btnMenu.addEventListener('click', () => {
+                menuMovil.classList.toggle('hidden');
+                menuMovil.classList.toggle('flex');
+            });
+
+            linksMovil.forEach(link => {
+                link.addEventListener('click', () => {
+                    menuMovil.classList.add('hidden');
+                    menuMovil.classList.remove('flex');
+                });
+            });
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+    <!-- BOTÓN VOLVER ARRIBA -->
+    <button id="btn-arriba" onclick="subirArriba()" class="fixed bottom-6 left-6 md:bottom-8 md:left-8 p-3 md:p-4 rounded-full shadow-2xl hover:-translate-y-2 transition-all duration-300 z-50 opacity-0 invisible flex items-center justify-center cursor-pointer border-2 border-transparent">
+        <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <!-- BOTÓN WHATSAPP -->
+    <a id="btn-whatsapp" href="https://wa.me/34966221516?text=Hola,%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n%20sobre%20la%20academia."
+       target="_blank"
+       rel="noopener noreferrer"
+       class="fixed bottom-6 right-6 md:bottom-8 md:right-8 p-4 rounded-full shadow-2xl hover:scale-110 transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer border-2 border-transparent">
+        <svg class="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.031 0C5.385 0 0 5.388 0 12.042c0 2.124.553 4.195 1.604 6.012L.263 24l6.104-1.603a11.95 11.95 0 005.664 1.425h.005c6.645 0 12.03-5.388 12.03-12.042S18.677 0 12.031 0zm0 21.84c-1.796 0-3.553-.483-5.097-1.398l-.365-.216-3.784.992.999-3.69-.236-.376A9.972 9.972 0 012.047 12.04C2.047 6.536 6.53 2.05 12.036 2.05s9.984 4.486 9.984 9.99-4.478 9.98-9.989 9.98zm5.485-7.493c-.301-.151-1.782-.88-2.059-.98-.277-.1-.479-.151-.68.151-.201.302-.78 1.025-.956 1.226-.176.202-.352.227-.653.076-1.558-.785-2.673-1.464-3.72-3.235-.176-.301-.019-.464.132-.614.135-.135.301-.352.452-.529.151-.176.201-.301.301-.502.1-.202.05-.378-.025-.529-.076-.151-.68-1.637-.932-2.242-.245-.589-.494-.509-.68-.518-.176-.009-.377-.009-.578-.009-.201 0-.528.075-.804.377-.277.302-1.055 1.03-1.055 2.515s1.08 2.916 1.231 3.117c.151.201 2.126 3.245 5.148 4.549.719.31 1.28.495 1.718.633.721.228 1.378.196 1.895.119.58-.086 1.782-.729 2.033-1.433.251-.704.251-1.307.176-1.433-.076-.126-.277-.202-.578-.352z"></path>
+        </svg>
+        <span id="wa-tooltip" class="absolute right-[115%] px-4 py-2 text-nota font-bold rounded-lg shadow-xl whitespace-nowrap transition-all duration-500 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 pointer-events-none border border-transparent">
+            ¿Necesitas ayuda?
+        </span>
+    </a>
+
+    <!-- LÓGICA DE CONTRASTE INTELIGENTE PARA LOS BOTONES FLOTANTES Y POP-UP -->
+    <!-- POP-UP DE WHATSAPP POR INACTIVIDAD -->
+    <script>
+        const btnArriba = document.getElementById('btn-arriba');
+        const btnWhatsapp = document.getElementById('btn-whatsapp');
+        const waTooltip = document.getElementById('wa-tooltip');
+        
+        const zonasOscuras = document.querySelectorAll('.fondo-oscuro');
+        
+        const btnNormal = ['bg-campoamor', 'text-white', 'hover:bg-campoamor80'];
+        const tooltipNormal = ['bg-campoamor', 'text-white'];
+        
+        const btnInvertido = ['bg-white', 'text-campoamor', 'hover:bg-campoamor10'];
+        const tooltipInvertido = ['bg-white', 'text-campoamor'];
+
+        function actualizarContrasteBotones() {
+            if (window.scrollY > 400) {
+                btnArriba.classList.remove('opacity-0', 'invisible');
+                btnArriba.classList.add('opacity-100', 'visible');
+            } else {
+                btnArriba.classList.remove('opacity-100', 'visible');
+                btnArriba.classList.add('opacity-0', 'invisible');
+            }
+
+            verificarElemento(btnArriba, btnNormal, btnInvertido);
+            verificarElemento(btnWhatsapp, btnNormal, btnInvertido);
+            verificarElemento(waTooltip, tooltipNormal, tooltipInvertido);
+        }
+
+        function verificarElemento(elemento, clasesNormales, clasesInvertidas) {
+            if(!elemento) return;
+            const rect = elemento.getBoundingClientRect();
+            const centroY = rect.top + (rect.height / 2);
+            const centroX = rect.left + (rect.width / 2);
+            
+            let sobreOscuro = false;
+            zonasOscuras.forEach(sec => {
+                const secRect = sec.getBoundingClientRect();
+                if (centroY >= secRect.top && centroY <= secRect.bottom && centroX >= secRect.left && centroX <= secRect.right) {
+                    sobreOscuro = true;
+                }
+            });
+
+            if (sobreOscuro) {
+                elemento.classList.remove(...clasesNormales);
+                elemento.classList.add(...clasesInvertidas);
+            } else {
+                elemento.classList.remove(...clasesInvertidas);
+                elemento.classList.add(...clasesNormales);
+            }
+        }
+
+        window.addEventListener('scroll', actualizarContrasteBotones);
+        window.addEventListener('resize', actualizarContrasteBotones);
+        actualizarContrasteBotones();
+
+        function subirArriba() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            history.pushState(null, null, window.location.pathname);
+        }
+
+        // POP-UP WHATSAPP POR INACTIVIDAD (10 segundos)
+        let inactividadTimer;
+        let isTooltipShowing = false;
+
+        function mostrarTooltip() {
+            if (waTooltip && !isTooltipShowing) {
+                isTooltipShowing = true;
+                
+                waTooltip.classList.remove('opacity-0', 'translate-x-4');
+                waTooltip.classList.add('opacity-100', 'translate-x-0');
+                
+                setTimeout(() => {
+                    waTooltip.classList.remove('opacity-100', 'translate-x-0');
+                    waTooltip.classList.add('opacity-0', 'translate-x-4');
+                    isTooltipShowing = false;
+                }, 4000); 
+            }
+        }
+
+        function resetearInactividad() {
+            clearTimeout(inactividadTimer);
+            if (!isTooltipShowing) {
+                inactividadTimer = setTimeout(mostrarTooltip, 10000); 
+            }
+        }
+
+        window.addEventListener('mousemove', resetearInactividad);
+        window.addEventListener('scroll', resetearInactividad);
+        window.addEventListener('keydown', resetearInactividad);
+        window.addEventListener('click', resetearInactividad);
+        window.addEventListener('touchstart', resetearInactividad);
+
+        resetearInactividad();
+    </script>
+<script>document.addEventListener('click',e=>{document.querySelectorAll('.cec-language-menu[open]').forEach(menu=>{if(!menu.contains(e.target))menu.open=false;});});document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.cec-language-menu[open]').forEach(menu=>{menu.open=false;menu.querySelector('summary').focus();});});</script>
+<script src="/js/cec-store.js?v=1" defer></script>
+</body>
+</html>
