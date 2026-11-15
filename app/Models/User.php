@@ -25,6 +25,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->display_name ?: $this->name;
     }
 
+    public function greetingName(): string
+    {
+        return preg_split('/\s+/u', trim($this->displayName()), 2)[0];
+    }
+
     public function isStaff(): bool
     {
         return in_array($this->role, ['admin', 'teacher'], true);

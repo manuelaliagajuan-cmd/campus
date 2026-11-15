@@ -1,7 +1,7 @@
 @extends('layout')
 @section('title','Clases online')
 @section('content')
-<section class="class-preview" data-schedule-state="{{ route('online.schedule-state') }}" data-revision="{{ $sourceRevision??'' }}"><header class="class-preview-heading"><div><p>{{ __('Hola, :name',['name'=>auth()->user()->name]) }}</p><h1>{{ \App\Services\ScheduledClasses::heading($upcoming[0]??null) }}</h1></div>@if(auth()->user()->isStaff())<a class="button outline" href="https://gestion.cecalicante.es/" target="_blank" rel="noopener">{{ __('Programar en Gestión') }}</a>@endif</header>
+<section class="class-preview" data-schedule-state="{{ route('online.schedule-state') }}" data-revision="{{ $sourceRevision??'' }}"><header class="class-preview-heading"><div><p>{{ __('Hola, :name',['name'=>auth()->user()->greetingName()]) }}</p><h1>{{ \App\Services\ScheduledClasses::heading($upcoming[0]??null) }}</h1></div>@if(auth()->user()->isStaff())<a class="button outline" href="https://gestion.cecalicante.es/" target="_blank" rel="noopener">{{ __('Programar en Gestión') }}</a>@endif</header>
 @if(count($upcoming))@include('partials.scheduled-class-card',['entry'=>$upcoming[0],'featured'=>true])@else<div class="panel"><h2>{{ __('Próxima clase') }}</h2><p>{{ __('Todavía no tienes clases online programadas. El centro confirmará contigo el próximo horario.') }}</p></div>@endif</section>
 @if(count($upcoming)>1)<section class="scheduled-next"><h2>{{ __('Próximas clases') }}</h2>@foreach(array_slice($upcoming,1) as $entry)@include('partials.scheduled-class-card',['entry'=>$entry,'featured'=>false])@endforeach</section>@endif
 <p class="help schedule-sync-state" role="status">{{ __('Los cambios de horario confirmados por el centro se actualizan aquí automáticamente.') }}</p>

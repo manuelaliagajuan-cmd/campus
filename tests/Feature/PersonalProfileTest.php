@@ -86,7 +86,7 @@ class PersonalProfileTest extends TestCase
     public function test_welcome_uses_profile_name_and_each_role_has_appropriate_message(): void
     {
         foreach (['student' => 'Continúa tus cursos, consulta tus bonos y prepara tu próxima clase.', 'teacher' => 'Prepara tus clases, consulta tu horario y acompaña a tus alumnos.', 'admin' => 'Organiza tus cursos, tu equipo y los accesos del campus.'] as $role => $text) {
-            $u = User::factory()->create(['role' => $role, 'display_name' => 'Sam']);
+            $u = User::factory()->create(['role' => $role, 'display_name' => 'Sam García Pérez']);
             $this->actingAs($u)->get('/campus')->assertOk()->assertSee('¡Hola, Sam!')->assertSee($text);
         }
     }
