@@ -100,3 +100,5 @@ body.online-class-page:has(#online-room){background:#111015;color:#fff}.online-c
 .availability-calendar{max-height:560px;overflow-y:auto;overscroll-behavior:contain;padding-right:4px}@media(max-width:600px){.availability-calendar{max-height:420px}}
 
 .language-options{max-height: min(70vh,440px);overflow-y:auto}.language-options button{min-height:44px}html[dir=rtl] .field,html[dir=rtl] .header-language{text-align:right}html[dir=rtl] .language-options{right:auto;left:0}
+
+.teacher-schedule-calendar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;max-height:600px;overflow-y:auto}.teacher-event{padding:16px;border:1px solid var(--line);border-left:4px solid #15803d;margin:10px 0;overflow-wrap:anywhere}.teacher-event.is-blocked{border-left-color:#b42318;background:#fff4f3}.teacher-event p{margin:8px 0}

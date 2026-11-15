@@ -92,13 +92,13 @@ class PassWorkspaceTest extends TestCase
         $this->actingAs($this->student)->get('/bonos/BON-1')->assertForbidden();
     }
 
-    public function test_private_registry_publishes_only_teacher_identity_fields(): void
+    public function test_private_registry_publishes_teacher_identity_and_course_workload_without_credentials(): void
     {
         CampusAccessRegistry::publishAll();
         $registry = json_decode(substr(file_get_contents($this->dir.'/campus-accounts.php'), 15), true);
         $teachers = $registry['teachers'];
         $this->assertCount(2, $teachers);
-        $this->assertSame(['id', 'name', 'email', 'role'], array_keys($teachers[0]));
+        $this->assertSame(['id', 'name', 'email', 'role', 'courses'], array_keys($teachers[0]));
         $this->assertStringNotContainsString('password', json_encode($registry));
     }
 

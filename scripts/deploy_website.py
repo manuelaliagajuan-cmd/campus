@@ -1,8 +1,8 @@
-"""Publish only the three reviewed public website files, with backup and rollback."""
+"""Publish only the reviewed public website files, with backup and rollback."""
 import base64,hashlib,hmac,json,os,posixpath,secrets,shlex,socket,stat,time,urllib.request
 from pathlib import Path
 import paramiko
-files={'index.html':Path('website/index.html'),'comprar.html':Path('website/comprar.html'),'js/cec-store.js':Path('website/js/cec-store.js')}
+files={'index.html':Path('website/index.html'),'comprar.html':Path('website/comprar.html'),'js/cec-store.js':Path('website/js/cec-store.js'),'pdf/precios-horarios-ingles-cec-2026-2027.pdf':Path('website/pdf/precios-horarios-ingles-cec-2026-2027.pdf')}
 expected_original='224e3672baedcdd1b9effb96a582c7305a1f1ae6b999ecb2c1bf61530fe26f26'
 transport=None
 try:
@@ -53,10 +53,11 @@ try:
  for name,data in prior.items():
   if data is not None:write(backup+'/'+name.replace('/','__'),data)
  if not exists('public/js'):ftp.mkdir(p('public/js'),0o755)
+ if not stat.S_ISDIR(ftp.lstat(p('public/pdf')).st_mode):raise RuntimeError('El directorio de documentos no es regular.')
  if not stat.S_ISDIR(ftp.lstat(p('public/js')).st_mode):raise RuntimeError('El directorio de scripts no es regular.')
  published=[]
  try:
-  for name in ['js/cec-store.js','comprar.html','index.html']:
+  for name in ['js/cec-store.js','pdf/precios-horarios-ingles-cec-2026-2027.pdf','comprar.html','index.html']:
    atomic('public/'+name,files[name].read_bytes());published.append(name)
   for name,source in files.items():
    if fetch('https://cecalicante.es/'+name+'?cec-release='+os.environ['GITHUB_SHA'])!=source.read_bytes():raise RuntimeError('La verificación pública no coincide: '+name)
@@ -67,6 +68,6 @@ try:
    else:atomic('public/'+name,prior[name])
   raise
  write(manifest_path,json.dumps({n:hashlib.sha256(v.read_bytes()).hexdigest() for n,v in files.items()}).encode())
- print('CEC_WEB_PUBLICADA=cecalicante.es');print('CEC_WEB_BACKUP='+backup);print('CEC_WEB_ARCHIVOS=3')
+ print('CEC_WEB_PUBLICADA=cecalicante.es');print('CEC_WEB_BACKUP='+backup);print('CEC_WEB_ARCHIVOS=4')
 finally:
  if transport:transport.close()

@@ -33,6 +33,7 @@ jobs:
           node --check public/assets/class-schedule.js
           node --check public/assets/store.js
           node --check public/assets/teacher-availability.js
+          node --check public/assets/teacher-schedule.js
       - name: Probar aula con dos navegadores y medios WebRTC reales
         env:
           APP_ENV: testing

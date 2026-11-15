@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\CampusAccessRegistry;
+use App\Services\TeacherDirectory;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,9 +69,17 @@ class AuthController extends Controller
     {
         $r->validate(['token' => 'required', 'email' => 'required|email', 'password' => ['required', 'confirmed', 'max:72', PasswordRule::min(12)->letters()->numbers()]]);
         $status = Password::reset($r->only('email', 'password', 'password_confirmation', 'token'), function (User $u, string $password) {
-            $u->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60)])->save();
+            $u->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60), 'teacher_access_pending' => false])->save();
             event(new PasswordReset($u));
         });
+
+        if ($status === Password::PASSWORD_RESET) {
+            try {
+                TeacherDirectory::sync();
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return $status === Password::PASSWORD_RESET ? redirect()->route('login')->with('status', __('Contraseña actualizada.')) : back()->withErrors(['email' => __('El enlace no es válido o ha caducado.')]);
     }

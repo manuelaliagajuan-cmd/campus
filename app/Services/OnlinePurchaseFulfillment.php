@@ -35,6 +35,7 @@ class OnlinePurchaseFulfillment
                 $prior === false ? putenv('CEC_ACADEMIC_STORE_DIR') : putenv('CEC_ACADEMIC_STORE_DIR='.$prior);
             }$o->update(['status' => 'fulfilled', 'fulfilled_at' => now(), 'erp_result' => $result]);
             ErpConnection::sync($user);
+            CampusAccessRegistry::safelyPublish($user);
         });
     }
 }

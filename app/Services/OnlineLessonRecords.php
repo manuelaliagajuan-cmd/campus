@@ -69,6 +69,7 @@ class OnlineLessonRecords
 
     public static function reconcile(): void
     {
+        TeacherDirectory::sync();
         if (! ErpConnection::snapshot()) {
             return;
         }

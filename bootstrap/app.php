@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->validateCsrfTokens(except: ['pagos/stripe/webhook', 'interno/clases/procesar']);
+        $middleware->validateCsrfTokens(except: ['pagos/stripe/webhook', 'interno/clases/procesar', 'interno/profesores/sincronizar']);
         $middleware->web(append: [SetLocale::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

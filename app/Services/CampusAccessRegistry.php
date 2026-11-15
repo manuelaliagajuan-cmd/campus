@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Course;
 use App\Models\User;
 use RuntimeException;
 
@@ -48,7 +49,9 @@ class CampusAccessRegistry
                 $oldTeachers = $previous['teachers'] ?? [];
             }
             $next = $change($accounts);
-            $teachers = User::whereIn('role', ['admin', 'teacher'])->orderBy('name')->get(['id', 'name', 'email', 'role'])->toArray();
+            $teacherUsers = User::whereIn('role', ['admin', 'teacher'])->orderBy('name')->get(['id', 'name', 'email', 'role']);
+            $courseRows = Course::withCount('students')->get()->groupBy('teacher_id');
+            $teachers = $teacherUsers->map(fn ($t) => $t->toArray() + ['courses' => ($courseRows->get($t->id) ?? collect())->map(fn ($c) => ['id' => $c->id, 'title' => $c->title, 'students' => $c->students_count, 'online' => (bool) $c->online_enabled])->values()->all()])->all();
             if ($accounts === $next && $teachers === $oldTeachers && is_file($path)) {
                 return;
             }

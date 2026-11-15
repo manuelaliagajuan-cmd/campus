@@ -13,10 +13,12 @@ use App\Http\Controllers\PassWorkspaceController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\TrashController;
 use App\Http\Middleware\PrivateResponse;
 use App\Http\Middleware\SyncErp;
 use App\Services\OnlineLessonRecords;
+use App\Services\TeacherDirectory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +40,9 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
     Route::middleware(['auth', SyncErp::class])->group(function () {
+        Route::get('/mi-horario', [TeacherScheduleController::class, 'index'])->name('staff.schedule');
+        Route::get('/mi-horario/datos', [TeacherScheduleController::class, 'data'])->name('staff.schedule.data');
+        Route::post('/mi-horario/ausencias', [TeacherScheduleController::class, 'leave'])->name('staff.schedule.leave');
         Route::get('/comprar', [StoreController::class, 'index'])->name('store.index');
         Route::get('/comprar/bonos/{type}/disponibilidad', [StoreController::class, 'availability'])->name('store.availability');
         Route::get('/comprar/bonos/{type}', [StoreController::class, 'pass'])->name('store.pass');
@@ -129,6 +134,22 @@ Route::post('/interno/clases/procesar', function (Request $r) {
     }
     try {
         OnlineLessonRecords::reconcile();
+    } finally {
+        $lock->release();
+    }
+
+    return response()->json(['ok' => true]);
+});
+
+Route::post('/interno/profesores/sincronizar', function (Request $r) {
+    $time = $r->header('X-CEC-Time', '');
+    $key = config('erp.jobs_key');
+    abort_unless($key && ctype_digit($time) && abs(time() - (int) $time) <= 300 && hash_equals(hash_hmac('sha256', $time, $key), $r->header('X-CEC-Signature', '')), 403);
+    $lock = Cache::lock('cec-teacher-directory', 90);
+    if (! $lock->get()) {
+        return response()->json(['busy' => true]);
+    }try {
+        TeacherDirectory::sync();
     } finally {
         $lock->release();
     }

@@ -42,6 +42,7 @@ class StaffController extends Controller
         $d = $this->courseData($r);
         $d['teacher_id'] = $r->user()->id;
         $c = CourseCover::save($r, $d);
+        CampusAccessRegistry::safelyPublish($r->user());
 
         return redirect()->route('staff.edit', $c)->with('status', __('Curso creado. Añade sus lecciones.'));
     }
@@ -94,6 +95,7 @@ class StaffController extends Controller
             $data['teacher_id'] = $teacher->id;
         }
         CourseCover::save($r, $data, $course);
+        CampusAccessRegistry::safelyPublish($r->user());
 
         return back()->with('status', __('Curso actualizado.'));
     }
@@ -102,6 +104,7 @@ class StaffController extends Controller
     {
         $this->manage($r, $course);
         $course->delete();
+        CampusAccessRegistry::safelyPublish($r->user());
 
         return redirect()->route('dashboard')->with('status', __('Curso eliminado del campus. Puedes restaurarlo desde la papelera.'));
     }
@@ -188,6 +191,7 @@ class StaffController extends Controller
         if (! $u) {
             return back()->withErrors(['email' => __('El estudiante debe registrarse primero en el campus.')]);
         }$course->students()->syncWithoutDetaching([$u->id => ['source_manual' => true]]);
+        CampusAccessRegistry::safelyPublish($r->user());
 
         return back()->with('status', __('Matrícula guardada.'));
     }
@@ -199,6 +203,7 @@ class StaffController extends Controller
             return back()->withErrors(['email' => __('Esta matrícula viene de Gestión CEC. Modifícala allí para actualizar el acceso.')]);
         }
         $course->students()->detach($user->id);
+        CampusAccessRegistry::safelyPublish($r->user());
 
         return back()->with('status', __('Matrícula retirada.'));
     }

@@ -17,7 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected function casts(): array
     {
-        return ['email_verified_at' => 'datetime', 'erp_link_reviewed_at' => 'datetime', 'password' => 'hashed'];
+        return ['teacher_access_pending' => 'boolean', 'email_verified_at' => 'datetime', 'erp_link_reviewed_at' => 'datetime', 'password' => 'hashed'];
     }
 
     public function isStaff(): bool
