@@ -11,7 +11,7 @@ use RuntimeException;
 
 class ErpConnection
 {
-    private static function snapshot(): ?array
+    public static function snapshot(): ?array
     {
         $path = config('erp.projection_path');
         if (! $path || ! is_file($path)) {
@@ -30,7 +30,7 @@ class ErpConnection
             'students.*.id' => 'required|string|max:100|distinct', 'students.*.email' => 'present|string|max:190', 'students.*.active' => 'required|boolean', 'students.*.withdrawal_date' => 'nullable|date_format:Y-m-d', 'students.*.courses' => 'present|array', 'students.*.courses.*' => 'string|max:100',
             'passes.*.id' => 'required|string|max:100|distinct', 'passes.*.student_id' => 'required|string|max:100', 'passes.*.name' => 'required|string|max:180',
             'passes.*.sessions' => 'required|integer|min:0|max:500', 'passes.*.used' => 'required|integer|min:0', 'passes.*.remaining' => 'required|integer|min:0',
-            'passes.*.online_enabled' => 'sometimes|boolean', 'passes.*.start' => 'nullable|date_format:Y-m-d', 'passes.*.expires' => 'nullable|date_format:Y-m-d',
+            'passes.*.online_enabled' => 'sometimes|boolean', 'passes.*.bookings' => 'sometimes|array|max:5000', 'passes.*.bookings.*.id' => 'required|string|max:100', 'passes.*.bookings.*.date' => 'required|date_format:Y-m-d', 'passes.*.bookings.*.start' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.end' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.completed' => 'required|boolean', 'passes.*.start' => 'nullable|date_format:Y-m-d', 'passes.*.expires' => 'nullable|date_format:Y-m-d',
         ])->validate();
 
         $today = now('Europe/Madrid')->toDateString();

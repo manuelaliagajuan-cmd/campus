@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\OnlineSession;
+use App\Services\ErpConnection;
 use App\Services\OnlineClassrooms;
+use App\Services\ScheduledClasses;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,28 +16,63 @@ class OnlineController extends Controller
     public function index(Request $r)
     {
         $rooms = OnlineClassrooms::available($r->user());
-        $sessions = OnlineSession::whereIn('scope', array_keys($rooms))->latest()->limit(50)->get();
+        $sessions = OnlineSession::where(function ($q) use ($rooms, $r) {
+            $q->whereIn('scope', array_keys($rooms))->orWhere(function ($past) use ($r) {
+                $past->whereNotNull('ended_at')->where(function ($own) use ($r) {
+                    $own->where('host_id', $r->user()->id)->orWhereIn('id', DB::table('online_participants')->where('user_id', $r->user()->id)->select('online_session_id'));
+                });
+            });
+        })->latest()->limit(50)->get();
         foreach ($sessions as $s) {
             OnlineClassrooms::expire($s);
         }$ratings = DB::table('online_ratings')->where('user_id', $r->user()->id)->pluck('stars', 'online_session_id');
 
-        return view('online.index', compact('rooms', 'sessions', 'ratings'));
+        $upcoming = ScheduledClasses::upcoming($rooms);
+        try {
+            $sourceRevision = ErpConnection::snapshot()['revision'] ?? null;
+        } catch (\Throwable $e) {
+            $sourceRevision = null;
+        }
+
+        return view('online.index', compact('rooms', 'sessions', 'ratings', 'upcoming', 'sourceRevision'));
+    }
+
+    public function scheduleState(Request $r)
+    {
+        try {
+            $source = ErpConnection::snapshot();
+
+            return response()->json(['revision' => $source['revision'] ?? null, 'time' => now()->toIso8601String()]);
+        } catch (\Throwable $e) {
+            return response()->json(['revision' => null, 'unavailable' => true], 503);
+        }
     }
 
     public function start(Request $r)
     {
-        $d = $r->validate(['scope' => 'required|string|max:230']);
+        $d = $r->validate(['scope' => 'required|string|max:230', 'booking_id' => 'nullable|string|max:100']);
         $room = OnlineClassrooms::room($r->user(), $d['scope']);
         abort_unless($room['manage'], 403);
+        $entry = null;
+        if (isset($room['pass']) && array_key_exists('bookings', $room['pass'])) {
+            $entry = ScheduledClasses::find($room, $d['booking_id'] ?? null);
+            abort_unless($entry && now()->betweenIncluded($entry['opens'], $entry['closes']), 403, __('El aula se habilita 15 minutos antes del horario acordado.'));
+        }
+        if (isset($room['pass'])) {
+            abort_if(! empty($room['pass']['start']) && $room['pass']['start'] > now('Europe/Madrid')->toDateString(), 403);
+        }
         $existing = OnlineSession::where('active_key', $d['scope'])->first();
         if ($existing) {
             OnlineClassrooms::expire($existing);
+            if (! $existing->ended_at && $entry && ($existing->booking_signature !== $entry['signature'] || $existing->booking_id !== $entry['id'])) {
+                $existing->update(['ended_at' => now(), 'active_key' => null]);
+            }
             if (! $existing->ended_at) {
                 return redirect()->route('online.show', $existing);
             }
         }
         try {
-            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $r->user()->id, 'title' => mb_substr($room['title'], 0, 180)]);
+            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $r->user()->id, 'booking_id' => $entry['id'] ?? null, 'booking_signature' => $entry['signature'] ?? null, 'booking_start_at' => isset($entry) ? $entry['start']->copy()->utc() : null, 'booking_end_at' => isset($entry) ? $entry['end']->copy()->utc() : null, 'title' => mb_substr($room['title'], 0, 180)]);
         } catch (UniqueConstraintViolationException $e) {
             $s = OnlineSession::where('active_key', $d['scope'])->firstOrFail();
         }

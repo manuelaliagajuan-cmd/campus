@@ -52,6 +52,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/bonos/{pass}', [PassWorkspaceController::class, 'store'])->name('passes.store');
         Route::get('/clases-online', [OnlineController::class, 'index'])->name('online.index');
         Route::post('/clases-online', [OnlineController::class, 'start'])->middleware('throttle:online-start')->name('online.start');
+        Route::get('/clases-online/horario', [OnlineController::class, 'scheduleState'])->name('online.schedule-state');
         Route::get('/clases-online/conexion', fn () => response()->json(['ok' => true, 'time' => now()->toIso8601String()]))->name('online.check');
         Route::get('/clases-online/{session}', [OnlineController::class, 'show'])->name('online.show');
         Route::post('/clases-online/{session}/entrar', [OnlineController::class, 'join'])->middleware('throttle:online-join')->name('online.join');
