@@ -5,6 +5,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampusController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\ClassroomConnectivityController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
@@ -42,6 +43,9 @@ Route::middleware(PrivateResponse::class)->group(function () {
     });
     Route::middleware(['auth', SyncErp::class])->group(function () {
         Route::get('/campus/vista-alumno', [CampusController::class, 'dashboard'])->name('dashboard.student-preview');
+        Route::get('/administracion/conexion-aula', [ClassroomConnectivityController::class, 'edit'])->name('connectivity.edit');
+        Route::get('/administracion/conexion-aula/prueba', [ClassroomConnectivityController::class, 'test'])->middleware('throttle:6,1')->name('connectivity.test');
+        Route::post('/administracion/conexion-aula', [ClassroomConnectivityController::class, 'update'])->middleware('throttle:6,1')->name('connectivity.update');
         Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/perfil', [ProfileController::class, 'update'])->name('profile.update');
         Route::get('/perfil/foto/{user}', [ProfileController::class, 'avatar'])->name('profile.avatar');
@@ -78,6 +82,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/clases-online', [OnlineController::class, 'start'])->middleware('throttle:online-start')->name('online.start');
         Route::post('/clases-online/cancelar', [OnlineController::class, 'cancel'])->middleware('throttle:online-start')->name('online.cancel');
         Route::get('/clases-online/horario', [OnlineController::class, 'scheduleState'])->name('online.schedule-state');
+        Route::get('/clases-online/{session}/conexion', [OnlineController::class, 'connectivity'])->middleware('throttle:120,1')->name('online.connectivity');
         Route::get('/clases-online/conexion', fn () => response()->json(['ok' => true, 'time' => now()->toIso8601String()]))->name('online.check');
         Route::get('/clases-online/{session}', [OnlineController::class, 'show'])->name('online.show');
         Route::post('/clases-online/{session}/entrar', [OnlineController::class, 'join'])->middleware('throttle:online-join')->name('online.join');

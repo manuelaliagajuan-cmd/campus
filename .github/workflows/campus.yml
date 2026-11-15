@@ -36,6 +36,7 @@ jobs:
           node --check public/assets/teacher-schedule.js
           node --check public/assets/profile-appearance.js
           node --check public/assets/profile-editor.js
+          node --check public/assets/rtc-connectivity-check.js
       - name: Probar aula con dos navegadores y medios WebRTC reales
         env:
           APP_ENV: testing
@@ -51,6 +52,19 @@ jobs:
           (cd public && php -S 127.0.0.1:8782 "$GITHUB_WORKSPACE/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php") > "$RUNNER_TEMP/classroom-php.log" 2>&1 &
           export CEC_PLAYWRIGHT_PATH="$RUNNER_TEMP/cec-browser/node_modules/playwright/index.mjs"
           node tests/browser/classroom.mjs
+      - name: Probar vídeo y recuperación mediante TURN TCP
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ runner.temp }}/classroom.sqlite
+          CEC_BROWSER_FIXTURE: ${{ runner.temp }}/classroom-fixture.json
+          CEC_RTC_ICE_SERVERS: '[{"urls":"turn:127.0.0.1:3479?transport=tcp","username":"campus-test","credential":"local-test-password"}]'
+        run: |
+          sudo apt-get install -y --no-install-recommends coturn
+          turnserver -n --no-cli --no-tls --no-dtls --listening-ip=127.0.0.1 --relay-ip=127.0.0.1 --listening-port=3479 --min-port=49160 --max-port=49200 --lt-cred-mech --realm=campus-test --user=campus-test:local-test-password --allow-loopback-peers --no-multicast-peers --log-file="$RUNNER_TEMP/coturn.log" --pidfile="$RUNNER_TEMP/coturn.pid" > "$RUNNER_TEMP/coturn-console.log" 2>&1 &
+          (cd public && php -S 127.0.0.1:8783 "$GITHUB_WORKSPACE/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php") > "$RUNNER_TEMP/classroom-relay-php.log" 2>&1 &
+          export CEC_PLAYWRIGHT_PATH="$RUNNER_TEMP/cec-browser/node_modules/playwright/index.mjs"
+          CEC_FORCE_RELAY=1 CEC_BROWSER_URL=http://127.0.0.1:8783 node tests/browser/classroom.mjs
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -58,6 +72,8 @@ jobs:
           path: |
             ${{ runner.temp }}/online-class-*.png
             ${{ runner.temp }}/classroom-php.log
+            ${{ runner.temp }}/classroom-relay-php.log
+            ${{ runner.temp }}/coturn*.log
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: test

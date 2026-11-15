@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OnlineSession;
 use App\Models\User;
+use App\Services\ClassroomConnectivity;
 use App\Services\ErpConnection;
 use App\Services\OnlineClassrooms;
 use App\Services\OnlineLessonRecords;
@@ -144,10 +145,21 @@ class OnlineController extends Controller
     {
         $this->access($r, $session);
         abort_if($session->ended_at, 409, __('La sesión ha finalizado.'));
+        $r->validate(['connection' => 'nullable|uuid']);
+        $servers = ClassroomConnectivity::servers($r->user()->id.':'.$session->id);
         $id = DB::transaction(function () use ($r, $session) {
             OnlineSession::whereKey($session->id)->lockForUpdate()->first();
+            if ($connection = $r->input('connection')) {
+                $existing = DB::table('online_participants')->where('id', $connection)->first();
+                if ($existing) {
+                    abort_unless($existing->user_id === $r->user()->id && $existing->online_session_id === $session->id && ! $existing->left_at, 403);
+                    DB::table('online_participants')->where('id', $connection)->update(['seen_at' => now(), 'updated_at' => now()]);
+
+                    return $connection;
+                }
+            }
             abort_if(DB::table('online_participants')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->count() >= config('online.max_participants'), 409, __('La sala está completa (máximo 6 personas).'));
-            $id = (string) Str::uuid();
+            $id = $r->input('connection') ?: (string) Str::uuid();
             DB::table('online_participants')->insert(['id' => $id, 'online_session_id' => $session->id, 'user_id' => $r->user()->id, 'seen_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
 
             return $id;
@@ -155,7 +167,16 @@ class OnlineController extends Controller
 
         OnlineLessonRecords::observe($session);
 
-        return response()->json(['participant' => $id, 'iceServers' => config('online.ice_servers')]);
+        return response()->json(['participant' => $id, 'iceServers' => $servers, 'relayAvailable' => ClassroomConnectivity::hasRelay($servers)]);
+    }
+
+    public function connectivity(Request $r, OnlineSession $session)
+    {
+        $this->access($r, $session);
+        $this->participant($r, $session);
+        $servers = ClassroomConnectivity::servers($r->user()->id.':'.$session->id);
+
+        return response()->json(['iceServers' => $servers, 'relayAvailable' => ClassroomConnectivity::hasRelay($servers)]);
     }
 
     public function poll(Request $r, OnlineSession $session)
@@ -191,7 +212,7 @@ class OnlineController extends Controller
         switch ($d['kind']) {
             case 'signal':$recipient = $d['recipient'] ?? null;
                 abort_unless($recipient && $recipient !== $p->id && DB::table('online_participants')->where('online_session_id', $session->id)->where('id', $recipient)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->exists(), 422);
-                $payload = validator($d['payload'], ['type' => 'required|in:offer,answer,candidate', 'sdp' => 'nullable|string|max:30000', 'candidate' => 'nullable|array', 'candidate.candidate' => 'nullable|string|max:4000', 'candidate.sdpMid' => 'nullable|string|max:100', 'candidate.sdpMLineIndex' => 'nullable|integer|min:0|max:100', 'candidate.usernameFragment' => 'nullable|string|max:256'])->validate();
+                $payload = validator($d['payload'], ['type' => 'required|in:offer,answer,candidate,restart', 'sdp' => 'nullable|string|max:30000', 'candidate' => 'nullable|array', 'candidate.candidate' => 'nullable|string|max:4000', 'candidate.sdpMid' => 'nullable|string|max:100', 'candidate.sdpMLineIndex' => 'nullable|integer|min:0|max:100', 'candidate.usernameFragment' => 'nullable|string|max:256'])->validate();
                 break;
             case 'sharing':$payload = validator($d['payload'], ['active' => 'required|boolean'])->validate();
                 break;

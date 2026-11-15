@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class OnlineLearningTest extends TestCase
@@ -138,5 +139,21 @@ class OnlineLearningTest extends TestCase
         $this->actingAs($teacher)->post(route('online.end', $session))->assertRedirect();
         $this->get(route('online.show', $session))->assertSee('Vocabulary: friendship and trust');
         $this->postJson(route('online.notes', $session), ['participant' => $t, 'text' => 'After end', 'revision' => 2])->assertStatus(409);
+    }
+
+    public function test_connection_retries_reuse_participant_and_recovery_requires_same_room_membership(): void
+    {
+        [$teacher, $student, $course, $room] = $this->setupRoom();
+        $connection = (string) Str::uuid();
+        $url = route('online.join', $room);
+        $this->actingAs($student)->postJson($url, ['connection' => $connection])->assertOk()->assertJsonPath('participant', $connection);
+        $this->postJson($url, ['connection' => $connection])->assertOk()->assertJsonPath('participant', $connection);
+        $this->assertSame(1, DB::table('online_participants')->where('online_session_id', $room->id)->count());
+        $this->actingAs($teacher)->postJson($url, ['connection' => $connection])->assertForbidden();
+        $teacherConnection = $this->postJson($url)->json('participant');
+        $this->postJson(route('online.event', $room), ['participant' => $teacherConnection, 'recipient' => $connection, 'kind' => 'signal', 'payload' => ['type' => 'restart']])->assertOk();
+        $this->actingAs($student)->getJson(route('online.connectivity', $room).'?participant='.$connection)->assertOk()->assertJsonStructure(['iceServers', 'relayAvailable']);
+        $course->students()->detach($student);
+        $this->getJson(route('online.connectivity', $room).'?participant='.$connection)->assertForbidden();
     }
 }
