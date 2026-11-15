@@ -5,7 +5,7 @@ on:
       mode:
         description: Inspección o limpieza de versiones de código inactivas, conservando actual y dos anteriores
         type: choice
-        options: [audit, prune-releases]
+        options: [audit, prune-releases, archive-legacy-wordpress]
         default: audit
         required: true
 permissions:
