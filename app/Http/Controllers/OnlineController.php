@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OnlineSession;
+use App\Models\User;
 use App\Services\ErpConnection;
 use App\Services\OnlineClassrooms;
 use App\Services\ScheduledClasses;
@@ -52,7 +53,8 @@ class OnlineController extends Controller
     {
         $d = $r->validate(['scope' => 'required|string|max:230', 'booking_id' => 'nullable|string|max:100']);
         $room = OnlineClassrooms::room($r->user(), $d['scope']);
-        abort_unless($room['manage'], 403);
+        $scheduledStudent = $r->user()->role === 'student' && isset($room['pass']) && array_key_exists('bookings', $room['pass']) && User::whereKey($room['pass']['teacher_id'] ?? 0)->whereIn('role', ['teacher', 'admin'])->exists();
+        abort_unless($room['manage'] || $scheduledStudent, 403);
         $entry = null;
         if (isset($room['pass']) && array_key_exists('bookings', $room['pass'])) {
             $entry = ScheduledClasses::find($room, $d['booking_id'] ?? null);
@@ -72,7 +74,7 @@ class OnlineController extends Controller
             }
         }
         try {
-            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $r->user()->id, 'booking_id' => $entry['id'] ?? null, 'booking_signature' => $entry['signature'] ?? null, 'booking_start_at' => isset($entry) ? $entry['start']->copy()->utc() : null, 'booking_end_at' => isset($entry) ? $entry['end']->copy()->utc() : null, 'title' => mb_substr($room['title'], 0, 180)]);
+            $s = OnlineSession::create(['scope' => $d['scope'], 'active_key' => $d['scope'], 'course_id' => $room['course']->id ?? null, 'erp_pass_id' => $room['pass']['id'] ?? null, 'erp_student_id' => $room['pass']['student_id'] ?? null, 'host_id' => $scheduledStudent ? (int) $room['pass']['teacher_id'] : $r->user()->id, 'booking_id' => $entry['id'] ?? null, 'booking_signature' => $entry['signature'] ?? null, 'booking_start_at' => isset($entry) ? $entry['start']->copy()->utc() : null, 'booking_end_at' => isset($entry) ? $entry['end']->copy()->utc() : null, 'title' => mb_substr($room['title'], 0, 180)]);
         } catch (UniqueConstraintViolationException $e) {
             $s = OnlineSession::where('active_key', $d['scope'])->firstOrFail();
         }

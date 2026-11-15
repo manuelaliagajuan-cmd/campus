@@ -8,6 +8,7 @@ use App\Services\ErpConnection;
 use App\Services\OnlinePurchaseFulfillment;
 use App\Services\StoreCatalog;
 use App\Services\StripeCheckout;
+use App\Services\TeacherAvailability;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +34,24 @@ class StoreController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['unavailable' => true], 503);
         }
+    }
+
+    public function pass(Request $r, string $type)
+    {
+        $items = StoreCatalog::all();
+        $item = $items['pass:'.$type] ?? null;
+        abort_unless($item, 404);
+
+        return view('store.pass', ['item' => $item, 'catalogVersion' => hash('sha256', json_encode($items)), 'enabled' => StoreCatalog::enabled()]);
+    }
+
+    public function availability(Request $r, string $type)
+    {
+        $d = $r->validate(['month' => 'required|date_format:Y-m', 'subject' => 'nullable|string|max:100', 'teacher_id' => 'nullable|integer|min:1']);
+        $item = StoreCatalog::all()['pass:'.$type] ?? null;
+        abort_unless($item, 404);
+
+        return response()->json(TeacherAvailability::month($item, $d['month'], $d['subject'] ?? null, isset($d['teacher_id']) ? (int) $d['teacher_id'] : null));
     }
 
     public function checkout(Request $r)

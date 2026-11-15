@@ -230,6 +230,7 @@ try:
                 sftp.remove(refreshpath)
     except (OSError, ValueError):
         print('CEC_VERIFICACION_WEB_PENDIENTE')
+    print('CEC_PAGOS_ONLINE_CONFIGURACION='+('LISTA' if config.get('STRIPE_SECRET_KEY','').startswith('sk_live_') and config.get('STRIPE_WEBHOOK_SECRET') else 'PENDIENTE_STRIPE'))
     print('CEC_INSTALACION_CORRECTA')
     print('CEC_DESTINO_IONOS=/campus-cec/public')
     print('CEC_WORDPRESS_CONSERVADO=/CampusCEC')

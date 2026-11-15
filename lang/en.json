@@ -778,5 +778,22 @@
     "Estamos preparando tu cuenta. El centro debe confirmar tu acceso antes de comprar.": "We are preparing your account. The school needs to confirm your access before you can buy.",
     "Ya tienes acceso a este curso.": "You already have access to this course.",
     "No se pudo abrir el pago. No se ha confirmado ningún cobro. Inténtalo de nuevo.": "Checkout could not be opened. No payment has been confirmed. Try again.",
-    "No se ha podido actualizar el catálogo. Comprueba la conexión antes de comprar.": "The catalog could not be refreshed. Check your connection before buying."
+    "No se ha podido actualizar el catálogo. Comprueba la conexión antes de comprar.": "The catalog could not be refreshed. Check your connection before buying.",
+    "Ver horarios y comprar": "View availability and buy",
+    "minutos por sesión": "minutes per session",
+    "Consulta la disponibilidad antes de comprar": "Check availability before buying",
+    "Elige qué quieres aprender y consulta las franjas libres del profesorado.": "Choose what you want to learn and view teachers’ available time windows.",
+    "Mes": "Month",
+    "Qué quieres aprender": "What you want to learn",
+    "Todas las materias": "All subjects",
+    "Profesor": "Teacher",
+    "Todos los profesores": "All teachers",
+    "Comprar el bono no reserva un horario. El centro confirmará contigo las fechas de las clases.": "Buying a package does not reserve a time. The school will confirm class dates with you.",
+    "Comprar este bono": "Buy this package",
+    "Actualizando disponibilidad…": "Refreshing availability…",
+    "Disponibilidad actualizada. Las horas ya reservadas y los bloqueos están excluidos.": "Availability updated. Booked times and blocked periods are excluded.",
+    "No hay disponibilidad publicada para estos filtros. Consulta con el centro para acordar un horario.": "No availability is published for these filters. Contact the school to agree a time.",
+    "No se ha podido actualizar la disponibilidad. Vuelve a intentarlo antes de comprar.": "Availability could not be refreshed. Try again before buying.",
+    "Disponibilidad mensual": "Monthly availability",
+    "Materias": "Subjects"
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\StoreOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -83,7 +84,7 @@ class StripeCheckout
                 abort_unless($o->payment_id === $intent['id'], 422);
 
                 return;
-            }$o->update(['status' => 'paid', 'payment_id' => $intent['id'], 'method' => $method, 'payer_name' => mb_substr((string) ($session['customer_details']['name'] ?? ''), 0, 190), 'payer_email' => mb_substr((string) ($session['customer_details']['email'] ?? ''), 0, 190), 'paid_at' => now()]);
+            }$o->update(['status' => 'paid', 'payment_id' => $intent['id'], 'method' => $method, 'payer_name' => mb_substr((string) ($session['customer_details']['name'] ?? ''), 0, 190), 'payer_email' => mb_substr((string) ($session['customer_details']['email'] ?? ''), 0, 190), 'paid_at' => is_int($intent['latest_charge']['created'] ?? null) ? Carbon::createFromTimestampUTC($intent['latest_charge']['created']) : now()]);
         });
         OnlinePurchaseFulfillment::fulfill($order->fresh());
     }

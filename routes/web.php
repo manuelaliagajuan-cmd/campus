@@ -33,6 +33,8 @@ Route::middleware(PrivateResponse::class)->group(function () {
     });
     Route::middleware(['auth', SyncErp::class])->group(function () {
         Route::get('/comprar', [StoreController::class, 'index'])->name('store.index');
+        Route::get('/comprar/bonos/{type}/disponibilidad', [StoreController::class, 'availability'])->name('store.availability');
+        Route::get('/comprar/bonos/{type}', [StoreController::class, 'pass'])->name('store.pass');
         Route::get('/comprar/catalogo', [StoreController::class, 'state'])->name('store.state');
         Route::post('/comprar/pagar', [StoreController::class, 'checkout'])->middleware('throttle:10,1')->name('store.checkout');
         Route::get('/mis-compras/{order}', [StoreController::class, 'order'])->name('store.order');

@@ -146,7 +146,7 @@ class PassWorkspaceTest extends TestCase
         $this->get('/clases-online')->assertOk()->assertSee('Tu clase empieza en 2 días')->assertSee('14:00')->assertDontSee('Iniciar clase online');
         $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertForbidden();
         $this->travelTo(Carbon::parse('2026-11-17 13:45', 'Europe/Madrid'));
-        $this->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect();
+        $this->actingAs($this->student)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect();
         $session = OnlineSession::firstOrFail();
         $outsider = User::factory()->create();
         $this->actingAs($outsider)->get('/clases-online/'.$session->id)->assertForbidden();

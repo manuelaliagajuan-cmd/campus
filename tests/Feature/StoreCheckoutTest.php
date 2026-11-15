@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\StoreOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -56,7 +57,7 @@ class StoreCheckoutTest extends TestCase
 
     private function paid(StoreOrder $o): array
     {
-        return ['id' => $o->stripe_session_id, 'client_reference_id' => $o->id, 'metadata' => ['campus_order' => $o->id], 'livemode' => true, 'payment_status' => 'paid', 'currency' => 'eur', 'amount_total' => $o->amount, 'customer_details' => ['name' => 'Parent buyer', 'email' => 'parent@example.test'], 'payment_intent' => ['id' => 'pi_'.$o->id, 'status' => 'succeeded', 'currency' => 'eur', 'livemode' => true, 'amount_received' => $o->amount, 'latest_charge' => ['payment_method_details' => ['type' => 'card', 'card' => ['wallet' => ['type' => 'apple_pay']]]]]];
+        return ['id' => $o->stripe_session_id, 'client_reference_id' => $o->id, 'metadata' => ['campus_order' => $o->id], 'livemode' => true, 'payment_status' => 'paid', 'currency' => 'eur', 'amount_total' => $o->amount, 'customer_details' => ['name' => 'Parent buyer', 'email' => 'parent@example.test'], 'payment_intent' => ['id' => 'pi_'.$o->id, 'status' => 'succeeded', 'currency' => 'eur', 'livemode' => true, 'amount_received' => $o->amount, 'latest_charge' => ['created' => 1763208000, 'payment_method_details' => ['type' => 'card', 'card' => ['wallet' => ['type' => 'apple_pay']]]]]];
     }
 
     private function webhook(array $session, ?string $key = null)
@@ -161,5 +162,23 @@ class StoreCheckoutTest extends TestCase
         $this->actingAs($teacher)->post('/docente/cursos', ['title' => 'Course price', 'language' => 'English', 'level' => 'B1', 'published' => 1, 'store_listed' => 1, 'store_price' => '12.34'])->assertRedirect();
         $this->assertDatabaseHas('courses', ['title' => 'Course price', 'store_price_cents' => 1234, 'store_listed' => true]);
         $this->postJson('/docente/cursos', ['title' => 'Bad price', 'language' => 'English', 'level' => 'B1', 'published' => 1, 'store_listed' => 1, 'store_price' => '0.49'])->assertUnprocessable();
+    }
+
+    public function test_monthly_availability_filters_subject_mode_and_excludes_bookings_and_blocks(): void
+    {
+        $this->travelTo(Carbon::parse('2026-11-15 10:00', 'Europe/Madrid'));
+        $this->source['availability'] = ['teachers' => [['id' => 20, 'name' => 'Teacher English', 'email' => 'private@example.test'], ['id' => 21, 'name' => 'Teacher Russian']], 'weekly' => [['teacher_id' => 20, 'weekday' => 0, 'start' => '09:00', 'end' => '14:00', 'subjects' => ['English'], 'mode' => 'online'], ['teacher_id' => 21, 'weekday' => 0, 'start' => '09:00', 'end' => '14:00', 'subjects' => ['Russian'], 'mode' => 'both']], 'busy' => [['teacher_id' => 20, 'date' => '2026-11-16', 'start' => '10:00', 'end' => '11:00', 'private_student' => 'SECRET'], ['teacher_id' => 20, 'date' => '2026-11-16', 'start' => '11:00', 'end' => '11:30'], ['teacher_id' => 20, 'weekday' => 0, 'start' => '13:00', 'end' => '14:00']]];
+        $this->write();
+        $response = $this->actingAs($this->student)->getJson(route('store.availability', 'TIP-1').'?month=2026-11&subject=English')->assertOk()->assertDontSee('private@example.test')->assertDontSee('SECRET');
+        $data = $response->json();
+        $this->assertSame('2026-11-16', $data['days'][0]['date']);
+        $this->assertSame([['teacher_id' => 20, 'teacher_name' => 'Teacher English', 'start' => '09:00', 'end' => '10:00', 'subjects' => ['English']], ['teacher_id' => 20, 'teacher_name' => 'Teacher English', 'start' => '11:30', 'end' => '13:00', 'subjects' => ['English']]], $data['days'][0]['windows']);
+        $this->assertCount(1, $data['teachers']);
+        $this->source['availability']['busy'] = [];
+        $this->source['revision']++;
+        $this->write();
+        $this->getJson(route('store.availability', 'TIP-1').'?month=2026-11&subject=English')->assertJsonPath('days.0.windows.0.end', '14:00');
+        $this->getJson(route('store.availability', 'TIP-1').'?month=2025-01')->assertUnprocessable();
+        $this->get(route('store.pass', 'TIP-1'))->assertOk()->assertSee('Consulta la disponibilidad antes de comprar');
     }
 }
