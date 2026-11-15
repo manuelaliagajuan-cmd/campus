@@ -143,11 +143,18 @@ class PassWorkspaceTest extends TestCase
         $this->data['revision']++;
         $this->write();
         $this->actingAs($this->student)->getJson('/clases-online/horario')->assertOk()->assertJsonPath('revision', $this->data['revision']);
-        $this->get('/clases-online')->assertOk()->assertSee('Tu clase empieza en 2 días')->assertSee('14:00')->assertDontSee('Iniciar clase online');
-        $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertForbidden();
+        $this->get('/clases-online')->assertOk()->assertSee('Tu clase empieza en 2 días')->assertSee('14:00')->assertSee('Entrar al aula')->assertDontSee('El acceso se habilita 15 minutos antes.');
+        $this->actingAs($this->student)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect();
+        $early = OnlineSession::firstOrFail();
+        $this->assertSame($this->teacher->id, $early->host_id);
+        $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect(route('online.show', $early));
+        $this->actingAs($this->student)->get(route('online.show', $early))->assertOk();
         $this->travelTo(Carbon::parse('2026-11-17 13:45', 'Europe/Madrid'));
+        $this->actingAs($this->student)->get('/clases-online/'.OnlineSession::firstOrFail()->id)->assertOk();
         $this->actingAs($this->student)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect();
         $session = OnlineSession::firstOrFail();
+        $this->assertSame($early->id, $session->id);
+        $this->assertNull($session->fresh()->ended_at);
         $outsider = User::factory()->create();
         $this->actingAs($outsider)->get('/clases-online/'.$session->id)->assertForbidden();
         $this->assertNull($session->fresh()->ended_at);
@@ -157,10 +164,11 @@ class PassWorkspaceTest extends TestCase
         $this->write();
         $this->getJson(route('online.poll', $session).'?participant='.$p)->assertOk()->assertJsonPath('ended', true);
         $this->get('/clases-online')->assertSee('Tu clase empieza mañana');
-        $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertForbidden();
+        $this->actingAs($this->teacher)->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertRedirect();
         $this->data['passes'][0]['bookings'] = [];
         $this->data['revision']++;
         $this->write();
         $this->actingAs($this->student)->get('/clases-online')->assertDontSee('data-booking="CITA-1"', false);
+        $this->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertForbidden();
     }
 }

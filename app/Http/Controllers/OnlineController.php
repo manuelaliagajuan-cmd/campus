@@ -58,9 +58,9 @@ class OnlineController extends Controller
         $entry = null;
         if (isset($room['pass']) && array_key_exists('bookings', $room['pass'])) {
             $entry = ScheduledClasses::find($room, $d['booking_id'] ?? null);
-            abort_unless($entry && now()->betweenIncluded($entry['opens'], $entry['closes']), 403, __('El aula se habilita 15 minutos antes del horario acordado.'));
+            abort_unless($entry && now()->lte($entry['closes']), 403, __('Esta clase ya no está disponible. Revisa el horario actualizado.'));
         }
-        if (isset($room['pass'])) {
+        if (isset($room['pass']) && ! $entry) {
             abort_if(! empty($room['pass']['start']) && $room['pass']['start'] > now('Europe/Madrid')->toDateString(), 403);
         }
         $existing = OnlineSession::where('active_key', $d['scope'])->first();

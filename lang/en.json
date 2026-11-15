@@ -795,5 +795,7 @@
     "No hay disponibilidad publicada para estos filtros. Consulta con el centro para acordar un horario.": "No availability is published for these filters. Contact the school to agree a time.",
     "No se ha podido actualizar la disponibilidad. Vuelve a intentarlo antes de comprar.": "Availability could not be refreshed. Try again before buying.",
     "Disponibilidad mensual": "Monthly availability",
-    "Materias": "Subjects"
+    "Materias": "Subjects",
+    "Puedes entrar al aula con antelación para comprobar la cámara y el micrófono.": "You can enter the classroom early to check your camera and microphone.",
+    "Esta clase ya no está disponible. Revisa el horario actualizado.": "This class is no longer available. Check the updated schedule."
 }

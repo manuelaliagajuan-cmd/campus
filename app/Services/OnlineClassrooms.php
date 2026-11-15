@@ -54,7 +54,7 @@ class OnlineClassrooms
         abort_unless($room, 403);
         if ($s->booking_id) {
             $entry = ScheduledClasses::find($room, $s->booking_id);
-            abort_unless($entry && now()->betweenIncluded($entry['opens'], $entry['closes']), 403);
+            abort_unless($entry && now()->lte($entry['closes']), 403);
         }
 
         return $room;
@@ -62,7 +62,7 @@ class OnlineClassrooms
 
     public static function expire(OnlineSession $s): void
     {
-        if (! $s->ended_at && ($s->created_at->lt(now()->subHours(6)) || ($s->booking_end_at && $s->booking_end_at->copy()->addMinutes(15)->lt(now())))) {
+        if (! $s->ended_at && ((! $s->booking_end_at && $s->created_at->lt(now()->subHours(6))) || ($s->booking_end_at && $s->booking_end_at->copy()->addMinutes(15)->lt(now())))) {
             $s->update(['ended_at' => now(), 'active_key' => null]);
         }
     }

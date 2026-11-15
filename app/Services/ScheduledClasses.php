@@ -25,7 +25,7 @@ class ScheduledClasses
             }if ((! empty($room['pass']['start']) && $b['date'] < $room['pass']['start']) || (! empty($room['pass']['expires']) && $b['date'] > $room['pass']['expires'])) {
                 continue;
             }
-            $rows[] = ['id' => $b['id'], 'room' => $room, 'start' => $start, 'end' => $end, 'opens' => $start->copy()->subMinutes(15), 'closes' => $end->copy()->addMinutes(15), 'signature' => hash('sha256', json_encode([$room['key'], $b, $room['pass']['teacher_id'] ?? null]))];
+            $rows[] = ['id' => $b['id'], 'room' => $room, 'start' => $start, 'end' => $end, 'closes' => $end->copy()->addMinutes(15), 'signature' => hash('sha256', json_encode([$room['key'], $b, $room['pass']['teacher_id'] ?? null]))];
         }
 
         return $rows;
@@ -42,7 +42,7 @@ class ScheduledClasses
         foreach ($rooms as $room) {
             foreach (self::forRoom($room) as $entry) {
                 if ($entry['closes']->gte(now())) {
-                    $entry['open'] = now()->betweenIncluded($entry['opens'], $entry['closes']);
+                    $entry['open'] = now()->lte($entry['closes']);
                     $entry['label'] = self::label($entry);
                     $rows[] = $entry;
                 }
