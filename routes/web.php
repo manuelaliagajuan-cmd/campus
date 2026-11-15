@@ -10,6 +10,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnlineController;
 use App\Http\Controllers\PassWorkspaceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StoreController;
@@ -40,6 +41,10 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/restablecer', [AuthController::class, 'reset'])->middleware('throttle:6,1')->name('password.update');
     });
     Route::middleware(['auth', SyncErp::class])->group(function () {
+        Route::get('/campus/vista-alumno', [CampusController::class, 'dashboard'])->name('dashboard.student-preview');
+        Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/perfil/foto/{user}', [ProfileController::class, 'avatar'])->name('profile.avatar');
         Route::get('/mi-horario', [TeacherScheduleController::class, 'index'])->name('staff.schedule');
         Route::get('/mi-horario/datos', [TeacherScheduleController::class, 'data'])->name('staff.schedule.data');
         Route::post('/mi-horario/ausencias', [TeacherScheduleController::class, 'leave'])->name('staff.schedule.leave');

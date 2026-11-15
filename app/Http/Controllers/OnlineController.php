@@ -164,7 +164,12 @@ class OnlineController extends Controller
         $p = $this->participant($r, $session);
         OnlineLessonRecords::observe($session);
         $r->validate(['after' => 'nullable|integer|min:0']);
-        $peers = DB::table('online_participants')->join('users', 'users.id', '=', 'online_participants.user_id')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->select('online_participants.id', 'users.name')->get();
+        $peers = DB::table('online_participants')->join('users', 'users.id', '=', 'online_participants.user_id')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->select('online_participants.id', 'users.name', 'users.display_name')->get()->map(function ($peer) {
+            $peer->name = $peer->display_name ?: $peer->name;
+            unset($peer->display_name);
+
+            return $peer;
+        });
         $events = DB::table('online_events')->where('online_session_id', $session->id)->where('id', '>', $r->integer('after'))->where(fn ($q) => $q->whereNull('recipient_id')->orWhere('recipient_id', $p->id))->orderBy('id')->limit(150)->get()->map(function ($e) {
             $e->payload = json_decode($e->payload, true);
 

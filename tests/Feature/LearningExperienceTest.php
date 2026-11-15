@@ -112,6 +112,7 @@ class LearningExperienceTest extends TestCase
         $this->post('/notificaciones/'.$a->id.'/leer')->assertForbidden();
         $this->actingAs($s)->get('/notificaciones/contador')->assertJson(['count' => 1]);
         $this->get('/notificaciones')->assertOk()->assertSee('Aviso visible')->assertDontSee('Aviso futuro');
+        $this->get('/campus')->assertOk()->assertSee('Aviso visible')->assertDontSee('Aviso futuro');
         $this->post('/notificaciones/'.$a->id.'/leer')->assertRedirect();
         $this->get('/notificaciones/contador')->assertJson(['count' => 0]);
         $this->travel(2)->days();
@@ -139,11 +140,11 @@ class LearningExperienceTest extends TestCase
         [$t,$s,$c,$l] = $this->fixtures();
         $this->actingAs($s)->post('/idioma', ['locale' => 'en'])->assertRedirect();
         $this->assertSame('en', $s->fresh()->locale);
-        $this->get('/campus')->assertOk()->assertSee('WELCOME TO YOUR CAMPUS.')->assertSee('My certificates');
+        $this->get('/campus')->assertOk()->assertSee('Hello, '.$s->displayName().'!')->assertSee('My certificates');
         $this->get('/lecciones/'.$l->id)->assertOk()->assertSee('Este contenido no debe traducirse.')->assertSee('Mark as complete');
         $this->post('/idioma', ['locale' => 'invalid'])->assertSessionHasErrors('locale');
         $this->post('/idioma', ['locale' => 'es'])->assertRedirect();
-        $this->get('/campus')->assertOk()->assertSee('BIENVENIDO A TU CAMPUS.');
+        $this->get('/campus')->assertOk()->assertSee('¡Hola, '.$s->displayName().'!');
     }
 
     public function test_result_uses_correct_error_and_solution_visual_states(): void

@@ -171,4 +171,16 @@ class PassWorkspaceTest extends TestCase
         $this->actingAs($this->student)->get('/clases-online')->assertDontSee('data-booking="CITA-1"', false);
         $this->post('/clases-online', ['scope' => 'pass:BON-1:A-1', 'booking_id' => 'CITA-1'])->assertForbidden();
     }
+
+    public function test_assigned_student_photo_is_visible_only_to_the_authorized_teacher(): void
+    {
+        $this->student->forceFill(['erp_student_id' => 'A-1', 'avatar_path' => 'avatars/pupil.png', 'avatar_mime' => 'image/png'])->save();
+        Storage::disk('local')->put('avatars/pupil.png', 'photo-fixture');
+        $url = route('profile.avatar', $this->student);
+        $this->actingAs($this->teacher)->get('/docente/bonos')->assertOk()->assertSee($url, false);
+
+        $this->get($url)->assertOk();
+        $stranger = User::factory()->create(['role' => 'teacher']);
+        $this->actingAs($stranger)->get($url)->assertNotFound();
+    }
 }

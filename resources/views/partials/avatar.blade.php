@@ -1,0 +1,1 @@
+<span class="avatar {{ $avatarClass??'' }}" aria-hidden="true">@if($avatarUser->avatar_path)<img src="{{ route('profile.avatar',$avatarUser) }}?v={{ $avatarUser->updated_at?->timestamp }}" alt="" width="48" height="48">@else{{ mb_substr($avatarUser->displayName(),0,1) }}@endif</span>

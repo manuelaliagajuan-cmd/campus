@@ -20,6 +20,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return ['teacher_access_pending' => 'boolean', 'email_verified_at' => 'datetime', 'erp_link_reviewed_at' => 'datetime', 'password' => 'hashed'];
     }
 
+    public function displayName(): string
+    {
+        return $this->display_name ?: $this->name;
+    }
+
     public function isStaff(): bool
     {
         return in_array($this->role, ['admin', 'teacher'], true);

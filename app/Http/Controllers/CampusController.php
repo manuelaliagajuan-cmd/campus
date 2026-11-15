@@ -7,10 +7,14 @@ use App\Models\Attempt;
 use App\Models\Completion;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\OnlineSession;
 use App\Models\Resource;
 use App\Services\Certificates;
 use App\Services\CourseProgress;
+use App\Services\ErpConnection;
 use App\Services\LearningAudio;
+use App\Services\OnlineClassrooms;
+use App\Services\ScheduledClasses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +22,12 @@ class CampusController extends Controller
 {
     public function dashboard(Request $r)
     {
-        $u = $r->user();
+        $studentPreview = $r->routeIs('dashboard.student-preview');
+        abort_if($studentPreview && $r->user()->role !== 'admin', 403);
+        $u = clone $r->user();
+        if ($studentPreview) {
+            $u->role = 'student';
+        }
         $courses = $u->isStaff() ? Course::when($u->role !== 'admin', fn ($q) => $q->where('teacher_id', $u->id)) : $u->courses()->where('published', true);
         $courses = $courses->withCount('lessons')->with('teacher')->orderByDesc('courses.created_at')->get();
         $completed = Completion::where('user_id', $u->id)->whereIn('lesson_id', Lesson::whereIn('course_id', $courses->pluck('id'))->select('id'))->pluck('lesson_id');
@@ -30,7 +39,18 @@ class CampusController extends Controller
         $erp = $r->attributes->get('erp', ['state' => 'unavailable', 'passes' => []]);
         $sessionPasses = $erp['state'] === 'connected' ? $erp['passes'] : [];
 
-        return view('dashboard', compact('courses', 'completed', 'progress', 'state', 'visibleCourses', 'erp', 'sessionPasses'));
+        $rooms = $studentPreview ? [] : OnlineClassrooms::available($r->user());
+        $upcoming = ScheduledClasses::upcoming($rooms);
+        $sessions = OnlineSession::whereIn('scope', array_keys($rooms))->whereNull('ended_at')->latest()->get();
+        $dashboardNotices = $studentPreview ? collect() : Announcement::visibleTo($u)->unreadBy($u)->with(['course', 'author'])->latest('publish_at')->limit(5)->get();
+        $sourceRevision = null;
+        try {
+            $sourceRevision = ErpConnection::snapshot()['revision'] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return view('dashboard', array_merge(compact('courses', 'completed', 'progress', 'state', 'visibleCourses', 'erp', 'sessionPasses', 'studentPreview', 'rooms', 'upcoming', 'sessions', 'dashboardNotices', 'sourceRevision'), ['dashboardUser' => $u]));
     }
 
     public function course(Request $r, Course $course)

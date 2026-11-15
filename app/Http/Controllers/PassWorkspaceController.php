@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PassContent;
+use App\Models\User;
 use App\Services\ErpConnection;
 use App\Services\YouTube;
 use Illuminate\Http\Request;
@@ -23,16 +24,18 @@ class PassWorkspaceController extends Controller
     {
         abort_unless($r->user()->isStaff(), 403);
         $passes = ErpConnection::workspaces($r->user());
+        $students = User::where('role', 'student')->whereIn('erp_student_id', array_column($passes, 'student_id'))->get()->keyBy('erp_student_id');
 
-        return view('passes.index', compact('passes'));
+        return view('passes.index', compact('passes', 'students'));
     }
 
     public function show(Request $r, string $pass)
     {
         $workspace = $this->workspace($r, $pass);
+        $student = User::where('role', 'student')->where('erp_student_id', $workspace['student_id'])->first();
         $contents = PassContent::where('erp_pass_id', $pass)->where('erp_student_id', $workspace['student_id'])->when(! $workspace['manage'], fn ($q) => $q->where('published', true))->with('author')->latest()->get();
 
-        return view('passes.show', compact('workspace', 'contents'));
+        return view('passes.show', compact('workspace', 'contents', 'student'));
     }
 
     public function store(Request $r, string $pass)
