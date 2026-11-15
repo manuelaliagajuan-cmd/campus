@@ -71,13 +71,19 @@ try:
     candidates=[r for r in releases if r['validated'] and r['sha'] not in keep]
     emit('ACTIVE_RELEASE',active_sha);emit('KEEP_RELEASES',sorted(keep));emit('RELEASES',releases);emit('POTENTIAL_RECLAIM_KIB',sum(r['KiB'] for r in candidates))
     def fetch(url,limit=2097152):
-        with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'CEC-maintenance/1.0'}),timeout=25) as response:
-            data=response.read(limit+1)
-            if response.status!=200 or len(data)>limit:raise RuntimeError('No se pudo verificar la página pública.')
-            return data
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'CEC-maintenance/1.0','Cache-Control':'no-cache'}),timeout=25) as response:
+                    data=response.read(limit+1)
+                    if response.status!=200 or len(data)>limit:raise RuntimeError('No se pudo verificar la página pública.')
+                    fetch.headers=response.headers
+                    return data
+            except (OSError,TimeoutError):
+                if attempt==2:raise
+                time.sleep(2)
     def verify_campus():
-        if fetch('https://campus.cecalicante.es/cec-release.txt',100).decode().strip()!=active_sha:raise RuntimeError('El campus público no coincide con la versión activa.')
-        fetch('https://campus.cecalicante.es/acceso')
+        fetch('https://campus.cecalicante.es/acceso?cec-maintenance='+str(time.time_ns()))
+        if fetch.headers.get('X-CEC-Release')!=active_sha:raise RuntimeError('El campus público no coincide con la versión activa.')
         fetch('https://gestion.cecalicante.es/')
     if mode=='prune-releases':
         verify_campus()
