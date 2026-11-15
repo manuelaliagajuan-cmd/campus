@@ -11,3 +11,5 @@ html[data-theme=dark] .field :is(input,select,textarea){background:#11192a;color
 html[data-theme=dark] .mobile-toggle{background:#252f49;color:var(--blue);border-color:var(--line)}
 
 .cec-logo-brand picture{padding:0!important}
+
+html[data-theme=dark] .profile-menu summary:is(:hover,:focus-visible),html[data-theme=dark] .profile-menu[open] summary{background:#303c57;color:#f3f6ff}html[data-theme=dark] .profile-menu summary:is(:hover,:focus-visible) .profile-name,html[data-theme=dark] .profile-menu[open] summary .profile-name{color:#f3f6ff}
