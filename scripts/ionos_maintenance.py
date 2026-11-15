@@ -38,7 +38,7 @@ try:
         return int(result.split()[0])
     def emit(key,value):print('CEC_'+key+'='+json.dumps(value,ensure_ascii=False),flush=True)
     inventory=[]
-    for entry in ftp.listdir_attr(base):
+    for entry in (ftp.listdir_attr(base) if mode=='audit' else []):
         name=entry.filename
         if name in ('.','..'):continue
         if stat.S_ISDIR(entry.st_mode):
@@ -58,10 +58,15 @@ try:
     for e in ftp.listdir_attr(path(root+'/releases')):
         if not re.fullmatch('[a-f0-9]{40}',e.filename) or not stat.S_ISDIR(e.st_mode):continue
         rel=root+'/releases/'+e.filename
-        valid=exists(rel+'/artisan') and exists(rel+'/composer.lock')
+        children={child.filename:child for child in ftp.listdir_attr(path(rel))}
+        valid=all(name in children and stat.S_ISREG(children[name].st_mode) for name in ('artisan','composer.lock'))
         for name,target in [('.env','../../shared/.env'),('storage','../../shared/storage')]:
-            if not exists(rel+'/'+name) or not stat.S_ISLNK(ftp.lstat(path(rel+'/'+name)).st_mode) or ftp.readlink(path(rel+'/'+name))!=target:valid=False
-        releases.append({'sha':e.filename,'mtime':e.st_mtime,'KiB':kb(rel),'validated':valid})
+            if name not in children or not stat.S_ISLNK(children[name].st_mode) or ftp.readlink(path(rel+'/'+name))!=target:valid=False
+        releases.append({'sha':e.filename,'mtime':e.st_mtime,'KiB':0,'validated':valid})
+    if releases:
+        sizes=run('du -sk -- '+' '.join(shlex.quote(posixpath.join(home,root,'releases',r['sha'])) for r in releases),timeout=240)
+        sizes={posixpath.basename(line.split(None,1)[1]):int(line.split(None,1)[0]) for line in sizes.splitlines()}
+        for release in releases:release['KiB']=sizes[release['sha']]
     releases.sort(key=lambda r:r['mtime'],reverse=True)
     if not any(r['sha']==active_sha and r['validated'] for r in releases):raise RuntimeError('La versión activa no está completa; no se limpiará.')
     # Retain current plus two previous complete releases.
