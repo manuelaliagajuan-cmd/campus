@@ -145,7 +145,7 @@ class OnlineController extends Controller
     {
         $this->access($r, $session);
         abort_if($session->ended_at, 409, __('La sesión ha finalizado.'));
-        $r->validate(['connection' => 'nullable|uuid']);
+        $r->validate(['connection' => 'nullable|uuid', 'media_version' => 'nullable|integer|in:1,2']);
         $servers = ClassroomConnectivity::servers($r->user()->id.':'.$session->id);
         $id = DB::transaction(function () use ($r, $session) {
             OnlineSession::whereKey($session->id)->lockForUpdate()->first();
@@ -160,7 +160,7 @@ class OnlineController extends Controller
             }
             abort_if(DB::table('online_participants')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->count() >= config('online.max_participants'), 409, __('La sala está completa (máximo 6 personas).'));
             $id = $r->input('connection') ?: (string) Str::uuid();
-            DB::table('online_participants')->insert(['id' => $id, 'online_session_id' => $session->id, 'user_id' => $r->user()->id, 'seen_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('online_participants')->insert(['id' => $id, 'online_session_id' => $session->id, 'user_id' => $r->user()->id, 'media_version' => $r->integer('media_version', 1), 'seen_at' => now(), 'created_at' => now(), 'updated_at' => now()]);
 
             return $id;
         });
@@ -185,7 +185,7 @@ class OnlineController extends Controller
         $p = $this->participant($r, $session);
         OnlineLessonRecords::observe($session);
         $r->validate(['after' => 'nullable|integer|min:0']);
-        $peers = DB::table('online_participants')->join('users', 'users.id', '=', 'online_participants.user_id')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->select('online_participants.id', 'users.name', 'users.display_name')->get()->map(function ($peer) {
+        $peers = DB::table('online_participants')->join('users', 'users.id', '=', 'online_participants.user_id')->where('online_session_id', $session->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->select('online_participants.id', 'online_participants.media_version', 'users.name', 'users.display_name')->get()->map(function ($peer) {
             $peer->name = $peer->display_name ?: $peer->name;
             unset($peer->display_name);
 
@@ -197,7 +197,7 @@ class OnlineController extends Controller
             return $e;
         });
 
-        return response()->json(['ended' => (bool) $session->ended_at, 'peers' => $peers, 'events' => $events, 'notes' => ['text' => $session->notes ?? '', 'revision' => (int) $session->notes_revision], 'time' => now()->toIso8601String()]);
+        return response()->json(['ended' => (bool) $session->ended_at, 'peers' => $peers, 'events' => $events, 'notes' => ['text' => $session->notes ?? '', 'revision' => (int) $session->notes_revision], 'workspace' => ['board_open' => (bool) $session->board_open, 'revision' => (int) $session->board_revision], 'time' => now()->toIso8601String()]);
     }
 
     public function event(Request $r, OnlineSession $session)
@@ -205,7 +205,7 @@ class OnlineController extends Controller
         $room = $this->access($r, $session);
         abort_if($session->ended_at, 409);
         $p = $this->participant($r, $session);
-        $d = $r->validate(['kind' => 'required|in:signal,chat,stroke,clear,sharing', 'recipient' => 'nullable|uuid', 'payload' => 'required|array']);
+        $d = $r->validate(['kind' => 'required|in:signal,chat,stroke,clear,sharing,workspace', 'recipient' => 'nullable|uuid', 'payload' => 'required|array']);
         abort_if(strlen(json_encode($d['payload'])) > 40000, 422);
         $payload = [];
         $recipient = null;
@@ -213,6 +213,16 @@ class OnlineController extends Controller
             case 'signal':$recipient = $d['recipient'] ?? null;
                 abort_unless($recipient && $recipient !== $p->id && DB::table('online_participants')->where('online_session_id', $session->id)->where('id', $recipient)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->exists(), 422);
                 $payload = validator($d['payload'], ['type' => 'required|in:offer,answer,candidate,restart', 'sdp' => 'nullable|string|max:30000', 'candidate' => 'nullable|array', 'candidate.candidate' => 'nullable|string|max:4000', 'candidate.sdpMid' => 'nullable|string|max:100', 'candidate.sdpMLineIndex' => 'nullable|integer|min:0|max:100', 'candidate.usernameFragment' => 'nullable|string|max:256'])->validate();
+                break;
+            case 'workspace':abort_unless($room['manage'], 403);
+                $state = validator($d['payload'], ['board_open' => 'required|boolean'])->validate();
+                $payload = DB::transaction(function () use ($session, $state) {
+                    $locked = OnlineSession::whereKey($session->id)->lockForUpdate()->firstOrFail();
+                    abort_if($locked->ended_at, 409);
+                    $locked->update(['board_open' => $state['board_open'], 'board_revision' => $locked->board_revision + 1]);
+
+                    return ['board_open' => (bool) $locked->board_open, 'revision' => (int) $locked->board_revision];
+                });
                 break;
             case 'sharing':$payload = validator($d['payload'], ['active' => 'required|boolean'])->validate();
                 break;

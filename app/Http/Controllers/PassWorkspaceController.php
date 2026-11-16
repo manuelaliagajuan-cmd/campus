@@ -38,6 +38,14 @@ class PassWorkspaceController extends Controller
         return view('passes.show', compact('workspace', 'contents', 'student'));
     }
 
+    public function schedule(Request $r, string $pass)
+    {
+        $workspace = $this->workspace($r, $pass);
+        $bookings = collect($workspace['bookings'] ?? [])->map(fn ($b) => ['id' => $b['id'], 'date' => $b['date'], 'start' => $b['start'], 'end' => $b['end'], 'completed' => (bool) ($b['completed'] ?? false)])->sortBy(fn ($b) => $b['date'].' '.$b['start'])->values();
+
+        return response()->json(['bookings' => $bookings]);
+    }
+
     public function store(Request $r, string $pass)
     {
         $workspace = $this->workspace($r, $pass);

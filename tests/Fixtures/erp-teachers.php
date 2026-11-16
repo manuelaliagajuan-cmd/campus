@@ -22,3 +22,10 @@ function campus_teacher_leave(int $id, array $input): void
 {
     $GLOBALS['cec_teacher_leave'] = ['teacher' => $id, 'input' => $input];
 }
+
+function campus_teacher_booking(int $id, array $input): array
+{
+    $GLOBALS['cec_teacher_booking'] = ['teacher' => $id, 'input' => $input];
+
+    return ['revision' => $input['revision'] + 1, 'ids' => ['CITA-test']];
+}

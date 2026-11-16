@@ -1,0 +1,2 @@
+#teacher-booking-cancel{width:560px;max-width:calc(100vw - 24px);border:1px solid var(--line);border-radius:12px;padding:24px;background:var(--profile-bg);color:var(--profile-text)}#teacher-booking-cancel::backdrop{background:#0008}#programar-clase{scroll-margin-top:24px}#teacher-booking-form select{max-width:100%}
+#teacher-booking-reset[hidden]{display:none!important}

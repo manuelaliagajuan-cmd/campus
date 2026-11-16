@@ -183,4 +183,12 @@ class PassWorkspaceTest extends TestCase
         $stranger = User::factory()->create(['role' => 'teacher']);
         $this->actingAs($stranger)->get($url)->assertNotFound();
     }
+
+    public function test_pass_schedule_is_private_to_the_assigned_teacher_and_owner(): void
+    {
+        $this->actingAs($this->teacher)->getJson(route('passes.schedule', 'BON-1'))->assertOk()->assertJsonPath('bookings', []);
+        $this->actingAs(User::factory()->create(['role' => 'teacher']))->getJson(route('passes.schedule', 'BON-1'))->assertForbidden();
+        $this->actingAs($this->student)->getJson(route('passes.schedule', 'BON-1'))->assertOk();
+        $this->getJson(route('passes.schedule', 'BON-2'))->assertForbidden();
+    }
 }

@@ -134,4 +134,21 @@ class TeacherDirectory
         abort_unless($user->isStaff(), 403);
         self::core(fn () => \campus_teacher_leave($user->id, $input));
     }
+
+    public static function booking(User $user, array $input): array
+    {
+        abort_unless($user->isStaff(), 403);
+        $allowed = collect(ErpConnection::workspaces($user))->contains(fn ($p) => $p['id'] === $input['pass_id'] && $p['manage']);
+        abort_unless($allowed, 403);
+        $input['revision'] = (int) $input['revision'];
+        $input['occurrences'] = (int) ($input['occurrences'] ?? 1);
+
+        return self::core(function () use ($user, $input) {
+            if (! function_exists('campus_teacher_booking')) {
+                throw new \RuntimeException('El centro está actualizando la agenda. Inténtalo de nuevo en unos instantes.');
+            }
+
+            return \campus_teacher_booking($user->id, $input);
+        });
+    }
 }

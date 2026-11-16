@@ -37,6 +37,8 @@ jobs:
           node --check public/assets/profile-appearance.js
           node --check public/assets/profile-editor.js
           node --check public/assets/rtc-connectivity-check.js
+          node --check public/assets/classroom-layout.js
+          node --check public/assets/pass-schedule.js
       - name: Probar aula con dos navegadores y medios WebRTC reales
         env:
           APP_ENV: testing

@@ -51,6 +51,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/perfil/foto/{user}', [ProfileController::class, 'avatar'])->name('profile.avatar');
         Route::get('/mi-horario', [TeacherScheduleController::class, 'index'])->name('staff.schedule');
         Route::get('/mi-horario/datos', [TeacherScheduleController::class, 'data'])->name('staff.schedule.data');
+        Route::post('/mi-horario/clases', [TeacherScheduleController::class, 'booking'])->middleware('throttle:30,1')->name('staff.schedule.booking');
         Route::post('/mi-horario/ausencias', [TeacherScheduleController::class, 'leave'])->name('staff.schedule.leave');
         Route::get('/comprar', [StoreController::class, 'index'])->name('store.index');
         Route::get('/comprar/bonos/{type}/disponibilidad', [StoreController::class, 'availability'])->name('store.availability');
@@ -76,6 +77,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::get('/bonos/materiales/{content}/archivo', [PassWorkspaceController::class, 'file'])->name('passes.file');
         Route::put('/bonos/materiales/{content}', [PassWorkspaceController::class, 'publish'])->name('passes.publish');
         Route::delete('/bonos/materiales/{content}', [PassWorkspaceController::class, 'destroy'])->name('passes.destroy');
+        Route::get('/bonos/{pass}/horario', [PassWorkspaceController::class, 'schedule'])->name('passes.schedule');
         Route::get('/bonos/{pass}', [PassWorkspaceController::class, 'show'])->name('passes.show');
         Route::post('/bonos/{pass}', [PassWorkspaceController::class, 'store'])->name('passes.store');
         Route::get('/clases-online', [OnlineController::class, 'index'])->name('online.index');

@@ -156,4 +156,31 @@ class OnlineLearningTest extends TestCase
         $course->students()->detach($student);
         $this->getJson(route('online.connectivity', $room).'?participant='.$connection)->assertForbidden();
     }
+
+    public function test_only_teacher_can_publish_board_visibility_and_late_joiners_receive_it(): void
+    {
+        [$teacher, $student, $course, $session] = $this->setupRoom();
+        $teacherParticipant = $this->actingAs($teacher)->postJson(route('online.join', $session))->json('participant');
+        $studentParticipant = $this->actingAs($student)->postJson(route('online.join', $session))->json('participant');
+        $event = ['participant' => $studentParticipant, 'kind' => 'workspace', 'payload' => ['board_open' => true]];
+        $this->postJson(route('online.event', $session), $event)->assertForbidden();
+        $event['participant'] = $teacherParticipant;
+        $this->actingAs($teacher)->postJson(route('online.event', $session), $event)->assertOk();
+        $this->actingAs($student)->getJson(route('online.poll', $session).'?participant='.$studentParticipant)->assertOk()->assertJsonPath('workspace.board_open', true)->assertJsonPath('workspace.revision', 1);
+        $event['payload']['board_open'] = false;
+        $this->actingAs($teacher)->postJson(route('online.event', $session), $event)->assertOk();
+        $late = $this->actingAs($student)->postJson(route('online.join', $session))->json('participant');
+        $this->getJson(route('online.poll', $session).'?participant='.$late)->assertOk()->assertJsonPath('workspace.board_open', false)->assertJsonPath('workspace.revision', 2);
+    }
+
+    public function test_media_capability_distinguishes_existing_clients_from_screen_audio_clients(): void
+    {
+        [$teacher, $student, $course, $session] = $this->setupRoom();
+        $old = $this->actingAs($teacher)->postJson(route('online.join', $session))->assertOk()->json('participant');
+        $new = $this->actingAs($student)->postJson(route('online.join', $session), ['media_version' => 2])->assertOk()->json('participant');
+        $peers = collect($this->getJson(route('online.poll', $session).'?participant='.$new)->assertOk()->json('peers'))->keyBy('id');
+        $this->assertSame(1, $peers[$old]['media_version']);
+        $this->assertSame(2, $peers[$new]['media_version']);
+        $this->postJson(route('online.join', $session), ['media_version' => 999])->assertUnprocessable();
+    }
 }
