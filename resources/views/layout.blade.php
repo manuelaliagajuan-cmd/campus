@@ -3,6 +3,7 @@
 @else
 <aside class="sidebar" id="campus-navigation">@include('partials.brand')<nav class="nav" aria-label="Campus">
 <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>{{ __('⌂   Mi campus') }}</a>
+<a href="{{ asset('prueba-espanol.html') }}">Prueba de español</a>
 @auth<a href="{{ route('certificates.index') }}">{{ __('◇   Mis certificados') }}</a><a href="{{ route('library') }}" @if(request()->routeIs('library')) aria-current="page" @endif>{{ __('▤   Biblioteca') }}</a><a href="{{ route('results') }}" @if(request()->routeIs('results')) aria-current="page" @endif>{{ __('▥   Resultados') }}</a>
 @if(auth()->user()->isStaff() && !($studentPreview??false))<a href="{{ route('staff.schedule') }}" @if(request()->routeIs('staff.schedule*')) aria-current="page" @endif>{{ __('Mi horario') }}</a><a href="{{ route('passes.index') }}">{{ __('Bonos a mi cargo') }}</a><a href="{{ route('activities.catalog') }}" @if(request()->routeIs('activities.*')) aria-current="page" @endif>{{ __('▦   Crear actividades') }}</a><a href="{{ route('staff.create') }}">{{ __('＋   Crear curso') }}</a>@endif
 @if(auth()->user()->role==='admin' && !($studentPreview??false))<a href="{{ route('staff.users') }}">{{ __('◯   Usuarios y permisos') }}</a>@endif

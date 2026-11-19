@@ -53,6 +53,7 @@ jobs:
           "$RUNNER_TEMP/cec-browser/node_modules/.bin/playwright" install --with-deps chromium
           (cd public && php -S 127.0.0.1:8782 "$GITHUB_WORKSPACE/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php") > "$RUNNER_TEMP/classroom-php.log" 2>&1 &
           export CEC_PLAYWRIGHT_PATH="$RUNNER_TEMP/cec-browser/node_modules/playwright/index.mjs"
+          node tests/browser/spanish.mjs
           node tests/browser/classroom.mjs
       - name: Probar vídeo y recuperación mediante TURN TCP
         env:
@@ -108,3 +109,18 @@ jobs:
           CEC_MAIL_PORT: ${{ secrets.CEC_MAIL_PORT }}
           CEC_MAIL_FROM: ${{ secrets.CEC_MAIL_FROM }}
         run: python scripts/deploy_ionos.py
+
+
+      - name: Verificar prueba de español publicada
+        run: |
+          python3 - <<'PYTHON'
+          import urllib.request
+          base = 'https://campus.cecalicante.es/'
+          with urllib.request.urlopen(base + 'cec-release.txt', timeout=30) as r:
+              import os
+              assert r.read().decode().strip() == os.environ['GITHUB_SHA'], 'La versión activa no coincide'
+          with urllib.request.urlopen(base + 'prueba-espanol.html', timeout=30) as r:
+              page = r.read().decode()
+              assert r.status == 200 and 'Comenzar prueba de nivel' in page and 'Practica por nivel' in page
+          print('Prueba de español publicada y verificada en campus.cecalicante.es/prueba-espanol.html')
+          PYTHON
