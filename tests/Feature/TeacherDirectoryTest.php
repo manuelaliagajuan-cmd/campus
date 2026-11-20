@@ -21,12 +21,13 @@ class TeacherDirectoryTest extends TestCase
         mkdir($this->dir, 0700);
         config(['erp.projection_path' => $this->dir.'/campus.php', 'erp.teachers_core' => base_path('tests/Fixtures/erp-teachers.php')]);
         $GLOBALS['cec_teacher_profiles'] = [];
+        $GLOBALS['cec_teacher_approvals'] = [];
     }
 
     protected function tearDown(): void
     {
         File::deleteDirectory($this->dir);
-        unset($GLOBALS['cec_teacher_profiles'],$GLOBALS['cec_agenda_teacher'],$GLOBALS['cec_teacher_leave']);
+        unset($GLOBALS['cec_teacher_profiles'],$GLOBALS['cec_agenda_teacher'],$GLOBALS['cec_teacher_leave'],$GLOBALS['cec_teacher_approvals']);
         parent::tearDown();
     }
 
@@ -100,4 +101,42 @@ class TeacherDirectoryTest extends TestCase
         $this->assertSame([], json_decode(substr(file_get_contents($this->dir.'/campus-teacher-access.php'), 15), true));
         $this->post('/restablecer', ['token' => $token, 'email' => 'newteacher@example.test', 'password' => 'OtherPassword12345', 'password_confirmation' => 'OtherPassword12345'])->assertSessionHasErrors('email');
     }
+
+    public function test_explicit_erp_admin_approval_promotes_only_the_bound_account_and_keeps_password(): void
+    {
+        $u = User::factory()->create(['email' => 'approved@example.test', 'role' => 'student', 'erp_student_id' => 'OLD-TEST']);
+        $other = User::factory()->create(['role' => 'student']);
+        $hash = $u->password;
+        $GLOBALS['cec_teacher_profiles'] = [['id' => 'PROF-001', 'name' => 'Approved teacher', 'email' => $u->email, 'active' => true, 'createCampus' => true]];
+        $GLOBALS['cec_teacher_approvals']['PROF-001'] = ['account_id' => $u->id, 'email' => $u->email, 'expiresAt' => time() + 600, 'nonce' => 'unit-nonce'];
+        TeacherDirectory::sync();
+        $this->assertSame('teacher', $u->fresh()->role);
+        $this->assertSame($hash, $u->fresh()->password);
+        $this->assertSame('PROF-001', $u->fresh()->erp_teacher_id);
+        $this->assertNull($u->fresh()->erp_student_id);
+        $this->assertSame('student', $other->fresh()->role);
+        $this->assertSame('active', $GLOBALS['cec_teacher_profiles'][0]['campusStatus']);
+        $this->assertNotEmpty($GLOBALS['cec_teacher_approvals']['PROF-001']['usedAt']);
+        TeacherDirectory::sync();
+        $this->assertDatabaseCount('users', 2);
+        $this->actingAs($u->fresh())->get('/docente/usuarios')->assertForbidden();
+        $this->get('/mi-horario')->assertOk();
+    }
+
+    public function test_approval_cannot_be_retargeted_to_another_email_or_an_admin(): void
+    {
+        $student = User::factory()->create(['role' => 'student']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $GLOBALS['cec_teacher_profiles'] = [['id' => 'PROF-001', 'name' => 'Teacher', 'email' => $student->email, 'active' => true, 'createCampus' => true]];
+        $GLOBALS['cec_teacher_approvals']['PROF-001'] = ['account_id' => $admin->id, 'email' => $student->email, 'expiresAt' => time() + 600, 'nonce' => 'wrong-account'];
+        TeacherDirectory::sync();
+        $this->assertSame('student', $student->fresh()->role);
+        $this->assertSame('admin', $admin->fresh()->role);
+        $this->assertSame('review', $GLOBALS['cec_teacher_profiles'][0]['campusStatus']);
+        $GLOBALS['cec_teacher_approvals']['PROF-001']['account_id'] = $student->id;
+        $GLOBALS['cec_teacher_approvals']['PROF-001']['expiresAt'] = time() - 1;
+        TeacherDirectory::sync();
+        $this->assertSame('student', $student->fresh()->role);
+    }
 }
+

@@ -29,3 +29,14 @@ function campus_teacher_booking(int $id, array $input): array
 
     return ['revision' => $input['revision'] + 1, 'ids' => ['CITA-test']];
 }
+
+
+function campus_teacher_approval(string $id, string $email): ?array
+{
+    $entry = $GLOBALS['cec_teacher_approvals'][$id] ?? null;
+    return $entry && $entry['email'] === $email && $entry['expiresAt'] >= time() && empty($entry['usedAt']) ? $entry : null;
+}
+function campus_teacher_approval_used(string $id, string $nonce): void
+{
+    if (($GLOBALS['cec_teacher_approvals'][$id]['nonce'] ?? '') === $nonce) $GLOBALS['cec_teacher_approvals'][$id]['usedAt'] = time();
+}

@@ -61,8 +61,19 @@ class TeacherDirectory
                 continue;
             }$email = strtolower(trim($profile['email']));
             try {
-                $user = DB::transaction(function () use ($profile, $email) {
+                $approval = function_exists('campus_teacher_approval') ? self::core(fn () => \campus_teacher_approval($profile['id'], $email)) : null;
+                $user = DB::transaction(function () use ($profile, $email, $approval) {
                     $u = User::where('erp_teacher_id', $profile['id'])->lockForUpdate()->first();
+                    if ($approval) {
+                        $approved = User::whereKey($approval['account_id'])->lockForUpdate()->first();
+                        if (! $approved || strtolower(trim($approved->email)) !== $email || ! in_array($approved->role, ['student', 'teacher'], true) || ($u && $u->id !== $approved->id) || (! empty($profile['campusId']) && (int) $profile['campusId'] !== $approved->id) || ($approved->erp_teacher_id && $approved->erp_teacher_id !== $profile['id'])) {
+                            throw new \InvalidArgumentException('La cuenta autorizada ha cambiado. Revisa y autoriza de nuevo desde Gestión.');
+                        }
+                        if ($approved->role === 'student') {
+                            $approved->forceFill(['role' => 'teacher', 'erp_student_id' => null, 'remember_token' => null])->save();
+                        }
+                        $u = $approved;
+                    }
                     if (! $u && ! empty($profile['campusId'])) {
                         $u = User::whereKey($profile['campusId'])->lockForUpdate()->first();
                         if (! $u || ! $u->isStaff() || strtolower($u->email) !== $email || ($u->erp_teacher_id && $u->erp_teacher_id !== $profile['id'])) {
@@ -82,6 +93,7 @@ class TeacherDirectory
                     return $u;
                 });
                 CampusAccessRegistry::publish($user);
+                if ($approval) { self::core(fn () => \campus_teacher_approval_used($profile['id'], $approval['nonce'])); }
                 if ($user->teacher_access_pending) {
                     $needs = false;
                     self::invitations(function ($rows) use ($profile, &$needs) {
@@ -152,3 +164,4 @@ class TeacherDirectory
         });
     }
 }
+
