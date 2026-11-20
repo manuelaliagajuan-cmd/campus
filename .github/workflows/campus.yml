@@ -2,6 +2,10 @@ name: Comprobar e instalar Campus CEC
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'website/**'
+      - 'scripts/deploy_website.py'
+      - '.github/workflows/website.yml'
   pull_request:
   workflow_dispatch:
 permissions:

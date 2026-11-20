@@ -1,5 +1,11 @@
 name: Publicar cambios revisados en cecalicante.es
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - 'scripts/deploy_website.py'
+      - '.github/workflows/website.yml'
   workflow_dispatch:
 permissions:
   contents: read
