@@ -12,11 +12,10 @@ class OnlineClassrooms
     public static function available(User $u): array
     {
         $rooms = [];
-        foreach (Course::where('online_enabled', true)->get() as $c) {
-            if ($c->accessibleBy($u)) {
-                $rooms['course:'.$c->id] = ['key' => 'course:'.$c->id, 'title' => $c->title, 'manage' => $c->managedBy($u), 'course' => $c];
-            }
-        }$today = now('Europe/Madrid')->toDateString();
+        foreach (Course::accessibleTo($u)->where('online_enabled', true)->get() as $c) {
+            $rooms['course:'.$c->id] = ['key' => 'course:'.$c->id, 'title' => $c->title, 'manage' => $c->managedBy($u), 'course' => $c];
+        }
+        $today = now('Europe/Madrid')->toDateString();
         foreach (ErpConnection::workspaces($u) as $p) {
             if (($p['online_enabled'] ?? false) === true && ($p['remaining'] > 0 || collect($p['bookings'] ?? [])->contains(fn ($b) => ! empty($b['online_consumed']) && $b['date'] >= $today)) && (! $p['expires'] || $p['expires'] >= $today)) {
                 $key = 'pass:'.$p['id'].':'.$p['student_id'];

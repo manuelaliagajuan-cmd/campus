@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -22,16 +23,38 @@ class ErpConnection
         if (! is_string($raw) || strlen($raw) > 16 * 1024 * 1024 || ! str_starts_with($raw, $prefix)) {
             throw new RuntimeException('Invalid ERP projection');
         }
-        $data = json_decode(substr($raw, strlen($prefix)), true, 512, JSON_THROW_ON_ERROR);
-        Validator::make($data, [
-            'schema' => 'required|in:1', 'revision' => 'required|integer|min:1', 'updated_at' => 'required|date',
-            'courses' => 'present|array', 'students' => 'present|array', 'passes' => 'present|array',
-            'courses.*.id' => 'required|string|max:100|distinct', 'courses.*.name' => 'required|string|max:180', 'courses.*.active' => 'required|boolean',
-            'students.*.id' => 'required|string|max:100|distinct', 'students.*.email' => 'present|string|max:190', 'students.*.active' => 'required|boolean', 'students.*.withdrawal_date' => 'nullable|date_format:Y-m-d', 'students.*.courses' => 'present|array', 'students.*.courses.*' => 'string|max:100',
-            'passes.*.id' => 'required|string|max:100|distinct', 'passes.*.student_id' => 'required|string|max:100', 'passes.*.name' => 'required|string|max:180',
-            'passes.*.sessions' => 'required|integer|min:0|max:500', 'passes.*.used' => 'required|integer|min:0', 'passes.*.remaining' => 'required|integer|min:0',
-            'passes.*.online_enabled' => 'sometimes|boolean', 'passes.*.bookings' => 'sometimes|array|max:5000', 'passes.*.bookings.*.id' => 'required|string|max:100', 'passes.*.bookings.*.date' => 'required|date_format:Y-m-d', 'passes.*.bookings.*.start' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.end' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.completed' => 'required|boolean', 'passes.*.start' => 'nullable|date_format:Y-m-d', 'passes.*.expires' => 'nullable|date_format:Y-m-d',
-        ])->validate();
+        $hash = hash('sha256', $raw);
+        $day = now('Europe/Madrid')->toDateString();
+        $memoKey = $path.'|'.$hash.'|'.$day;
+        $memo = request()->attributes->get('cec.erp.snapshot');
+        if (is_array($memo) && ($memo['key'] ?? null) === $memoKey) {
+            return $memo['data'];
+        }
+        // The current source is always read and hashed: cache never grants stale access.
+        $cacheKey = 'erp-validated:'.hash('sha256', $path);
+        try {
+            $cached = Cache::get($cacheKey);
+        } catch (\Throwable $e) {
+            $cached = null;
+        }
+        if (is_array($cached) && ($cached['hash'] ?? null) === $hash && is_array($cached['data'] ?? null)) {
+            $data = $cached['data'];
+        } else {
+            $data = json_decode(substr($raw, strlen($prefix)), true, 512, JSON_THROW_ON_ERROR);
+            Validator::make($data, [
+                'schema' => 'required|in:1', 'revision' => 'required|integer|min:1', 'updated_at' => 'required|date',
+                'courses' => 'present|array', 'students' => 'present|array', 'passes' => 'present|array',
+                'courses.*.id' => 'required|string|max:100|distinct', 'courses.*.name' => 'required|string|max:180', 'courses.*.active' => 'required|boolean',
+                'students.*.id' => 'required|string|max:100|distinct', 'students.*.email' => 'present|string|max:190', 'students.*.active' => 'required|boolean', 'students.*.withdrawal_date' => 'nullable|date_format:Y-m-d', 'students.*.courses' => 'present|array', 'students.*.courses.*' => 'string|max:100',
+                'passes.*.id' => 'required|string|max:100|distinct', 'passes.*.student_id' => 'required|string|max:100', 'passes.*.name' => 'required|string|max:180',
+                'passes.*.sessions' => 'required|integer|min:0|max:500', 'passes.*.used' => 'required|integer|min:0', 'passes.*.remaining' => 'required|integer|min:0',
+                'passes.*.online_enabled' => 'sometimes|boolean', 'passes.*.bookings' => 'sometimes|array|max:5000', 'passes.*.bookings.*.id' => 'required|string|max:100', 'passes.*.bookings.*.date' => 'required|date_format:Y-m-d', 'passes.*.bookings.*.start' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.end' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'], 'passes.*.bookings.*.completed' => 'required|boolean', 'passes.*.start' => 'nullable|date_format:Y-m-d', 'passes.*.expires' => 'nullable|date_format:Y-m-d',
+            ])->validate();
+            try {
+                Cache::put($cacheKey, ['hash' => $hash, 'data' => $data], now()->addMinutes(2));
+            } catch (\Throwable $e) { /* Revalidation remains safe if caching is unavailable. */
+            }
+        }
 
         $today = now('Europe/Madrid')->toDateString();
         foreach ($data['students'] as &$student) {
@@ -40,6 +63,8 @@ class ErpConnection
             }
         }
         unset($student);
+
+        request()->attributes->set('cec.erp.snapshot', ['key' => $memoKey, 'data' => $data]);
 
         return $data;
     }
@@ -60,9 +85,13 @@ class ErpConnection
             return [];
         }
         $students = collect($data['students'])->where('active', true)->keyBy('id');
-        $teachers = User::whereIn('role', ['teacher', 'admin'])->get()->keyBy('id');
+        $candidates = collect($data['passes'])->filter(fn ($p) => $students->has($p['student_id']) && ($user->role === 'admin' || ($user->role === 'teacher' && ($p['teacher_id'] ?? null) === $user->id) || ($user->role === 'student' && $p['student_id'] === $user->erp_student_id)));
+        if ($candidates->isEmpty()) {
+            return [];
+        }
+        $teachers = User::whereIn('id', $candidates->pluck('teacher_id')->filter()->unique())->whereIn('role', ['teacher', 'admin'])->get()->keyBy('id');
         $result = [];
-        foreach ($data['passes'] as $pass) {
+        foreach ($candidates as $pass) {
             $student = $students->get($pass['student_id']);
             if (! $student) {
                 continue;
@@ -221,6 +250,9 @@ class ErpConnection
 
     private static function courses(array $data): void
     {
+        if ((int) DB::table('erp_sync_states')->where('source', 'gestion')->value('revision') === (int) $data['revision']) {
+            return;
+        }
         DB::transaction(function () use ($data) {
             DB::table('erp_sync_states')->insertOrIgnore(['source' => 'gestion', 'revision' => 0]);
             $state = DB::table('erp_sync_states')->where('source', 'gestion')->lockForUpdate()->first();
@@ -253,6 +285,13 @@ class ErpConnection
 
     private static function reconcile(User $user, array $ids): void
     {
+        $expected = array_values(array_unique(array_map('intval', $ids)));
+        $actual = DB::table('enrollments')->where('user_id', $user->id)->where('source_erp', true)->pluck('course_id')->map(fn ($id) => (int) $id)->all();
+        sort($expected);
+        sort($actual);
+        if ($actual === $expected) {
+            return;
+        }
         DB::transaction(function () use ($user, $ids) {
             // Serialize membership changes for this account; retain independent manual enrolments.
             User::whereKey($user->id)->lockForUpdate()->first();

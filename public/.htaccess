@@ -23,3 +23,13 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Static assets only. Authenticated pages, files and APIs keep private/no-store headers.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/css application/javascript application/json image/svg+xml text/html
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|svg|woff2?)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+</IfModule>

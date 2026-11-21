@@ -11,6 +11,7 @@ use App\Services\OnlineLessonRecords;
 use App\Services\ScheduledClasses;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -134,8 +135,8 @@ class OnlineController extends Controller
         $q = DB::table('online_participants')->where('id', $r->input('participant'))->where('online_session_id', $s->id)->where('user_id', $r->user()->id)->whereNull('left_at');
         $p = $q->first();
         abort_unless($p, 403);
-        if ($touch) {
-            $q->update(['seen_at' => now(), 'updated_at' => now()]);
+        if ($touch && Carbon::parse($p->seen_at)->lt(now()->subSeconds(5))) {
+            $q->where('seen_at', '<', now()->subSeconds(5))->update(['seen_at' => now(), 'updated_at' => now()]);
         }
 
         return $p;

@@ -18,6 +18,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Comprobar SEO y recursos públicos
+        run: |
+          python tests/website/check.py
+          node --check website/js/cec-performance.js
       - run: python -m pip install --disable-pip-version-check paramiko==4.0.0
       - name: Publicar conservando copia y verificando contenido
         env:

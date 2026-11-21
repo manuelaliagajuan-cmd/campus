@@ -1,0 +1,44 @@
+
+        /* Cortes corporativos a 45 grados pequeños */
+        .corte-superior-derecho { clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 0 100%); }
+        .boton-corte { clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%); }
+        
+        /* CORTES GIGANTES PARA ROMPER SECCIONES */
+        .corte-inferior-derecho-gigante { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 120px), calc(100% - 120px) 100%, 0 100%); }
+        .corte-superior-derecho-gigante { clip-path: polygon(0 0, calc(100% - 120px) 0, 100% 120px, 100% 100%, 0 100%); }
+        
+        /* Trama de marca discreta (azul al 7%) */
+        .trama-fondo {
+            background-image: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(33, 42, 94, 0.07) 10px, rgba(33, 42, 94, 0.07) 20px);
+        }
+
+        /* =======================================================
+           BLOQUEO DEFINITIVO DE LA BARRA DE GOOGLE TRANSLATE
+           ======================================================= */
+        iframe.goog-te-banner-frame, .goog-te-banner-frame, #google_translate_element, .VIpgJd-ZVi9od-ORHb-OEVmcd {
+            display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important; width: 0 !important; pointer-events: none !important;
+        }
+        body > .skiptranslate { display: none !important; height: 0px !important; min-height: 0px !important; margin: 0px !important; padding: 0px !important; opacity: 0 !important; position: absolute !important; z-index: -1000 !important; }
+        html, body { top: 0px !important; margin-top: 0px !important; padding-top: 0px !important; }
+
+        /* Ocultar barra de desplazamiento en los carruseles horizontales */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Efecto difuminado en los laterales de los carruseles */
+        .mascara-carrusel {
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        /* Animación para el Ticker Infinito */
+        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+        .animate-marquee { animation: marquee 35s linear infinite; }
+        .contenedor-marquee:hover .animate-marquee { animation-play-state: paused; }
+    
+
+.cec-site-brand{width:220px;min-width:220px}.cec-desktop-links{gap:16px!important}.cec-desktop-links>:not([hidden])~:not([hidden]){margin-left:0!important}.cec-desktop-links>a{font-size:14px!important}.cec-desktop-links>a.boton-corte{padding-left:16px!important;padding-right:16px!important}@media(max-width:1279px){nav .cec-desktop-links{display:none!important}nav #btn-menu-movil{display:block!important}.cec-site-brand{width:200px;min-width:200px}}
+.cec-language-menu{position:relative;flex-shrink:0}.cec-language-menu>summary{display:flex;align-items:center;gap:4px;cursor:pointer;list-style:none;padding:8px 0;border-bottom:2px solid transparent;color:#212a5e;font-weight:700}.cec-language-menu>summary::-webkit-details-marker{display:none}.cec-language-menu[open]>summary{border-bottom-color:#212a5e}.cec-language-options{position:absolute;right:0;top:calc(100% + 10px);width:160px;max-height:calc(100svh - 130px);overflow-y:auto;padding:6px;background:#fff;border:1px solid #e7e8ef;border-radius:8px;box-shadow:0 12px 30px #212a5e26;z-index:200}.cec-language-options button{display:block;width:100%;min-height:44px;padding:10px;text-align:left;font-size:14px;font-weight:700;color:#212a5e;border-radius:4px}.cec-language-options button:hover,.cec-language-options button:focus-visible{background:#f0f1f6;outline:2px solid #212a5e;outline-offset:-2px}.cec-buy-link{white-space:nowrap}
+@media(min-width:768px) and (max-width:1199px){nav .md\:flex{gap:14px!important}nav .md\:flex>a{font-size:14px!important}nav .md\:gap-8{gap:14px!important}.cec-buy-link{padding:10px 12px!important}}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}.titulo-animado{opacity:1!important;transform:none!important}}

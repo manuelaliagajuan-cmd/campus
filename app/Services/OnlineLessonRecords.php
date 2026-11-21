@@ -46,7 +46,7 @@ class OnlineLessonRecords
         }
         $ids = DB::table('online_participants')->where('online_session_id', $s->id)->whereNull('left_at')->where('seen_at', '>', now()->subSeconds(40))->pluck('user_id');
         $present = $ids->contains($room['pass']['teacher_id']);
-        if ($present && $s->booking_start_at && now()->betweenIncluded($s->booking_start_at, $s->booking_end_at)) {
+        if ($present && $s->booking_start_at && now()->betweenIncluded($s->booking_start_at, $s->booking_end_at) && (! $s->teacher_seen_at || $s->teacher_seen_at->lt(now()->subSeconds(10)))) {
             $s->update(['teacher_seen_at' => now()]);
         }
         $pupil = User::whereIn('id', $ids)->where('role', 'student')->where('erp_student_id', $s->erp_student_id)->exists();

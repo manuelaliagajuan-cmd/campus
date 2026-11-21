@@ -3,142 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="preload" as="image" href="/img/cec-alicante-clases-poster.webp" fetchpriority="high">
+
     <!-- Optimización SEO Principal -->
-    <title>CEC Alicante | Academia de Español e Inglés - Centro de Estudios Campoamor</title>
-    <meta name="description" content="CEC Alicante (Centro de Estudios Campoamor). Academia de idiomas en Alicante. Cursos de inglés y español para extranjeros, grupos reducidos de máximo 7 alumnos, preparación de exámenes y alquiler de aulas.">
-    <meta name="keywords" content="CEC Alicante, academia de idiomas alicante, aprender español alicante, clases de ingles alicante, centro de estudios campoamor, DELE, Cambridge, actividades culturales">
+    <title>Academia de inglés y español en Alicante | CEC Campoamor</title>
+    <meta name="description" content="Aprende inglés y español en Alicante con cursos presenciales y online, grupos de hasta 7 alumnos y bonos de clases particulares. Consulta horarios y precios.">
     <meta name="author" content="Centro de Estudios Campoamor">
     <link rel="canonical" href="https://cecalicante.es/" />
-    
+
     <!-- Open Graph (Previsualización para Redes Sociales y WhatsApp) -->
-    <meta property="og:title" content="CEC Alicante | Academia de Español e Inglés">
-    <meta property="og:description" content="Academia de idiomas en Alicante. Grupos reducidos, atención personalizada y preparación de exámenes oficiales.">
+    <meta property="og:title" content="Academia de inglés y español en Alicante | CEC Campoamor">
+    <meta property="og:description" content="Aprende inglés y español en Alicante con cursos presenciales y online, grupos de hasta 7 alumnos y bonos de clases particulares. Consulta horarios y precios.">
     <meta property="og:image" content="https://cecalicante.es/img/cec-provisional-sobre-nosotros-1200.jpg">
     <meta property="og:url" content="https://cecalicante.es/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="CEC Alicante">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="index,follow,max-image-preview:large">
 
     <!-- Schema.org JSON-LD para SEO Local y Reconocimiento de Marca -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
-      "name": "Centro de Estudios Campoamor",
-      "alternateName": ["CEC Alicante", "CEC"],
-      "url": "https://cecalicante.es",
-      "logo": "https://cecalicante.es/img/logo.svg",
-      "description": "Academia de idiomas en Alicante especializada en clases de inglés y español para extranjeros con grupos muy reducidos y actividades culturales.",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Calle Teniente Llorca, 4",
-        "addressLocality": "Alicante",
-        "postalCode": "03009",
-        "addressCountry": "ES"
-      },
-      "telephone": "+34966221516",
-      "email": "info@cecalicante.es",
-      "sameAs": [
-        "https://instagram.com/cecalicante"
-      ],
-      "offers": {
-        "@type": "AggregateOffer",
-        "offerCount": "5",
-        "priceCurrency": "EUR",
-        "description": "Cursos de idiomas, preparación de exámenes, actividades culturales y alquiler de aulas."
-      }
-    }
-    </script>
-    
+{"@context":"https://schema.org","@graph":[{"@type":"EducationalOrganization","@id":"https://cecalicante.es/#centro","name":"Centro de Estudios Campoamor","alternateName":["CEC Alicante","CEC Campoamor"],"url":"https://cecalicante.es/","logo":"https://cecalicante.es/img/logo.svg","description":"Academia de inglés y español en Alicante con cursos presenciales y online, grupos reducidos y bonos de clases particulares.","address":{"@type":"PostalAddress","streetAddress":"Calle Teniente Llorca, 4","addressLocality":"Alicante","postalCode":"03009","addressCountry":"ES"},"telephone":"+34966221516","email":"info@cecalicante.es","sameAs":["https://instagram.com/cecalicante"]},{"@type":"WebSite","@id":"https://cecalicante.es/#web","url":"https://cecalicante.es/","name":"CEC Alicante","publisher":{"@id":"https://cecalicante.es/#centro"}},{"@type":"WebPage","@id":"https://cecalicante.es/#pagina","url":"https://cecalicante.es/","name":"Academia de inglés y español en Alicante | CEC Campoamor","description":"Aprende inglés y español en Alicante con cursos presenciales y online, grupos de hasta 7 alumnos y bonos de clases particulares. Consulta horarios y precios.","inLanguage":"es","isPartOf":{"@id":"https://cecalicante.es/#web"},"about":{"@id":"https://cecalicante.es/#centro"}}]}
+</script>
+
     <!-- Favicon para modo CLARO (El navegador es blanco/gris) -->
     <link rel="icon" type="image/svg+xml" href="img/favicon-blanco.svg" media="(prefers-color-scheme: light)">
-    
+
     <!-- Favicon para modo OSCURO (El navegador es oscuro/negro) -->
     <link rel="icon" type="image/svg+xml" href="img/favicon-oscuro.svg" media="(prefers-color-scheme: dark)">
-    
+
     <!-- Favicon "Plan B" en formato ICO para navegadores antiguos -->
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
-    
-    <!-- Cargamos Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        /* PALETA DE COLOR CORPORATIVA COMPLETA (Sección 8.1 y 8.2) */
-                        campoamor: '#212A5E',    /* 100% */
-                        campoamor80: '#4D557E',  /* 80% */
-                        campoamor60: '#7A7F9E',  /* 60% */
-                        campoamor40: '#A6AABF',  /* 40% */
-                        campoamor20: '#D3D4DF',  /* 20% */
-                        campoamor10: '#E9EAEF',  /* 10% */
-                    },
-                    fontFamily: {
-                        /* Uso oficial de Arial como tipografía de sustitución (Sección 9.4) */
-                        sans: ['Arial', 'Helvetica', 'sans-serif'],
-                    },
-                    /* Jerarquia tipografica corporativa (Sec 9.2 y 9.3) */
-                    fontSize: {
-                        'impacto': ['48px', '1.15'],
-                        't1': ['39px', '1.15'],
-                        't2': ['31px', '1.2'],
-                        't3': ['25px', '1.3'],
-                        'entradilla': ['20px', '1.5'],
-                        'texto': ['16px', '1.5'],
-                        'nota': ['13px', '1.5'],
-                    },
-                    letterSpacing: {
-                        'titulares': '0.02em', /* +2% exigido por manual para mayusculas */
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Cortes corporativos a 45 grados pequeños */
-        .corte-superior-derecho { clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 0 100%); }
-        .boton-corte { clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%); }
-        
-        /* CORTES GIGANTES PARA ROMPER SECCIONES */
-        .corte-inferior-derecho-gigante { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 120px), calc(100% - 120px) 100%, 0 100%); }
-        .corte-superior-derecho-gigante { clip-path: polygon(0 0, calc(100% - 120px) 0, 100% 120px, 100% 100%, 0 100%); }
-        
-        /* Trama de marca discreta (azul al 7%) */
-        .trama-fondo {
-            background-image: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(33, 42, 94, 0.07) 10px, rgba(33, 42, 94, 0.07) 20px);
-        }
+    <link rel="stylesheet" href="/css/cec-site.425ceee8d72d.css">
+    <script src="/js/cec-performance.js?v=1" defer></script>
 
-        /* =======================================================
-           BLOQUEO DEFINITIVO DE LA BARRA DE GOOGLE TRANSLATE
-           ======================================================= */
-        iframe.goog-te-banner-frame, .goog-te-banner-frame, #google_translate_element, .VIpgJd-ZVi9od-ORHb-OEVmcd {
-            display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important; width: 0 !important; pointer-events: none !important;
-        }
-        body > .skiptranslate { display: none !important; height: 0px !important; min-height: 0px !important; margin: 0px !important; padding: 0px !important; opacity: 0 !important; position: absolute !important; z-index: -1000 !important; }
-        html, body { top: 0px !important; margin-top: 0px !important; padding-top: 0px !important; }
 
-        /* Ocultar barra de desplazamiento en los carruseles horizontales */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Efecto difuminado en los laterales de los carruseles */
-        .mascara-carrusel {
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-        }
-
-        /* Animación para el Ticker Infinito */
-        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
-        .animate-marquee { animation: marquee 35s linear infinite; }
-        .contenedor-marquee:hover .animate-marquee { animation-play-state: paused; }
-    </style>
-<style>
-.cec-site-brand{width:220px;min-width:220px}.cec-desktop-links{gap:16px!important}.cec-desktop-links>:not([hidden])~:not([hidden]){margin-left:0!important}.cec-desktop-links>a{font-size:14px!important}.cec-desktop-links>a.boton-corte{padding-left:16px!important;padding-right:16px!important}@media(max-width:1279px){nav .cec-desktop-links{display:none!important}nav #btn-menu-movil{display:block!important}.cec-site-brand{width:200px;min-width:200px}}
-.cec-language-menu{position:relative;flex-shrink:0}.cec-language-menu>summary{display:flex;align-items:center;gap:4px;cursor:pointer;list-style:none;padding:8px 0;border-bottom:2px solid transparent;color:#212a5e;font-weight:700}.cec-language-menu>summary::-webkit-details-marker{display:none}.cec-language-menu[open]>summary{border-bottom-color:#212a5e}.cec-language-options{position:absolute;right:0;top:calc(100% + 10px);width:160px;max-height:calc(100svh - 130px);overflow-y:auto;padding:6px;background:#fff;border:1px solid #e7e8ef;border-radius:8px;box-shadow:0 12px 30px #212a5e26;z-index:200}.cec-language-options button{display:block;width:100%;min-height:44px;padding:10px;text-align:left;font-size:14px;font-weight:700;color:#212a5e;border-radius:4px}.cec-language-options button:hover,.cec-language-options button:focus-visible{background:#f0f1f6;outline:2px solid #212a5e;outline-offset:-2px}.cec-buy-link{white-space:nowrap}
-@media(min-width:768px) and (max-width:1199px){nav .md\:flex{gap:14px!important}nav .md\:flex>a{font-size:14px!important}nav .md\:gap-8{gap:14px!important}.cec-buy-link{padding:10px 12px!important}}
-</style>
+<noscript><link rel="stylesheet" href="/css/cec-no-script.css"></noscript>
 </head>
 <body class="bg-white text-campoamor antialiased relative text-left">
 
@@ -150,10 +51,10 @@
                 <a href="/" class="cec-site-brand flex-shrink-0 flex items-center hover:opacity-80 transition overflow-visible h-full py-2">
                     <img src="img/logo.svg" alt="Logotipo CEC Alicante - Centro de Estudios Campoamor" class="h-10 md:h-12 w-auto transform scale-[3.5] md:scale-[4.5] origin-left my-2">
                 </a>
-                
+
                 <!-- Contenedor Derecho -->
                 <div class="flex items-center gap-3 md:gap-8">
-                    
+
                     <!-- Menú de Enlaces (Oculto en móvil, visible en PC) -->
                     <div class="cec-desktop-links hidden md:flex space-x-6 lg:space-x-8 items-center">
                         <a href="#nosotros" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Nosotros</a>
@@ -161,7 +62,7 @@
                         <a href="#actividades" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Actividades</a>
                         <a href="#faqs" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">FAQs</a>
                         <a href="#aulas" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Aulas</a>
-                        
+
                         <a href="/#contacto" class="text-campoamor text-texto font-bold hover:text-campoamor60 transition">Contactar</a>
 
                         <!-- Botón Acceso al Campus Virtual -->
@@ -174,7 +75,7 @@
                             Ver planes
                         </a>
                     </div>
-                    
+
                     <!-- Menú de Idiomas Personalizado -->
                     <details class="cec-language-menu notranslate"><summary aria-label="Cambiar idioma"><svg class="w-6 h-6 md:w-5 md:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="hidden sm:inline">Idioma</span></summary><div class="cec-language-options"><button type="button" onclick="cambiarIdioma('es')" lang="es" dir="auto">Español</button><button type="button" onclick="cambiarIdioma('en')" lang="en" dir="auto">English</button><button type="button" onclick="cambiarIdioma('fr')" lang="fr" dir="auto">Français</button><button type="button" onclick="cambiarIdioma('ru')" lang="ru" dir="auto">Русский</button><button type="button" onclick="cambiarIdioma('uk')" lang="uk" dir="auto">Українська</button><button type="button" onclick="cambiarIdioma('ar')" lang="ar" dir="auto">العربية</button><button type="button" onclick="cambiarIdioma('hi')" lang="hi" dir="auto">हिन्दी</button><button type="button" onclick="cambiarIdioma('zh-CN')" lang="zh-CN" dir="auto">中文</button></div></details>
 
@@ -208,8 +109,8 @@
 
     <!-- Sección Hero con VÍDEO DE FONDO -->
     <header class="relative overflow-hidden h-[85vh] min-h-[600px] flex items-center bg-black fondo-oscuro">
-        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none">
-            <source src="img/video-hero.mp4" type="video/mp4">
+        <video autoplay loop muted playsinline preload="none" poster="/img/cec-alicante-clases-poster.webp" data-cec-hero-video class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none">
+            <source data-src="/img/cec-alicante-clases-720p.mp4" type="video/mp4">
         </video>
         <!-- Filtro negro al 40% neutro en vez del filtro azulado -->
         <div class="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
@@ -217,21 +118,21 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full text-left">
             <div class="max-w-3xl">
                 <!-- Bloque interactivo de Matrícula Abierta con colores de la paleta oficial al hacer hover -->
-                <div class="group cursor-default mb-6 flex flex-col items-start titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out">
+                <div class="group cursor-default mb-6 flex flex-col items-start titulo-animado transition-all duration-1000 ease-out">
                     <span class="text-white group-hover:text-campoamor40 transition-colors duration-300 font-bold text-nota uppercase tracking-titulares drop-shadow-md">Matrícula abierta</span>
                     <span class="text-white group-hover:text-campoamor20 transition-colors duration-300 font-normal text-nota uppercase mt-1 mb-3 tracking-titulares drop-shadow-md">Curso 2026-2027</span>
                     <div class="h-1 w-24 bg-white group-hover:bg-campoamor40 transition-colors duration-300 transform -skew-x-12"></div>
                 </div>
-                
+
                 <!-- H1 OPTIMIZADO PARA SEO CON MARCA -->
-                <h1 class="text-impacto font-black text-white mb-6 uppercase tracking-titulares titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-100 drop-shadow-md">
+                <h1 class="text-impacto font-black text-white mb-6 uppercase tracking-titulares titulo-animado transition-all duration-1000 ease-out delay-100 drop-shadow-md">
                     <span class="block text-t3 text-campoamor10 mb-2 font-bold tracking-titulares uppercase">CEC ALICANTE</span>
                     Clases de <br>Español e Inglés
                 </h1>
-                <p class="text-entradilla font-normal text-campoamor10 mb-10 max-w-2xl titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-200 drop-shadow-sm">
+                <p class="text-entradilla font-normal text-campoamor10 mb-10 max-w-2xl titulo-animado transition-all duration-1000 ease-out delay-200 drop-shadow-sm">
                     Cursos y bonos de clases presenciales u online, con método, rigor y cercanía. Aprende desde Alicante o desde donde estés, a tu ritmo y con nuestro profesorado.
                 </p>
-                <div class="titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300">
+                <div class="titulo-animado transition-all duration-1000 ease-out delay-300">
                     <a href="#cursos" class="inline-block boton-corte bg-campoamor text-white px-10 py-4 font-bold text-texto hover:bg-campoamor80 transition shadow-2xl">
                         Ver cursos
                     </a>
@@ -248,14 +149,14 @@
                     <span class="font-bold text-t3 text-campoamor80 mb-2 block uppercase tracking-titulares titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out">Academia CEC Alicante</span>
                     <h2 class="text-t1 font-extrabold text-campoamor mb-6 uppercase tracking-titulares titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-100">Quiénes Somos</h2>
                     <div class="h-1 w-24 bg-campoamor mt-4 mb-8 transform -skew-x-12 titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-200"></div>
-                    
+
                     <p class="text-texto font-normal text-black mb-6 titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300 max-w-2xl">
                         El <strong>Centro de Estudios Campoamor (CEC Alicante)</strong> nació con la vocación de ofrecer una enseñanza de idiomas rigurosa, cercana y enfocada en resultados reales. Ubicados en el corazón de Alicante, acompañamos a estudiantes locales e internacionales en su aprendizaje.
                     </p>
                     <p class="text-texto font-normal text-black mb-8 titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300 max-w-2xl">
                         No creemos en las clases masificadas. Apostamos firmemente por grupos muy reducidos y una atención completamente personalizada para que cada alumno aproveche al máximo su tiempo, pierda el miedo a hablar y supere sus exámenes oficiales con confianza.
                     </p>
-                    
+
                     <div class="grid grid-cols-2 gap-6 titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-400">
                         <div class="border-l-4 border-campoamor pl-4">
                             <p class="text-t2 font-bold text-campoamor uppercase tracking-titulares">20€</p>
@@ -267,9 +168,9 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="corte-superior-derecho h-full min-h-[400px] bg-campoamor10 relative shadow-xl titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-200">
-                    <img src="img/cec-provisional-sobre-nosotros-1200.jpg" srcset="img/cec-provisional-sobre-nosotros-600.jpg 600w, img/cec-provisional-sobre-nosotros-1200.jpg 1200w" sizes="(min-width: 1024px) 700px, 90vw" width="1200" height="900" loading="lazy" decoding="async" alt="Estudiantes trabajando en grupo" class="w-full h-full object-cover">
+                    <picture class="contents"><source type="image/webp" srcset="img/cec-provisional-sobre-nosotros-600.webp 600w, img/cec-provisional-sobre-nosotros-1200.webp 1200w" sizes="(min-width: 1024px) 700px, 90vw"><img src="img/cec-provisional-sobre-nosotros-1200.jpg" srcset="img/cec-provisional-sobre-nosotros-600.jpg 600w, img/cec-provisional-sobre-nosotros-1200.jpg 1200w" sizes="(min-width: 1024px) 700px, 90vw" width="1200" height="900" loading="lazy" decoding="async" alt="Estudiantes trabajando en grupo" class="w-full h-full object-cover"></picture>
                 </div>
             </div>
         </div>
@@ -411,21 +312,21 @@
                             Salidas a la Isla de Tabarca, rutas por el Castillo de Santa Bárbara y visitas guiadas para descubrir Alicante mientras practicas el idioma.
                         </p>
                     </div>
-                    
+
                     <div class="bg-campoamor10 p-8 corte-superior-derecho shadow-xl titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-200 hover:-translate-y-2 duration-300 flex flex-col h-full">
                         <h3 class="text-t3 font-bold text-campoamor mb-3 uppercase tracking-titulares">Club de Lectura</h3>
                         <p class="text-texto font-normal text-black mb-4 flex-grow">
                             Encuentros mensuales para debatir sobre libros adaptados a tu nivel. Mejora tu vocabulario y comprensión lectora en grupo.
                         </p>
                     </div>
-                    
+
                     <div class="bg-campoamor10 p-8 corte-superior-derecho shadow-xl titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300 hover:-translate-y-2 duration-300 flex flex-col h-full">
                         <h3 class="text-t3 font-bold text-campoamor mb-3 uppercase tracking-titulares">Mar y Deporte</h3>
                         <p class="text-texto font-normal text-black mb-4 flex-grow">
                             Salidas al mar en kayak y pádel surf por la costa alicantina. Una forma divertida y dinámica de socializar en español e inglés.
                         </p>
                     </div>
-                    
+
                     <div class="bg-campoamor fondo-oscuro p-8 corte-superior-derecho shadow-xl titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-400 hover:-translate-y-2 duration-300 flex flex-col h-full text-white">
                         <h3 class="text-t3 font-bold text-white mb-3 uppercase tracking-titulares">Campus</h3>
                         <p class="text-texto font-normal text-campoamor10 mb-4 flex-grow">
@@ -433,21 +334,21 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Carrusel fotográfico de actividades -->
                 <div class="relative group overflow-hidden mascara-carrusel titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-200 w-full">
                     <div id="slider-actividades" class="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth w-full py-8 items-center px-[10vw] md:px-[calc(50%-300px)] lg:px-[calc(50%-350px)]">
                         <div class="snap-center w-[80vw] md:w-[600px] lg:w-[700px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/cec-provisional-actividad-tabarca-1400.jpg" srcset="img/cec-provisional-actividad-tabarca-700.jpg 700w, img/cec-provisional-actividad-tabarca-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Costa de Tabarca" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-provisional-actividad-tabarca-700.webp 700w, img/cec-provisional-actividad-tabarca-1400.webp 1400w" sizes="(min-width: 1024px) 700px, 90vw"><img src="img/cec-provisional-actividad-tabarca-1400.jpg" srcset="img/cec-provisional-actividad-tabarca-700.jpg 700w, img/cec-provisional-actividad-tabarca-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Costa de Tabarca" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[600px] lg:w-[700px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/cec-provisional-actividad-lectura-1400.jpg" srcset="img/cec-provisional-actividad-lectura-700.jpg 700w, img/cec-provisional-actividad-lectura-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Club de lectura en inglés y español" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-provisional-actividad-lectura-700.webp 700w, img/cec-provisional-actividad-lectura-1400.webp 1400w" sizes="(min-width: 1024px) 700px, 90vw"><img src="img/cec-provisional-actividad-lectura-1400.jpg" srcset="img/cec-provisional-actividad-lectura-700.jpg 700w, img/cec-provisional-actividad-lectura-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Club de lectura en inglés y español" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[600px] lg:w-[700px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/cec-provisional-actividad-kayak-1400.jpg" srcset="img/cec-provisional-actividad-kayak-700.jpg 700w, img/cec-provisional-actividad-kayak-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Actividad de kayak en el mar" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-provisional-actividad-kayak-700.webp 700w, img/cec-provisional-actividad-kayak-1400.webp 1400w" sizes="(min-width: 1024px) 700px, 90vw"><img src="img/cec-provisional-actividad-kayak-1400.jpg" srcset="img/cec-provisional-actividad-kayak-700.jpg 700w, img/cec-provisional-actividad-kayak-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Actividad de kayak en el mar" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[600px] lg:w-[700px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/cec-provisional-actividad-campus-1400.jpg" srcset="img/cec-provisional-actividad-campus-700.jpg 700w, img/cec-provisional-actividad-campus-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Aprendizaje en grupo" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-provisional-actividad-campus-700.webp 700w, img/cec-provisional-actividad-campus-1400.webp 1400w" sizes="(min-width: 1024px) 700px, 90vw"><img src="img/cec-provisional-actividad-campus-1400.jpg" srcset="img/cec-provisional-actividad-campus-700.jpg 700w, img/cec-provisional-actividad-campus-1400.jpg 1400w" sizes="(min-width: 1024px) 700px, 90vw" width="1400" height="640" loading="lazy" decoding="async" alt="Aprendizaje en grupo" class="w-full h-64 md:h-80 object-cover shadow-xl corte-superior-derecho cursor-pointer hover:scale-105 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300"></picture>
                         </div>
                     </div>
                     <button onclick="moverActividadManual(-1)" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white text-campoamor w-12 h-12 flex items-center justify-center rounded-full shadow-xl font-bold opacity-0 group-hover:opacity-100 hover:scale-110 transition-all z-10 hidden md:flex">❮</button>
@@ -594,7 +495,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                     <div class="corte-superior-derecho h-80 bg-white titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out">
-                        <img src="img/aula-limpia.jpg" alt="Aulas disponibles para alquilar en la academia CEC Alicante" class="w-full h-full object-cover">
+                        <picture class="contents"><source type="image/webp" srcset="img/cec-aula-alicante.webp"><img src="img/aula-limpia.jpg" alt="Aulas disponibles para alquilar en la academia CEC Alicante" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1400" height="934"></picture>
                     </div>
                     <div>
                         <span class="font-bold text-t3 text-campoamor60 mb-2 block uppercase tracking-titulares titulo-animado opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-100">¿Eres profesor?</span>
@@ -620,16 +521,16 @@
                 <div class="relative group overflow-hidden mascara-carrusel w-full">
                     <div id="slider-posts" class="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth w-full py-8 items-center px-[10vw] md:px-[calc(50%-200px)] lg:px-[calc(50%-225px)]">
                         <div class="snap-center w-[80vw] md:w-[400px] lg:w-[450px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/post-espanol.png" alt="Cursos de Español para extranjeros en CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-cursos-espanol-alicante.webp"><img src="img/post-espanol.png" alt="Cursos de Español para extranjeros en CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white" loading="lazy" decoding="async" width="1080" height="1080"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[400px] lg:w-[450px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/post-ingles.png" alt="Cursos de Inglés certificados en CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-cursos-ingles-alicante.webp"><img src="img/post-ingles.png" alt="Cursos de Inglés certificados en CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white" loading="lazy" decoding="async" width="1080" height="1080"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[400px] lg:w-[450px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/post-aulas.png" alt="Servicio de alquiler de aulas CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-alquiler-aulas-alicante.webp"><img src="img/post-aulas.png" alt="Servicio de alquiler de aulas CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white" loading="lazy" decoding="async" width="1080" height="1080"></picture>
                         </div>
                         <div class="snap-center w-[80vw] md:w-[400px] lg:w-[450px] shrink-0 flex justify-center relative z-0 hover:z-10 transition-all duration-300">
-                            <img src="img/post-matricula.png" alt="Apertura de matrícula CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white">
+                            <picture class="contents"><source type="image/webp" srcset="img/cec-matricula-cursos-alicante.webp"><img src="img/post-matricula.png" alt="Apertura de matrícula CEC Alicante" class="w-full h-auto object-contain shadow-xl border-2 border-campoamor60 cursor-pointer hover:scale-105 hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)] hover:-translate-y-1 transition-all duration-300 bg-white" loading="lazy" decoding="async" width="1080" height="1080"></picture>
                         </div>
                     </div>
                     <button onclick="moverPostManual(-1)" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white text-campoamor w-12 h-12 flex items-center justify-center rounded-full shadow-xl font-bold opacity-0 group-hover:opacity-100 hover:scale-110 transition-all z-10 hidden md:flex">❮</button>
@@ -651,7 +552,7 @@
                 <input type="hidden" name="_subject" value="Nuevo mensaje desde la web de CEC Alicante">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_next" value="https://cecalicante.es/gracias">
-                
+
                 <div class="mb-6">
                     <label for="nombre" class="block text-nota font-bold text-campoamor mb-2 uppercase tracking-titulares">Nombre completo</label>
                     <input type="text" id="nombre" name="Nombre" required class="w-full px-4 py-3 border border-campoamor60 focus:outline-none focus:border-campoamor focus:ring-1 focus:ring-campoamor bg-white text-campoamor text-texto">
@@ -703,7 +604,7 @@
                 <p class="text-texto font-normal text-campoamor10 mb-6 max-w-xs">
                     Acompañando a los alumnos en el aprendizaje de idiomas con rigor y cercanía en Alicante.
                 </p>
-                
+
                 <div class="mb-8">
                     <a href="https://instagram.com/cecalicante" target="_blank" class="inline-flex items-center text-campoamor10 hover:text-white transition group">
                         <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -722,25 +623,25 @@
                     <p class="text-nota font-normal text-campoamor10">Sábados: 9:00 - 14:00</p>
                 </div>
             </div>
-            
+
             <div>
                 <h3 class="text-entradilla font-bold mb-6 flex items-center">
                     <span class="w-2 h-2 bg-white transform rotate-45 mr-3"></span> Contacto
                 </h3>
-                
+
                 <div class="mb-8 space-y-2 text-texto font-normal">
                     <p>Calle Teniente Llorca, 4<br>03009 Alicante, España</p>
                     <p class="font-bold"><a href="tel:+34966221516" class="hover:text-campoamor60 transition cursor-pointer">966 22 15 16</a></p>
                     <p class="font-bold"><a href="mailto:info@cecalicante.es" class="hover:text-campoamor60 transition cursor-pointer">info@cecalicante.es</a></p>
                 </div>
-                
+
                 <div class="boton-corte overflow-hidden shadow-lg border border-white/10 h-32 w-full">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3128.78517432987!2d-0.48979642356693726!3d38.3539539785857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6237ab3904eaa9%3A0x6651a8028a44e813!2sC.%20Teniente%20Llorca%2C%204%2C%2003009%20Alicante!5e0!3m2!1ses!2ses!4v1791133835151!5m2!1ses!2ses" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
+                    <iframe title="Ubicación del Centro de Estudios Campoamor en Alicante" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3128.78517432987!2d-0.48979642356693726!3d38.3539539785857!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd6237ab3904eaa9%3A0x6651a8028a44e813!2sC.%20Teniente%20Llorca%2C%204%2C%2003009%20Alicante!5e0!3m2!1ses!2ses!4v1791133835151!5m2!1ses!2ses"
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe>
                 </div>
@@ -784,7 +685,7 @@
         function comprobarCookies() {
             const estadoCookies = localStorage.getItem('cookiesAceptadas');
             const banner = document.getElementById('cookie-banner');
-            
+
             if (!estadoCookies) {
                 banner.classList.remove('hidden');
                 setTimeout(() => banner.classList.remove('translate-y-full'), 100);
@@ -844,19 +745,16 @@
 
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
-                pageLanguage: 'es', 
-                includedLanguages: 'es,ru,fr,ar,hi,en,uk,zh-CN', 
+                pageLanguage: 'es',
+                includedLanguages: 'es,ru,fr,ar,hi,en,uk,zh-CN',
                 autoDisplay: false
             }, 'google_translate_element');
+            window.cecApplyRequestedLanguage?.();
         }
 
         function cambiarIdioma(langCode) {
             document.querySelectorAll('.cec-language-menu').forEach(menu=>menu.open=false);
-            var selectElement = document.querySelector('.goog-te-combo');
-            if (selectElement) {
-                selectElement.value = langCode;
-                selectElement.dispatchEvent(new Event('change'));
-            }
+            window.cecLoadTranslation(langCode);
         }
 
         // CONTROL CARRUSEL POSTS
@@ -867,8 +765,8 @@
             if (!sliderPosts) return;
             const primeraTarjeta = sliderPosts.firstElementChild;
             if (!primeraTarjeta) return;
-            
-            const gap = 24; 
+
+            const gap = 24;
             const itemWidth = primeraTarjeta.offsetWidth + gap;
 
             if (sliderPosts.scrollLeft + sliderPosts.clientWidth >= sliderPosts.scrollWidth - 50) {
@@ -898,7 +796,7 @@
             sliderPosts.parentElement.addEventListener('mouseenter', () => clearInterval(postsInterval));
             sliderPosts.parentElement.addEventListener('mouseleave', iniciarCarruselPosts);
         }
-        
+
         if (sliderPosts) {
             sliderPosts.addEventListener('touchstart', () => clearInterval(postsInterval), {passive: true});
             sliderPosts.addEventListener('touchend', iniciarCarruselPosts, {passive: true});
@@ -912,7 +810,7 @@
             if (!sliderActividades) return;
             const primeraTarjeta = sliderActividades.firstElementChild;
             if (!primeraTarjeta) return;
-            const gap = 24; 
+            const gap = 24;
             const itemWidth = primeraTarjeta.offsetWidth + gap;
             if (sliderActividades.scrollLeft + sliderActividades.clientWidth >= sliderActividades.scrollWidth - 50) {
                 sliderActividades.scrollTo({ left: 0, behavior: 'smooth' });
@@ -932,7 +830,7 @@
 
         function iniciarCarruselActividades() {
             clearInterval(actividadesInterval);
-            actividadesInterval = setInterval(autoScrollActividades, 3000); 
+            actividadesInterval = setInterval(autoScrollActividades, 3000);
         }
 
         iniciarCarruselActividades();
@@ -941,7 +839,7 @@
             sliderActividades.parentElement.addEventListener('mouseenter', () => clearInterval(actividadesInterval));
             sliderActividades.parentElement.addEventListener('mouseleave', iniciarCarruselActividades);
         }
-        
+
         if (sliderActividades) {
             sliderActividades.addEventListener('touchstart', () => clearInterval(actividadesInterval), {passive: true});
             sliderActividades.addEventListener('touchend', iniciarCarruselActividades, {passive: true});
@@ -950,7 +848,7 @@
         // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 const destino = document.querySelector(this.getAttribute('href'));
                 if (destino) {
                     destino.scrollIntoView({ behavior: 'smooth' });
@@ -964,7 +862,7 @@
             btn.addEventListener('click', () => {
                 const content = btn.nextElementSibling;
                 const icon = btn.querySelector('svg');
-                
+
                 document.querySelectorAll('.faq-content').forEach(otherContent => {
                     if (otherContent !== content && otherContent.style.maxHeight) {
                         otherContent.style.maxHeight = null;
@@ -1004,8 +902,7 @@
             });
         }
     </script>
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    
+
     <!-- BOTÓN VOLVER ARRIBA -->
     <button id="btn-arriba" onclick="subirArriba()" class="fixed bottom-6 left-6 md:bottom-8 md:left-8 p-3 md:p-4 rounded-full shadow-2xl hover:-translate-y-2 transition-all duration-300 z-50 opacity-0 invisible flex items-center justify-center cursor-pointer border-2 border-transparent">
         <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1032,12 +929,12 @@
         const btnArriba = document.getElementById('btn-arriba');
         const btnWhatsapp = document.getElementById('btn-whatsapp');
         const waTooltip = document.getElementById('wa-tooltip');
-        
+
         const zonasOscuras = document.querySelectorAll('.fondo-oscuro');
-        
+
         const btnNormal = ['bg-campoamor', 'text-white', 'hover:bg-campoamor80'];
         const tooltipNormal = ['bg-campoamor', 'text-white'];
-        
+
         const btnInvertido = ['bg-white', 'text-campoamor', 'hover:bg-campoamor10'];
         const tooltipInvertido = ['bg-white', 'text-campoamor'];
 
@@ -1060,7 +957,7 @@
             const rect = elemento.getBoundingClientRect();
             const centroY = rect.top + (rect.height / 2);
             const centroX = rect.left + (rect.width / 2);
-            
+
             let sobreOscuro = false;
             zonasOscuras.forEach(sec => {
                 const secRect = sec.getBoundingClientRect();
@@ -1094,22 +991,22 @@
         function mostrarTooltip() {
             if (waTooltip && !isTooltipShowing) {
                 isTooltipShowing = true;
-                
+
                 waTooltip.classList.remove('opacity-0', 'translate-x-4');
                 waTooltip.classList.add('opacity-100', 'translate-x-0');
-                
+
                 setTimeout(() => {
                     waTooltip.classList.remove('opacity-100', 'translate-x-0');
                     waTooltip.classList.add('opacity-0', 'translate-x-4');
                     isTooltipShowing = false;
-                }, 4000); 
+                }, 4000);
             }
         }
 
         function resetearInactividad() {
             clearTimeout(inactividadTimer);
             if (!isTooltipShowing) {
-                inactividadTimer = setTimeout(mostrarTooltip, 10000); 
+                inactividadTimer = setTimeout(mostrarTooltip, 10000);
             }
         }
 

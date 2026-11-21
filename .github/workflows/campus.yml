@@ -82,9 +82,56 @@ jobs:
             ${{ runner.temp }}/classroom-php.log
             ${{ runner.temp }}/classroom-relay-php.log
             ${{ runner.temp }}/coturn*.log
+  performance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: capacity-test-only
+          MYSQL_DATABASE: cec_performance
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pcapacity-test-only"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: cec_performance
+      DB_USERNAME: root
+      DB_PASSWORD: capacity-test-only
+      SESSION_DRIVER: database
+      SESSION_ENCRYPT: 'true'
+      CACHE_STORE: file
+      CEC_ERP_PROJECTION_PATH: ${{ runner.temp }}/cec-capacity-private/campus.php
+      CEC_PERF_ALLOW_SEED: '1'
+      CEC_PERF_FIXTURE: ${{ runner.temp }}/cec-capacity-clients.json
+      CEC_PERF_REPORT: ${{ runner.temp }}/cec-capacity-report.json
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Preparar 40 cuentas sintéticas en 20 aulas aisladas
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
+          php tests/performance/seed.php
+      - name: Comprobar concurrencia HTTP con sesiones cifradas y MySQL
+        run: |
+          (cd public && PHP_CLI_SERVER_WORKERS=8 php -d opcache.enable_cli=1 -S 127.0.0.1:8787 "$GITHUB_WORKSPACE/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php") > "$RUNNER_TEMP/cec-capacity-server.log" 2>&1 &
+          for attempt in $(seq 1 20); do curl -fsS http://127.0.0.1:8787/up > /dev/null && break; sleep 1; done
+          python tests/performance/load.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: classroom-capacity-summary
+          path: ${{ runner.temp }}/cec-capacity-report.json
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: test
+    needs: [test, performance]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:

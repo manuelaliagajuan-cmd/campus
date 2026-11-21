@@ -1,0 +1,16 @@
+# BEGIN CEC PERFORMANCE
+<IfModule mod_deflate.c>
+ AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml application/xml text/xml
+</IfModule>
+<IfModule mod_headers.c>
+ <FilesMatch "\.(?:css|js|webp|png|jpe?g|svg|woff2?|mp4)$">
+  Header set Cache-Control "public, max-age=86400"
+ </FilesMatch>
+ <FilesMatch "^cec-site\.[a-f0-9]{12}\.css$">
+  Header set Cache-Control "public, max-age=31536000, immutable"
+ </FilesMatch>
+ <FilesMatch "\.(?:html|xml|txt)$">
+  Header set Cache-Control "public, max-age=0, must-revalidate"
+ </FilesMatch>
+</IfModule>
+# END CEC PERFORMANCE
