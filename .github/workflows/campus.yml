@@ -106,10 +106,10 @@ jobs:
       SESSION_DRIVER: database
       SESSION_ENCRYPT: 'true'
       CACHE_STORE: file
-      CEC_ERP_PROJECTION_PATH: ${{ runner.temp }}/cec-capacity-private/campus.php
+      CEC_ERP_PROJECTION_PATH: ${{ github.workspace }}/storage/app/cec-capacity-private/campus.php
       CEC_PERF_ALLOW_SEED: '1'
-      CEC_PERF_FIXTURE: ${{ runner.temp }}/cec-capacity-clients.json
-      CEC_PERF_REPORT: ${{ runner.temp }}/cec-capacity-report.json
+      CEC_PERF_FIXTURE: ${{ github.workspace }}/storage/app/cec-capacity-clients.json
+      CEC_PERF_REPORT: ${{ github.workspace }}/storage/app/cec-capacity-report.json
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Preparar 40 cuentas sintéticas en 20 aulas aisladas
@@ -128,7 +128,7 @@ jobs:
         if: always()
         with:
           name: classroom-capacity-summary
-          path: ${{ runner.temp }}/cec-capacity-report.json
+          path: ${{ github.workspace }}/storage/app/cec-capacity-report.json
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: [test, performance]
