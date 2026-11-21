@@ -42,12 +42,20 @@ try:
         name=entry.filename
         if name in ('.','..'):continue
         if stat.S_ISDIR(entry.st_mode):
-            row={'directory':name,'KiB':kb(name),'wordpress':exists(name+'/wp-config.php'),'laravel':exists(name+'/artisan')}
+            if name not in ('public','CampusCEC','campus-cec','gestion','.cec-gestion-private'):continue
+            row={'directory':name}
+            try:row['KiB']=kb(name)
+            except RuntimeError:row['size_unavailable']=True
             if name in ('public','CampusCEC','campus-cec','gestion','clickandbuilds'):
                 row['children']=[{'name':e.filename,'directory':stat.S_ISDIR(e.st_mode),'symlink':stat.S_ISLNK(e.st_mode)} for e in ftp.listdir_attr(path(name)) if stat.S_ISDIR(e.st_mode) or stat.S_ISLNK(e.st_mode)]
             inventory.append(row)
         elif stat.S_ISLNK(entry.st_mode):inventory.append({'symlink':name})
     emit('INVENTORY',inventory)
+    if mode=='audit':
+        for rel in ('campus-cec/shared/website-backups','campus-cec/shared/legacy-backups','campus-cec/releases'):
+            if exists(rel):
+                try:emit('DIRECTORY_SIZE',{'directory':rel,'KiB':kb(rel)})
+                except RuntimeError:emit('DIRECTORY_SIZE',{'directory':rel,'size_unavailable':True})
     root='campus-cec'
     if not exists(root+'/.cec-managed') or text(root+'/.cec-managed').strip()!='manuelaliagajuan-cmd/campus':raise RuntimeError('No se reconoce la instalación gestionada.')
     active=ftp.readlink(path(root+'/current'))
