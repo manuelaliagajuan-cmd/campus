@@ -1,5 +1,7 @@
 name: Revisar espacio y limpiar versiones antiguas
 on:
+  push:
+    branches: [audit/cec-storage-20261121]
   workflow_dispatch:
     inputs:
       mode:
@@ -25,5 +27,5 @@ jobs:
           IONOS_HOST: ${{ secrets.IONOS_HOST }}
           IONOS_USER: ${{ secrets.IONOS_USER }}
           IONOS_PASSWORD: ${{ secrets.IONOS_PASSWORD }}
-          MAINTENANCE_MODE: ${{ inputs.mode }}
+          MAINTENANCE_MODE: audit
         run: python scripts/ionos_maintenance.py
