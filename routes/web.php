@@ -95,6 +95,7 @@ Route::middleware(PrivateResponse::class)->group(function () {
         Route::post('/clases-online/{session}/finalizar', [OnlineController::class, 'end'])->name('online.end');
         Route::post('/clases-online/{session}/valorar', [OnlineController::class, 'rate'])->middleware('throttle:online-rate')->name('online.rate');
         Route::get('/mis-accesos', [AccessController::class, 'index'])->name('accesses');
+        Route::post('/mis-accesos/encuesta-bono', [AccessController::class, 'feedback'])->middleware('throttle:10,1')->name('accesses.feedback');
         Route::get('/campus', [CampusController::class, 'dashboard'])->name('dashboard');
         Route::get('/cursos/{course}/cabecera', [CampusController::class, 'cover'])->name('courses.cover');
         Route::get('/cursos/{course}', [CampusController::class, 'course'])->name('courses.show');
