@@ -4,6 +4,7 @@ from pathlib import Path
 import paramiko
 import tempfile
 files={'index.html':Path('website/index.html'),'comprar.html':Path('website/comprar.html'),'js/cec-store.js':Path('website/js/cec-store.js'),'pdf/precios-horarios-ingles-cec-2026-2027.pdf':Path('website/pdf/precios-horarios-ingles-cec-2026-2027.pdf')}
+files['pdf/folleto-informativo.pdf']=Path('website/pdf/folleto-informativo.pdf')
 photo_names=[f'cec-provisional-{kind}-{width}.jpg' for kind in ['sobre-nosotros','actividad-tabarca','actividad-lectura','actividad-kayak','actividad-campus'] for width in ([600,1200] if kind=='sobre-nosotros' else [700,1400])]
 files.update({'img/'+name:Path('website/img')/name for name in photo_names})
 files.update({str(v.relative_to('website')):v for pattern in ['img/*.webp','img/cec-alicante-clases-720p.mp4','css/*.css','js/cec-performance.js','robots.txt','sitemap.xml'] for v in Path('website').glob(pattern)})
@@ -19,7 +20,7 @@ try:
   try:ftp.lstat(p(rel));return True
   except FileNotFoundError:return False
  def read(rel):
-  with ftp.open(p(rel)) as f:return f.read(4194305)
+  with ftp.open(p(rel)) as f:return f.read(32*1024*1024) if rel=='public/pdf/folleto-informativo.pdf' else f.read(4194305)
  def write(rel,data,mode=0o600):
   with ftp.open(p(rel),'wb') as f:f.write(data)
   ftp.chmod(p(rel),mode)
@@ -63,6 +64,7 @@ try:
   if current is not None:
    digest=hashlib.sha256(current).hexdigest();allowed={hashlib.sha256(source.read_bytes()).hexdigest(),manifest.get(name)}
    if name=='index.html':allowed.add(expected_original)
+   if name=='pdf/folleto-informativo.pdf':allowed.add('891a5941ffcd9565d4e9faa848476bf4b1ce1d3703afc7bda56637d0857af45d')
    if name!='.htaccess' and digest not in allowed:raise RuntimeError('Hay cambios no revisados en '+name+'. No se sobrescribirá.')
   elif name=='index.html':raise RuntimeError('No se encontró la web principal.')
  backups='campus-cec/shared/website-backups'

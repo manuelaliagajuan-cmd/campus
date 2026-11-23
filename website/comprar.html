@@ -167,6 +167,7 @@
                     <a href="aviso-legal" class="block hover:text-campoamor60 transition">Aviso Legal</a>
                     <a href="privacidad" class="block hover:text-campoamor60 transition">Política de Privacidad</a>
                     <a href="cookies" class="block hover:text-campoamor60 transition">Política de Cookies</a>
+                    <button type="button" onclick="mostrarPreferencias()">Configurar cookies</button>
                     <a href="https://campus.cecalicante.es" class="block text-campoamor10 font-bold hover:text-white transition pt-4 border-t border-white/10">→ Acceso Campus Virtual</a>
                 </div>
             </div>
@@ -194,6 +195,12 @@
     <script type="text/javascript">
         const GA_TRACKING_ID = 'G-9XBGVMDXZG';
 
+        function mostrarPreferencias() {
+            const banner = document.getElementById('cookie-banner');
+            banner.classList.remove('hidden', 'translate-y-full');
+            banner.querySelector('button').focus();
+        }
+
         function comprobarCookies() {
             const estadoCookies = localStorage.getItem('cookiesAceptadas');
             const banner = document.getElementById('cookie-banner');
@@ -213,7 +220,17 @@
         }
 
         function rechazarCookies() {
+            const estabaActivo = localStorage.getItem('cookiesAceptadas') === 'si';
+            window['ga-disable-' + GA_TRACKING_ID] = true;
             localStorage.setItem('cookiesAceptadas', 'no');
+            for (const cookie of document.cookie.split(';')) {
+                const name = cookie.split('=')[0].trim();
+                if (/^_ga(?:_|$)/.test(name)) {
+                    document.cookie = name + '=; Max-Age=0; Path=/';
+                    document.cookie = name + '=; Max-Age=0; Path=/; Domain=cecalicante.es';
+                }
+            }
+            if (estabaActivo) return location.reload();
             ocultarBannerCookies();
         }
 
@@ -224,7 +241,10 @@
         }
 
         function cargarAnalytics() {
+            window['ga-disable-' + GA_TRACKING_ID] = false;
+            if (document.getElementById('cec-analytics')) return;
             let script = document.createElement('script');
+            script.id = 'cec-analytics';
             script.async = true;
             script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
             document.head.appendChild(script);
