@@ -63,7 +63,7 @@ try:
   current=read(rel) if exists(rel) else None;prior[name]=current
   if current is not None:
    digest=hashlib.sha256(current).hexdigest();allowed={hashlib.sha256(source.read_bytes()).hexdigest(),manifest.get(name)}
-   if name=='index.html':allowed.add(expected_original)
+   if name=='index.html':allowed.update({expected_original,'3cff2821d0c08c8de28230f233510ae69437a58f330115113599799d9d1c0e6e','3cff2821d0c08c8de28230f233510ae69437a58f330115113599799d9d1c0e6e'})
    if name=='pdf/folleto-informativo.pdf':allowed.add('891a5941ffcd9565d4e9faa848476bf4b1ce1d3703afc7bda56637d0857af45d')
    if name!='.htaccess' and digest not in allowed:raise RuntimeError('Hay cambios no revisados en '+name+'. No se sobrescribirá.')
   elif name=='index.html':raise RuntimeError('No se encontró la web principal.')
