@@ -7,7 +7,7 @@ files={'index.html':Path('website/index.html'),'comprar.html':Path('website/comp
 files['pdf/folleto-informativo.pdf']=Path('website/pdf/folleto-informativo.pdf')
 photo_names=[f'cec-provisional-{kind}-{width}.jpg' for kind in ['sobre-nosotros','actividad-tabarca','actividad-lectura','actividad-kayak','actividad-campus'] for width in ([600,1200] if kind=='sobre-nosotros' else [700,1400])]
 files.update({'img/'+name:Path('website/img')/name for name in photo_names})
-files.update({str(v.relative_to('website')):v for pattern in ['img/*.webp','img/cec-alicante-clases-720p.mp4','css/*.css','js/cec-performance.js','robots.txt','sitemap.xml'] for v in Path('website').glob(pattern)})
+files.update({str(v.relative_to('website')):v for pattern in ['img/*.webp','img/cec-alicante-clases-720p.mp4','img/cec-clases-movil.mp4','css/*.css','js/cec-performance.js','robots.txt','sitemap.xml'] for v in Path('website').glob(pattern)})
 expected_original='224e3672baedcdd1b9effb96a582c7305a1f1ae6b999ecb2c1bf61530fe26f26'
 transport=None
 try:

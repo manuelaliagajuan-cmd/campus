@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preload" as="image" href="/img/cec-alicante-clases-poster.webp?v=rdne1" fetchpriority="high">
+    <link rel="preload" as="image" media="(max-width: 767px)" href="/img/cec-clases-movil.webp"><link rel="preload" media="(min-width: 768px)" as="image" href="/img/cec-alicante-clases-poster.webp?v=clase2" fetchpriority="high">
 
     <!-- Optimización SEO Principal -->
     <title>Academia de idiomas en Alicante · Inglés y español | CEC Alicante</title>
@@ -110,9 +110,9 @@
 
     <!-- Sección Hero con VÍDEO DE FONDO -->
     <header class="relative overflow-hidden h-[85vh] min-h-[600px] flex items-center bg-black fondo-oscuro">
-        <video autoplay loop muted playsinline preload="none" poster="/img/cec-alicante-clases-poster.webp?v=rdne1" data-cec-hero-video class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none">
-            <source data-src="/img/cec-alicante-clases-720p.mp4?v=rdne1" type="video/mp4">
-        </video>
+        <video autoplay loop muted playsinline preload="none" poster="/img/cec-alicante-clases-poster.webp?v=clase2" data-cec-hero-video class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none">
+            <source media="(max-width: 767px)" data-src="/img/cec-clases-movil.mp4?v=clase2" type="video/mp4"><source data-src="/img/cec-alicante-clases-720p.mp4?v=clase2" type="video/mp4">
+        </video><script>if(matchMedia('(max-width: 767px)').matches)document.querySelector('[data-cec-hero-video]').poster='/img/cec-clases-movil.webp';</script>
         <!-- Filtro negro al 40% neutro en vez del filtro azulado -->
         <div class="absolute inset-0 bg-black/40 z-10 pointer-events-none"></div>
 
@@ -607,10 +607,10 @@
                         loading="lazy"
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe><h3>Cómo llegar a CEC Alicante</h3><p>Estamos en Campoamor, cerca del ADDA (Auditorio de la Diputación de Alicante) y de la Plaza de Toros.</p><h3>Rutas a pie</h3><ul >
-                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Mercado%20Central%20de%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde Mercado Central</a></li>
-                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Plaza%20de%20los%20Luceros%2C%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde Plaza de los Luceros</a></li>
-                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Palacio%20Provincial%20de%20la%20Diputaci%C3%B3n%20de%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde Palacio de la Diputación de Alicante</a></li>
-                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Altozano%2C%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde Altozano</a></li>
+                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Plaza%20de%20Toros%20de%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde la Plaza de Toros (6 min aprox.)</a></li><li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Mercado%20Central%20de%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde el Mercado Central (9 min aprox.)</a></li>
+                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Plaza%20de%20los%20Luceros%2C%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde la plaza de los Luceros (16 min aprox.)</a></li>
+                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Palacio%20Provincial%20de%20la%20Diputaci%C3%B3n%20de%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde el Palacio de la Diputación (19 min aprox.)</a></li>
+                        <li><a class="underline" href="https://www.google.com/maps/dir/?api=1&amp;origin=Plaza%20de%20Am%C3%A9rica%2C%20Alicante&amp;destination=Calle%20Teniente%20Llorca%204%2C%2003009%20Alicante&amp;travelmode=walking">Desde Altozano, plaza de América (10 min aprox.)</a></li>
                     </ul></section>
 <section><h2>Enlaces de interés</h2><ul><li><a href="https://campus.cecalicante.es">Acceso al Campus Virtual</a></li><li><a href="aviso-legal">Aviso legal</a></li><li><a href="privacidad">Política de privacidad</a></li><li><a href="cookies">Política de cookies</a></li><li><button type="button" onclick="mostrarPreferencias()">Configurar cookies</button></li></ul></section>
 </div><p class="cec-copy">© 2026 Centro de Estudios Campoamor (CEC Alicante).</p></div></footer>
